@@ -15,7 +15,7 @@ Regras curtas para 5 pessoas mexerem no mesmo projeto Unity sem quebrar o trabal
 4. Abra um PR para `main` com `Closes #12` na descrição. Precisa de **1 aprovação**.
 5. Quem aprovou faz o merge com **Squash and merge**. A branch é apagada.
 
-A `main` é protegida: ninguém faz push direto.
+A `main` não tem proteção técnica, então a regra é combinada: **ninguém faz push direto na `main`**, tudo entra por PR.
 
 ## Commits (Conventional Commits)
 
