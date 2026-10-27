@@ -1,0 +1,51 @@
+# Pastas geradas pela Unity
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+/[Bb]uild/
+/[Bb]uilds/
+
+# Meta de pastas ignoradas
+/[Aa]ssets/[Aa]ssetStoreTools*
+
+# IDEs
+.vs/
+.vscode/
+.idea/
+*.csproj
+*.sln
+*.slnx
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Autogerado
+sysinfo.txt
+crashlytics-build.properties
+*.apk
+*.aab
+*.unitypackage
+*.app
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Materiais de referência do professor (ficam só local)
+docs/referencias/*
+!docs/referencias/README.md
+
+# Configuração pessoal de ferramentas
+CLAUDE.md
+CLAUDE.local.md
+.claude/

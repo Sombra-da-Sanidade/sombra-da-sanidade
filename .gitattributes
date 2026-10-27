@@ -1,0 +1,30 @@
+* text=auto
+
+# Código e texto
+*.cs        text diff=csharp eol=lf
+*.md        text eol=lf
+*.json      text eol=lf
+*.shader    text eol=lf
+*.inputactions text eol=lf
+
+# Arquivos YAML da Unity: merge semântico com UnityYAMLMerge (ver CONTRIBUTING.md)
+*.unity     text eol=lf merge=unityyamlmerge
+*.prefab    text eol=lf merge=unityyamlmerge
+*.asset     text eol=lf merge=unityyamlmerge
+*.mat       text eol=lf merge=unityyamlmerge
+*.anim      text eol=lf merge=unityyamlmerge
+*.controller text eol=lf merge=unityyamlmerge
+*.meta      text eol=lf merge=unityyamlmerge
+
+# Binários
+*.png  binary
+*.jpg  binary
+*.psd  binary
+*.aseprite binary
+*.ase  binary
+*.wav  binary
+*.ogg  binary
+*.mp3  binary
+*.ttf  binary
+*.otf  binary
+*.pdf  binary
