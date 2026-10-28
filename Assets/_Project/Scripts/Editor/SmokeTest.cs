@@ -150,7 +150,7 @@ namespace SombraDaSanidade.EditorTools
                     if (gm.DrivesCollected < 1 && Time.time - stepStart < 4f) { waitFrames = 5; return; }
                     Release();
                     CheckInput($"Segurar E coleta um HD ({gm.DrivesCollected}/3)", gm.DrivesCollected == 1);
-                    foreach (var s in Object.FindObjectsByType<DriveServer>(FindObjectsSortMode.None))
+                    foreach (var s in Object.FindObjectsByType<DriveServer>())
                         if (s.CanInteract) s.CompleteInteract();
                     Check($"3 HDs coletados ({gm.DrivesCollected}/3)", gm.HasAllDrives);
                     var door = Object.FindAnyObjectByType<ExitDoor>();
