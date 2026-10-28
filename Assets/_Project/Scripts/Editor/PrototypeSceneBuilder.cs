@@ -208,7 +208,7 @@ namespace SombraDaSanidade.EditorTools
             visual.transform.localScale = new Vector3(0.9f, 0.9f, 1f);
             var sr = visual.AddComponent<SpriteRenderer>();
             sr.sprite = square;
-            sr.color = new Color(0.6f, 0.1f, 0.12f);
+            sr.color = new Color(0.55f, 0.2f, 0.75f); // roxo: não confundir com a porta trancada (vermelha)
             sr.sortingOrder = 9;
 
             var monster = go.AddComponent<MonsterController>();
