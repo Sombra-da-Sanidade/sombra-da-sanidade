@@ -58,7 +58,12 @@ namespace SombraDaSanidade.Sanity
 
         private void Update()
         {
-            if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) return;
+            if (GameManager.Instance != null && !GameManager.Instance.IsPlaying)
+            {
+                // Sem isso a silhueta fica congelada atrás da tela de fim.
+                if (IsShowing) Hide();
+                return;
+            }
 
             if (IsShowing) UpdatePhantom();
 
@@ -106,8 +111,7 @@ namespace SombraDaSanidade.Sanity
 
             if (elapsed >= TotalTime)
             {
-                IsShowing = false;
-                phantom.gameObject.SetActive(false);
+                Hide();
                 return;
             }
 
@@ -117,6 +121,12 @@ namespace SombraDaSanidade.Sanity
 
             phantom.transform.position = Vector2.MoveTowards(
                 phantom.transform.position, sanity.transform.position, approachSpeed * Time.deltaTime);
+        }
+
+        private void Hide()
+        {
+            IsShowing = false;
+            phantom.gameObject.SetActive(false);
         }
 
         private void SetAlpha(float a)
