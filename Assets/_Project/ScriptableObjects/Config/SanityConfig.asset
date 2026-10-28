@@ -15,10 +15,16 @@ MonoBehaviour:
   maxSanity: 100
   darknessDrain: 1.5
   monsterProximityDrain: 3
+  monsterProximityRadius: 5
   adrenaSynCost: 20
   safeZoneRegen: 2
   stabilizerAmount: 30
+  stabilizerSlowMultiplier: 0.6
+  stabilizerSlowDuration: 4
   anxiousBelow: 75
   hallucinatingBelow: 40
   collapsedBelow: 15
   revealCluesBelow: 35
+  hallucinationsBelow: 35
+  hallucinationMinInterval: 15
+  hallucinationMaxInterval: 25

@@ -26,6 +26,7 @@ namespace SombraDaSanidade.EditorTools
         private static int waitFrames;
         private static float stepStart;
         private static float batteryAtStart;
+        private static float sanityAtDark;
         private static Mouse mouse;
         private static Keyboard keyboard;
         private static readonly List<string> results = new List<string>();
@@ -92,6 +93,11 @@ namespace SombraDaSanidade.EditorTools
                     Check("Lanterna habilitada (config presente)", flashlight && flashlight.enabled);
                     var sanity = Object.FindAnyObjectByType<SanityController>();
                     Check("Sanidade habilitada (config presente)", sanity && sanity.enabled);
+                    Check("Cena tem efeitos de sanidade (vinheta, batimento, alucinação, pistas)",
+                        Object.FindAnyObjectByType<SanityVignette>() && Object.FindAnyObjectByType<SanityHeartbeat>()
+                        && Object.FindAnyObjectByType<SanityHallucination>() && Object.FindAnyObjectByType<SanityClue>());
+                    var clue = Object.FindAnyObjectByType<SanityClue>();
+                    Check("Pista em fósforo escondida com a sanidade cheia", clue && !clue.IsRevealed);
                     if (failed) { Finish(); return; }
                     batteryAtStart = flashlight.Battery;
                     stepStart = Time.time;
@@ -127,10 +133,13 @@ namespace SombraDaSanidade.EditorTools
                 case 5:
                     Release();
                     CheckInput("F desliga a lanterna", !flashlight.IsSwitchedOn);
-                    Next(3);
+                    sanityAtDark = Object.FindAnyObjectByType<SanityController>().Value;
+                    Next(30);
                     break;
 
                 case 6:
+                    float sanityNow = Object.FindAnyObjectByType<SanityController>().Value;
+                    CheckInput($"Sanidade drena no escuro ({sanityAtDark:0.0} -> {sanityNow:0.0})", sanityNow < sanityAtDark);
                     Press(Key.F);
                     Next(3);
                     break;
