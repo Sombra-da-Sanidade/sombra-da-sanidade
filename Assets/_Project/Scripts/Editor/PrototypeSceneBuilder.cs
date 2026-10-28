@@ -297,7 +297,8 @@ namespace SombraDaSanidade.EditorTools
             cam.orthographicSize = 6f;
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = Color.black;
-            go.AddComponent<UniversalAdditionalCameraData>();
+            var camData = go.AddComponent<UniversalAdditionalCameraData>();
+            camData.renderPostProcessing = true; // vinheta da sanidade
             go.AddComponent<AudioListener>();
 
             var follow = go.AddComponent<CameraFollow>();
@@ -308,6 +309,12 @@ namespace SombraDaSanidade.EditorTools
         {
             var hud = new GameObject("DemoHud").AddComponent<DemoHud>();
             SetRef(hud, "flashlight", flashlight);
+
+            var sanity = flashlight.GetComponent<SanityController>();
+            SetRef(hud, "sanity", sanity);
+
+            var vignette = new GameObject("SanityVignette").AddComponent<SanityVignette>();
+            SetRef(vignette, "sanity", sanity);
         }
 
         // ---------- Helpers ----------
