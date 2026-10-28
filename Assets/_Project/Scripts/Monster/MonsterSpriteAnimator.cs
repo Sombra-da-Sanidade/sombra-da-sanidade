@@ -31,8 +31,9 @@ namespace SombraDaSanidade.Monster
         [Header("Folha de sprites")]
         [SerializeField] private Texture2D sheet;
         [SerializeField] private Texture2D glowSheet;
-        [SerializeField] private Vector2Int frameSize = new Vector2Int(96, 128);
-        [SerializeField] private float pixelsPerUnit = 32f;
+        // 48x64 a 16 px/unidade: mesma densidade de pixel dos tiles (docs/arte/guia-de-estilo.md).
+        [SerializeField] private Vector2Int frameSize = new Vector2Int(48, 64);
+        [SerializeField] private float pixelsPerUnit = 16f;
         [Tooltip("Pivô do quadro (0-1). Embaixo no centro: o transform fica nos pés.")]
         [SerializeField] private Vector2 pivot = new Vector2(0.5f, 0.02f);
 

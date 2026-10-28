@@ -19,7 +19,7 @@ namespace SombraDaSanidade.EditorTools
         private const string LitMaterialPath = "Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Lit-Default.mat";
         private const string UnlitMaterialPath = "Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Unlit-Default.mat";
 
-        // Altura dos eletrodos acima dos pés (sprite de 128 px a 32 px/unidade, cérebro perto do topo).
+        // Altura dos eletrodos acima dos pés (sprite de 64 px a 16 px/unidade, cérebro perto do topo).
         private const float LedHeight = 3.1f;
 
         [MenuItem("Sombra da Sanidade/Gerar prefab do Monstro", priority = 40)]
@@ -108,33 +108,14 @@ namespace SombraDaSanidade.EditorTools
             return sr;
         }
 
-        // Pixel art: sem filtro, sem compressão e sem redimensionar a folha (768x1280 não é potência de 2).
+        // A configuração de importação (Point, sem compressão, 16 PPU) fica no PixelArtImporter,
+        // que vale para tudo em Art/Monster. Aqui só garante que a folha já foi importada.
         public static void EnsureArtImport(string path)
         {
-            var importer = AssetImporter.GetAtPath(path) as TextureImporter;
-            if (importer == null)
-            {
-                Debug.LogWarning($"Arte do monstro não encontrada em {path}.");
-                return;
-            }
-
-            bool dirty = importer.textureType != TextureImporterType.Sprite
-                         || importer.filterMode != FilterMode.Point
-                         || importer.textureCompression != TextureImporterCompression.Uncompressed
-                         || importer.mipmapEnabled
-                         || importer.spritePixelsPerUnit != 32f
-                         || importer.maxTextureSize < 2048;
-            if (!dirty) return;
-
-            importer.textureType = TextureImporterType.Sprite;
-            importer.spriteImportMode = SpriteImportMode.Single;
-            importer.spritePixelsPerUnit = 32f;
-            importer.filterMode = FilterMode.Point;
-            importer.textureCompression = TextureImporterCompression.Uncompressed;
-            importer.mipmapEnabled = false;
-            importer.alphaIsTransparency = true;
-            importer.maxTextureSize = 2048;
-            importer.SaveAndReimport();
+            if (AssetImporter.GetAtPath(path) is TextureImporter) return;
+            AssetDatabase.ImportAsset(path);
+            if (!(AssetImporter.GetAtPath(path) is TextureImporter))
+                Debug.LogWarning($"Arte do monstro não encontrada em {path}. Rode python3 tools/art/export_sprites.py.");
         }
 
         private static void Set(Object target, string field, Object value)

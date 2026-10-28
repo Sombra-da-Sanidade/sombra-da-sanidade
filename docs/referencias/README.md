@@ -15,3 +15,7 @@ Materiais postados no Classroom (tarefa do GDD). Os arquivos **não vão para o 
 | Mass Flux - Game Design (Google Docs) | Exemplo de GDD com sumário extenso e balanceamento. |
 
 Ao revisar o GDD (ex.: v1.1), conferir primeiro os **Critérios de Avaliação** e o **Modelo_GDD**.
+
+## Arte (`arte/`)
+
+Imagens de referência visual (Yuppie Psycho, Penusbmic) para a direção de arte. Também ficam só local. `arte/FONTES.md` lista a origem de cada arquivo. Guia: [docs/arte/guia-de-estilo.md](../arte/guia-de-estilo.md).

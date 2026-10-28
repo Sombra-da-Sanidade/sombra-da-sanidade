@@ -13,6 +13,8 @@ Tudo em blocos cinzas. Arte, som, alucinações e narrativa ficam para depois.
 | Peça | Arquivo | Estado |
 |---|---|---|
 | Movimento + mira | `Player/PlayerController.cs` | pronto |
+| Sprite do Thomas (8 direções, andar, reparo) | `Player/PlayerSpriteAnimator.cs` | pronto (ver [guia de estilo](arte/guia-de-estilo.md)) |
+| Tileset do laboratório | `art-src/Tiles/lab_tiles.json` | rascunho (ainda não usado na Demo) |
 | Lanterna (cone, bateria, sombras) | `Flashlight/FlashlightController.cs` | pronto |
 | Câmera com tremor | `Core/CameraFollow.cs` | pronto |
 | Estado da partida, HDs, vitória/derrota, tela de fim, R reinicia | `Core/GameManager.cs` | pronto |
@@ -30,6 +32,8 @@ Menus no Unity (**Sombra da Sanidade**):
 - **Criar Sandbox > Frente N**: cena de teste da sua frente com o mapa da demo completo.
 - **Gerar cena Demo (base)**: cria `Scenes/Main/Demo.unity`. A Frente 4 gera uma vez no 6000.5.10f1 e commita; depois disso só ela edita a cena.
 - **Build WebGL**: gera `Builds/WebGL`.
+- **Arte > Gerar cena de teste de arte**: sala com o tileset, o Thomas e Light2D (`Sandbox/ArteTeste.unity`).
+- **Arte > Gerar Tile assets do laboratório**: cria os `Tile` em `Art/Tiles/Lab/` para usar no Tile Palette.
 
 Procure `TODO(Frente N)` no código para achar o que falta na sua frente.
 

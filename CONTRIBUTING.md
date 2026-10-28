@@ -32,7 +32,7 @@ Formato: `tipo(escopo): descrição em imperativo` (máx. 72 caracteres).
 | `test` | Testes |
 | `art` / `audio` | Assets de arte e som |
 
-Escopos: `player`, `flashlight`, `monster`, `sanity`, `interaction`, `ui`, `level`, `gdd`, `unity`.
+Escopos: `player`, `flashlight`, `monster`, `sanity`, `interaction`, `ui`, `level`, `gdd`, `unity`, `art`.
 
 Exemplos:
 ```
@@ -81,6 +81,15 @@ git config --global merge.unityyamlmerge.name "Unity SmartMerge"
 
 - Versão única: **6000.5.10f1**. Não atualize o projeto sem combinar com o grupo.
 - Pacote novo só via PR, explicando o motivo e registrando em `docs/decisoes/`.
+
+## Arte
+
+Guia completo: [docs/arte/guia-de-estilo.md](docs/arte/guia-de-estilo.md). Decisão: [ADR 0004](docs/decisoes/0004-pipeline-de-arte.md).
+
+- A fonte da pixel art é texto: `art-src/<Categoria>/<nome>.json`, um caractere por pixel, cores de `art-src/palette.json`. Use só a paleta (`art-src/sombra.gpl` no Aseprite/LibreSprite).
+- Depois de editar, rode `python3 tools/art/export_sprites.py` (precisa de `pip install pillow`). Ele gera o PNG em `Assets/_Project/Art/`. **Não edite esse PNG direto**: ele é sobrescrito.
+- O Unity fatia e configura o PNG sozinho (16 PPU, Point). Para ver no escuro com lanterna: **Sombra da Sanidade > Arte > Gerar cena de teste de arte**.
+- Commite o JSON, o PNG e o `.meta` juntos. Commit `art(<asset>): ...`, PR com print da cena de teste.
 
 ## GDD
 
