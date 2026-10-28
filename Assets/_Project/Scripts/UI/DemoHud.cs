@@ -19,7 +19,7 @@ namespace SombraDaSanidade.UI
             style ??= new GUIStyle(GUI.skin.label) { fontSize = 18 };
             style.normal.textColor = new Color(0.75f, 0.95f, 0.75f);
 
-            if (flashlight != null)
+            if (flashlight != null && flashlight.enabled)
             {
                 const float barWidth = 160f;
                 GUI.Label(new Rect(16, 12, 120, 24), "BATERIA", style);

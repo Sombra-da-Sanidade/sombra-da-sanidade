@@ -32,6 +32,13 @@ namespace SombraDaSanidade.Flashlight
 
         private void Awake()
         {
+            if (config == null || player == null)
+            {
+                Debug.LogError($"{name}: FlashlightController sem config ou player no Inspector.", this);
+                enabled = false;
+                return;
+            }
+
             if (pivot != null) light2D = pivot.GetComponent<Light2D>();
             Battery = config.maxBattery;
             ApplyConeShape();

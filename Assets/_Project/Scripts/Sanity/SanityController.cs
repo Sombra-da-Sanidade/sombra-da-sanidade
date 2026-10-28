@@ -24,6 +24,13 @@ namespace SombraDaSanidade.Sanity
 
         private void Awake()
         {
+            if (config == null)
+            {
+                Debug.LogError($"{name}: SanityController sem SanityConfig no Inspector.", this);
+                enabled = false;
+                return;
+            }
+
             Value = config.maxSanity;
         }
 
