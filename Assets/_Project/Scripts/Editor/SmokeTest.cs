@@ -93,6 +93,11 @@ namespace SombraDaSanidade.EditorTools
                     Check("Lanterna habilitada (config presente)", flashlight && flashlight.enabled);
                     var sanity = Object.FindAnyObjectByType<SanityController>();
                     Check("Sanidade habilitada (config presente)", sanity && sanity.enabled);
+                    Check("Cena tem efeitos de sanidade (vinheta, batimento, alucinação, pistas)",
+                        Object.FindAnyObjectByType<SanityVignette>() && Object.FindAnyObjectByType<SanityHeartbeat>()
+                        && Object.FindAnyObjectByType<SanityHallucination>() && Object.FindAnyObjectByType<SanityClue>());
+                    var clue = Object.FindAnyObjectByType<SanityClue>();
+                    Check("Pista em fósforo escondida com a sanidade cheia", clue && !clue.IsRevealed);
                     if (failed) { Finish(); return; }
                     batteryAtStart = flashlight.Battery;
                     stepStart = Time.time;
