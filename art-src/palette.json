@@ -33,6 +33,12 @@
     {"key": "t", "hex": "#c8922c", "name": "ambar-1", "role": "faixa de aviso, lâmpada"},
     {"key": "u", "hex": "#f6d878", "name": "ambar-2", "role": "luz de lâmpada"},
     {"key": "v", "hex": "#3e2048", "name": "hipnos-1", "role": "carne do Espécime, sombra"},
-    {"key": "w", "hex": "#7e4a8a", "name": "hipnos-2", "role": "carne do Espécime"}
+    {"key": "w", "hex": "#7e4a8a", "name": "hipnos-2", "role": "carne do Espécime"},
+    {"key": "x", "hex": "#364644", "name": "especime-tecido-1", "role": "sombra da saia/trapos do Espécime"},
+    {"key": "y", "hex": "#50645e", "name": "especime-tecido-2", "role": "trapos do Espécime, verde-doente"},
+    {"key": "z", "hex": "#70847a", "name": "especime-tecido-3", "role": "brilho dos trapos"},
+    {"key": "A", "hex": "#b24e5c", "name": "especime-carne-1", "role": "sombra do cérebro exposto"},
+    {"key": "B", "hex": "#d67c80", "name": "especime-carne-2", "role": "cérebro exposto, carne"},
+    {"key": "C", "hex": "#ecaaa4", "name": "especime-carne-3", "role": "brilho da carne"}
   ]
 }
