@@ -9,7 +9,7 @@ Cinco pessoas precisam ver, revisar e editar a pixel art pelo GitHub. PNG é bin
 - A fonte da arte é texto: `art-src/<Categoria>/<nome>.json`, um caractere por pixel, chaves da paleta `art-src/palette.json`.
 - `tools/art/export_sprites.py` (Python 3 + Pillow) gera os PNG em `Assets/_Project/Art/<Categoria>/`, com `.meta` de GUID determinístico.
 - O Unity configura e fatia os PNG sozinho com `Scripts/Editor/PixelArtImporter.cs`, lendo o mesmo JSON (16 PPU, Point, sem compressão).
-- Escala: tile 16x16, personagem ~32 px de altura, Pixel Perfect Camera 320x180.
+- Escala: tile 16x16, personagem de 24 a 28 px num frame 16x32, Pixel Perfect Camera 320x180.
 
 ## Consequências
 - PR de arte mostra exatamente quais pixels mudaram.

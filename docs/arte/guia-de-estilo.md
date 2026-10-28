@@ -20,7 +20,7 @@ Cada regra de arte reforça uma regra de jogo:
 ## 2. Escala e técnica
 
 - **Tile:** 16x16 px. **PPU:** 16 (1 tile = 1 unidade do Unity).
-- **Personagens:** cerca de 32 px de altura (2 tiles), largura de 12 a 16 px. Espécime Vazio maior que Thomas (36 a 40 px), membros finos e longos.
+- **Personagens:** 24 a 28 px de altura dentro de um frame 16x32, largura de 10 a 14 px. Cabeça grande (cerca de 1/3 da altura), como em Yuppie Psycho. Espécime Vazio bem maior que Thomas (36 a 40 px, frame 24x40), membros finos e longos.
 - **Câmera:** Pixel Perfect Camera, resolução base 320x180 (escala inteira para 1280x720 e 1920x1080).
 - **Perspectiva:** top-down 3/4, como Yuppie Psycho: chão visto de cima, paredes mostram a face frontal (2 tiles de altura) com topo escuro.
 - **Importação no Unity:** Point (sem filtro), sem compressão, sem mipmap. O `PixelArtImporter` aplica isso sozinho.
@@ -46,11 +46,25 @@ Tiradas da prática do Penusbmic (tutoriais de paleta, tileset e personagem) e d
 1. **Três tons por material, no mínimo:** base, sombra e brilho. Metal ganha um quarto tom de brilho especular.
 2. **Hue shift:** sombra não é só "mais escura", é mais fria (azul/roxo). Brilho é mais quente.
 3. **Luz vem de cima (norte):** bordas superiores claras, inferiores escuras. Sem *pillow shading* (sombra em volta de tudo).
-4. **Outline seletivo:** objetos e personagens com contorno escuro (`0`, `1`, `p`), nunca preto puro em área iluminada. Chão e paredes não têm outline.
+4. **Silhueta por massa escura, não por contorno:** personagens se destacam por blocos escuros (cabelo, terno, casaco), não por linha preta em volta de tudo. Objetos interativos podem ter contorno escuro (`0`, `1`, `p`). Chão e paredes não têm outline.
 5. **Menos ruído:** textura em grupos de 2 a 3 pixels, nunca pixel solto aleatório ("sal e pimenta"). Deixe áreas lisas para o olho descansar.
 6. **Detalhe concentrado:** o objeto que importa (disjuntor, HD, porta) recebe o detalhe; o entorno fica simples.
 7. **Variações de tile:** um tile liso dominante (60%+) e variações raras (rachadura, mancha, junta). Repetição visível quebra a imersão.
 8. **Animação:** poucos frames, bem escolhidos (idle 2 a 4, andar 4 a 6). Exagero na pose, não na quantidade.
+9. **Uma cor de destaque por personagem:** corpo em tons escuros e um único acento saturado (o laranja do casaco do herói do Penusbmic, a gravata vermelha em Yuppie Psycho). Para Thomas: terno escuro, lanterna em âmbar.
+10. **Sombra no chão:** elipse escura (`1` ou `2`) sob os pés de todo personagem e objeto solto. Ancora o sprite no top-down.
+11. **Rosto mínimo:** em jogo, olhos de 1 a 2 px e quase nada mais. O detalhe do rosto vai para o retrato de diálogo (64 a 96 px), como em Yuppie Psycho.
+
+### O que as referências mostram
+
+| Referência | Observação | Como aplicamos |
+|---|---|---|
+| Yuppie Psycho, lanterna no escuro | Feixe largo e suave; fora dele tudo vira névoa cinza-azulada | Light2D com borda suave, Global Light baixa e azulada |
+| Yuppie Psycho, sangue | Vermelho saturado é a única cor forte da tela | Rampa Emergência só para perigo e sangue |
+| Yuppie Psycho, personagens | ~24 px, cabeça grande, sem outline, sombra simples | Escala de personagem acima |
+| Penusbmic, top-down sombrio | Luz como manchas chapadas de borda pixelada, sem gradiente liso; fundo dessaturado | Pixel Perfect Camera com upscale para a luz também sair pixelada |
+| Penusbmic, personagens | Silhueta escura compacta, um acento de cor, sombra elíptica | Regras 4, 9 e 10 |
+| Penusbmic, paletas | 6 a 10 cores por objeto, rampas curtas com hue shift | Regra 1 e 2; cada sprite usa só uma parte da paleta |
 
 ## 5. Inventário de assets
 
@@ -76,6 +90,9 @@ Ver [CONTRIBUTING.md, seção Arte](../../CONTRIBUTING.md#arte). Resumo:
 4. PR com escopo `art`, com print da cena de teste.
 
 ## 7. Referências (só links)
+
+Imagens para estudo ficam em `docs/referencias/arte/` (local, ignorado). O arquivo `FONTES.md` dessa pasta diz de onde veio cada uma: screenshots da página Steam do Yuppie Psycho e previews das páginas do Penusbmic no itch.io.
+
 
 - Yuppie Psycho, Baroque Decay (2019): [página na Wikipedia](https://en.wikipedia.org/wiki/Yuppie_Psycho). Observar: escritório em 3/4, paredes altas, retratos de diálogo, cutscenes animadas, humor grotesco.
 - Penusbmic: [itch.io](https://penusbmic.itch.io/). Observar: séries *The DARK Series* e *Sci-Fi Series*, tutoriais "Designing Palettes", "Tileset Workflow", "Character Design".
