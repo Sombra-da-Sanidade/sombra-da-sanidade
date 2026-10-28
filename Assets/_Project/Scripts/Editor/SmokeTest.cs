@@ -26,6 +26,7 @@ namespace SombraDaSanidade.EditorTools
         private static int waitFrames;
         private static float stepStart;
         private static float batteryAtStart;
+        private static float sanityAtDark;
         private static Mouse mouse;
         private static Keyboard keyboard;
         private static readonly List<string> results = new List<string>();
@@ -127,10 +128,13 @@ namespace SombraDaSanidade.EditorTools
                 case 5:
                     Release();
                     CheckInput("F desliga a lanterna", !flashlight.IsSwitchedOn);
-                    Next(3);
+                    sanityAtDark = Object.FindAnyObjectByType<SanityController>().Value;
+                    Next(30);
                     break;
 
                 case 6:
+                    float sanityNow = Object.FindAnyObjectByType<SanityController>().Value;
+                    CheckInput($"Sanidade drena no escuro ({sanityAtDark:0.0} -> {sanityNow:0.0})", sanityNow < sanityAtDark);
                     Press(Key.F);
                     Next(3);
                     break;
