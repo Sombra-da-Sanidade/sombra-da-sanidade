@@ -11,14 +11,14 @@ using UnityEngine;
 namespace SombraDaSanidade.EditorTools
 {
     // Aplica as regras de importação de pixel art (docs/arte/guia-de-estilo.md) a tudo em
-    // Art/Tiles, Art/Sprites e Art/Palette, e fatia as folhas usando o JSON de art-src/
+    // Art/Tiles, Art/Sprites, Art/Monster e Art/Palette, e fatia as folhas usando o JSON de art-src/
     // (mesmo arquivo que tools/art/export_sprites.py usa para gerar o PNG).
     public class PixelArtImporter : AssetPostprocessor
     {
         // Tile de 16px = 1 unidade do mundo (guia de estilo, "Escala").
         public const int PixelsPerUnit = 16;
         private const string ArtRoot = "Assets/_Project/Art/";
-        private static readonly string[] Categories = { "Tiles", "Sprites", "Palette" };
+        private static readonly string[] Categories = { "Tiles", "Sprites", "Monster", "Palette" };
 
         [Serializable]
         private class Sheet
@@ -96,8 +96,8 @@ namespace SombraDaSanidade.EditorTools
                 .GroupBy(r => r.name)
                 .ToDictionary(g => g.Key, g => g.First());
 
-            // Personagens pisam no chão: pivô nos pés. Tiles: pivô no centro.
-            var alignment = category == "Sprites" ? SpriteAlignment.BottomCenter : SpriteAlignment.Center;
+            // Personagens e monstro pisam no chão: pivô nos pés. Tiles: pivô no centro.
+            var alignment = category == "Tiles" ? SpriteAlignment.Center : SpriteAlignment.BottomCenter;
 
             // Cópia do layout atual antes de mexer (SpriteRect é referência).
             var current = provider.GetSpriteRects().Select(r => (r.name, r.rect, r.alignment)).ToList();
