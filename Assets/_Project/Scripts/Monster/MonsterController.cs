@@ -5,7 +5,7 @@ namespace SombraDaSanidade.Monster
 {
     public enum MonsterState { Patrol, Investigate, Chase, Stunned }
 
-    // Espécime Vazio (GDD 4.2). Dono: Rony. Issues #4 e #5.
+    // Espécime Vazio (GDD 4.2). Frente 2 (Monstro). Issues #4 e #5.
     // A API pública abaixo é o contrato usado por Lanterna (EMP), Sanidade e HDs: não mudar sem avisar o grupo.
     public class MonsterController : MonoBehaviour
     {
@@ -45,20 +45,20 @@ namespace SombraDaSanidade.Monster
         // Chamado pelo pulso EMP.
         public void Stun(float duration)
         {
-            // TODO(Rony): parar o agente por `duration` segundos e voltar para Patrol ou Chase.
+            // TODO(Frente 2): parar o agente por `duration` segundos e voltar para Patrol ou Chase.
             State = MonsterState.Stunned;
         }
 
         // Chamado quando o cone da lanterna toca o monstro ou um ruído é ouvido.
         public void Alert(Vector2 position)
         {
-            // TODO(Rony): ir até `position` (Investigate) ou perseguir o jogador (Chase).
+            // TODO(Frente 2): ir até `position` (Investigate) ou perseguir o jogador (Chase).
         }
 
         public void SetSpeedMultiplier(float multiplier)
         {
             SpeedMultiplier = multiplier;
-            // TODO(Rony): aplicar CurrentSpeed no NavMeshAgent.
+            // TODO(Frente 2): aplicar CurrentSpeed no NavMeshAgent.
         }
 
         private void OnNoise(Vector2 position, float radius)
@@ -72,7 +72,7 @@ namespace SombraDaSanidade.Monster
             if (config != null) SetSpeedMultiplier(1f + config.speedBonusPerDrive * total);
         }
 
-        // TODO(Rony): patrulha por waypoints (NavMeshPlus), perseguição, atração pela luz
+        // TODO(Frente 2): patrulha por waypoints (NavMeshPlus), perseguição, atração pela luz
         // via FlashlightController.IsPointInCone e GameManager.TriggerGameOver(DeathCause.Monster) ao encostar.
     }
 }

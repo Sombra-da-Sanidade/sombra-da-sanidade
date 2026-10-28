@@ -33,20 +33,21 @@ namespace SombraDaSanidade.EditorTools
         [MenuItem("Sombra da Sanidade/Gerar cena Demo (base)", priority = 1)]
         public static void BuildDemo() => BuildScene(DemoScenePath, overwrite: false);
 
-        [MenuItem("Sombra da Sanidade/Criar minha Sandbox/Davi", priority = 20)]
-        public static void SandboxDavi() => BuildSandbox("Davi");
+        // Uma Sandbox por frente de trabalho (docs/equipe.md).
+        [MenuItem("Sombra da Sanidade/Criar Sandbox/Frente 1 - Lanterna e EMP", priority = 20)]
+        public static void SandboxFrente1() => BuildSandbox("Frente1");
 
-        [MenuItem("Sombra da Sanidade/Criar minha Sandbox/Luis", priority = 21)]
-        public static void SandboxLuis() => BuildSandbox("Luis");
+        [MenuItem("Sombra da Sanidade/Criar Sandbox/Frente 2 - Monstro", priority = 21)]
+        public static void SandboxFrente2() => BuildSandbox("Frente2");
 
-        [MenuItem("Sombra da Sanidade/Criar minha Sandbox/Marley", priority = 22)]
-        public static void SandboxMarley() => BuildSandbox("Marley");
+        [MenuItem("Sombra da Sanidade/Criar Sandbox/Frente 3 - Sanidade e HUD", priority = 22)]
+        public static void SandboxFrente3() => BuildSandbox("Frente3");
 
-        [MenuItem("Sombra da Sanidade/Criar minha Sandbox/Rony", priority = 23)]
-        public static void SandboxRony() => BuildSandbox("Rony");
+        [MenuItem("Sombra da Sanidade/Criar Sandbox/Frente 4 - Disjuntor e mapa", priority = 23)]
+        public static void SandboxFrente4() => BuildSandbox("Frente4");
 
-        [MenuItem("Sombra da Sanidade/Criar minha Sandbox/Thiago", priority = 24)]
-        public static void SandboxThiago() => BuildSandbox("Thiago");
+        [MenuItem("Sombra da Sanidade/Criar Sandbox/Frente 5 - Partida, HDs e build", priority = 24)]
+        public static void SandboxFrente5() => BuildSandbox("Frente5");
 
         // Mantido para o batchmode do PR anterior.
         public static void Build() => BuildPrototype();

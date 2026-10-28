@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SombraDaSanidade.Interaction
 {
-    // Disjuntor / quadro elétrico (GDD 4.2, 4.3 e regra 6). Dono: Thiago. Issue #10.
+    // Disjuntor / quadro elétrico (GDD 4.2, 4.3 e regra 6). Frente 4 (Disjuntor e mapa). Issue #10.
     // Segurar E por 4s acende a lâmpada de teto (Zona Segura) por 60s.
     public class Breaker : MonoBehaviour, IInteractable
     {
@@ -22,23 +22,23 @@ namespace SombraDaSanidade.Interaction
         {
             // O ruído do reparo atrai o monstro (GDD 4.3).
             NoiseBus.Emit(transform.position, repairNoiseRadius);
-            // TODO(Thiago): faíscas / som de reparo.
+            // TODO(Frente 4): faíscas / som de reparo.
         }
 
         public void TickInteract(float progress)
         {
-            // TODO(Thiago): feedback visual do progresso, se quiser.
+            // TODO(Frente 4): feedback visual do progresso, se quiser.
         }
 
         public void CancelInteract()
         {
-            // TODO(Thiago): parar faíscas / som.
+            // TODO(Frente 4): parar faíscas / som.
         }
 
         public void CompleteInteract()
         {
             isActive = true;
-            // TODO(Thiago): ligar a SafeZone (Light2D de teto + trigger que chama
+            // TODO(Frente 4): ligar a SafeZone (Light2D de teto + trigger que chama
             // SanityController.SetInSafeZone e bloqueia o monstro) por lightDuration segundos,
             // depois isActive = false para poder reparar de novo.
         }

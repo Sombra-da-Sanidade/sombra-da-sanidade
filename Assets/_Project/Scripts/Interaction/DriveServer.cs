@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SombraDaSanidade.Interaction
 {
-    // Servidor com a Gaveta de HD (GDD 4.3). Dono: Davi. Issue #11.
+    // Servidor com a Gaveta de HD (GDD 4.3). Frente 5 (Partida, HDs e build). Issue #11.
     // Segurar E ejeta o HD: soma no GameManager (que acelera o monstro) e faz barulho.
     public class DriveServer : MonoBehaviour, IInteractable
     {

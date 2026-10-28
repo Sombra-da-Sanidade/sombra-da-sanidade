@@ -6,7 +6,7 @@ namespace SombraDaSanidade.Sanity
 {
     public enum SanityState { Lucid, Anxious, Hallucinating, Collapsed, Dead }
 
-    // Sanidade do jogador (GDD 4.2 e 6.3). Dono: Marley. Issue #8.
+    // Sanidade do jogador (GDD 4.2 e 6.3). Frente 3 (Sanidade e HUD). Issue #8.
     // Fica no Player. A API pública é o contrato usado por Zona Segura, itens e HUD.
     public class SanityController : MonoBehaviour
     {
@@ -31,7 +31,7 @@ namespace SombraDaSanidade.Sanity
         {
             if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) return;
 
-            // TODO(Marley): dreno no escuro (lanterna apagada e fora de Zona Segura),
+            // TODO(Frente 3): dreno no escuro (lanterna apagada e fora de Zona Segura),
             // dreno com o monstro próximo, regeneração em Zona Segura. Usar Add(-x * Time.deltaTime).
         }
 

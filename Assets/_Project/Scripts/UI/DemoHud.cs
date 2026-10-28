@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SombraDaSanidade.UI
 {
     // HUD provisório da mini demo: bateria e HDs no canto superior esquerdo (GDD 7).
-    // Dona: Marley. Issue #9. Trocar por UI diegética (referência: PixelHud do Escura).
+    // Frente 3 (Sanidade e HUD). Issue #9. Trocar por UI diegética (referência: PixelHud do Escura).
     public class DemoHud : MonoBehaviour
     {
         [SerializeField] private FlashlightController flashlight;
