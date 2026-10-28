@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using SombraDaSanidade.Core;
 using SombraDaSanidade.Flashlight;
 using SombraDaSanidade.Interaction;
@@ -23,6 +24,7 @@ namespace SombraDaSanidade.EditorTools
         private const string Root = "Assets/_Project";
         private const string ConfigDir = Root + "/ScriptableObjects/Config";
         private const string PlaceholderSpritePath = Root + "/Art/Placeholder/square.png";
+        private const string ThomasSheetPath = Root + "/Art/Sprites/thomas.png";
         public const string PrototypeScenePath = Root + "/Scenes/Sandbox/Prototipo.unity";
         public const string DemoScenePath = Root + "/Scenes/Main/Demo.unity";
         private const string WallLayerName = "Walls";
@@ -268,13 +270,25 @@ namespace SombraDaSanidade.EditorTools
             var col = player.AddComponent<CircleCollider2D>();
             col.radius = 0.3f;
 
+            // Sprite do Thomas (art-src/Sprites/thomas.json). Pivô nos pés; desce um pouco para a
+            // sombra desenhada ficar no centro do collider. Sem a folha, cai no quadrado placeholder.
+            var thomasSheet = AssetDatabase.LoadAssetAtPath<Texture2D>(ThomasSheetPath);
+            var thomasIdle = AssetDatabase.LoadAllAssetsAtPath(ThomasSheetPath).OfType<Sprite>().FirstOrDefault(s => s.name == "idle_down_0");
             var visual = new GameObject("Visual");
             visual.transform.SetParent(player.transform, false);
-            visual.transform.localScale = new Vector3(0.6f, 0.6f, 1f);
             var sr = visual.AddComponent<SpriteRenderer>();
-            sr.sprite = square;
-            sr.color = new Color(0.85f, 0.8f, 0.65f);
             sr.sortingOrder = 10;
+            if (thomasSheet != null && thomasIdle != null)
+            {
+                visual.transform.localPosition = new Vector3(0f, -0.15f, 0f);
+                sr.sprite = thomasIdle;
+            }
+            else
+            {
+                visual.transform.localScale = new Vector3(0.6f, 0.6f, 1f);
+                sr.sprite = square;
+                sr.color = new Color(0.85f, 0.8f, 0.65f);
+            }
 
             var pivot = new GameObject("FlashlightPivot");
             pivot.transform.SetParent(player.transform, false);
@@ -299,6 +313,15 @@ namespace SombraDaSanidade.EditorTools
             var controller = player.AddComponent<PlayerController>();
             SetRef(controller, "config", playerConfig);
             SetRef(controller, "visual", visual.transform);
+            if (thomasSheet != null && thomasIdle != null)
+            {
+                var controllerSo = new SerializedObject(controller);
+                controllerSo.FindProperty("rotateVisual").boolValue = false;
+                controllerSo.ApplyModifiedPropertiesWithoutUndo();
+                var animator = player.AddComponent<PlayerSpriteAnimator>();
+                SetRef(animator, "sheet", thomasSheet);
+                SetRef(animator, "body", sr);
+            }
 
             var flashlight = player.AddComponent<FlashlightController>();
             SetRef(flashlight, "config", flashlightConfig);

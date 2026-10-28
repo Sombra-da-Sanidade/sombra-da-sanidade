@@ -70,6 +70,7 @@ namespace SombraDaSanidade.EditorTools
             decals.SetTile(new Vector3Int(9, 5, 0), tiles["blood_smear"]);
             decals.SetTile(new Vector3Int(4, 5, 0), tiles["papers"]);
 
+            CreateThomas();
             CreateLights(sprites);
             CreateCamera();
 
@@ -85,6 +86,19 @@ namespace SombraDaSanidade.EditorTools
             var map = go.AddComponent<Tilemap>();
             go.AddComponent<TilemapRenderer>().sortingOrder = order;
             return map;
+        }
+
+        // Thomas parado de costas-lado, mirando a lanterna para cima e à direita (como a luz de teste).
+        private static void CreateThomas()
+        {
+            const string path = Root + "/Art/Sprites/thomas.png";
+            var sprite = AssetDatabase.LoadAllAssetsAtPath(path).OfType<Sprite>().FirstOrDefault(s => s.name == "idle_up_side_0");
+            if (sprite == null) return;
+            var go = new GameObject("Thomas");
+            go.transform.position = new Vector3(3.5f, 1.35f, 0f);
+            var sr = go.AddComponent<SpriteRenderer>();
+            sr.sprite = sprite;
+            sr.sortingOrder = 10;
         }
 
         private static void CreateLights(Dictionary<string, Sprite> sprites)
