@@ -7,6 +7,8 @@ using SombraDaSanidade.Monster;
 using SombraDaSanidade.Player;
 using SombraDaSanidade.Sanity;
 using SombraDaSanidade.UI;
+using NavMeshPlus.Components;
+using NavMeshPlus.Extensions;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -90,19 +92,19 @@ namespace SombraDaSanidade.EditorTools
             var playerConfig = GetOrCreateConfig<PlayerConfig>("PlayerConfig");
             var flashlightConfig = GetOrCreateConfig<FlashlightConfig>("FlashlightConfig");
             var sanityConfig = GetOrCreateConfig<SanityConfig>("SanityConfig");
-            var monsterConfig = GetOrCreateConfig<MonsterConfig>("MonsterConfig");
             var square = GetOrCreatePlaceholderSprite();
 
             new GameObject("GameManager").AddComponent<GameManager>();
             CreateGlobalLight();
             CreateMap(square, wallLayer);
+            CreateNavMesh();
             var player = CreatePlayer(square, playerConfig, flashlightConfig, sanityConfig, wallLayer, new Vector2(0f, -11f));
             CreateCamera(player.transform);
             CreateHud(player.GetComponent<FlashlightController>());
             CreateSanityEffects(player.GetComponent<SanityController>(), square, wallLayer);
             CreateObjectives(square);
             CreateSanityItems(square);
-            CreateMonster(square, monsterConfig, new Vector2(16f, 10f));
+            CreateMonster(new Vector2(16f, 10f));
 
             Directory.CreateDirectory(Path.GetDirectoryName(path));
             EditorSceneManager.SaveScene(scene, path);
@@ -121,6 +123,7 @@ namespace SombraDaSanidade.EditorTools
             floorSr.sprite = square;
             floorSr.color = new Color(0.2f, 0.21f, 0.22f);
             floorSr.sortingOrder = -10;
+            floor.AddComponent<NavMeshModifier>(); // andável no NavMesh do monstro
 
             var walls = new GameObject("Walls").transform;
             // Bordas
@@ -195,27 +198,50 @@ namespace SombraDaSanidade.EditorTools
             go.AddComponent<Breaker>();
         }
 
-        private static void CreateMonster(Sprite square, MonsterConfig config, Vector2 position)
+        // Frente 2: instancia o prefab do monstro (Prefabs/Monster.prefab) e os pontos de patrulha
+        // nos cruzamentos dos corredores em loop. Se o prefab não existir, é gerado agora.
+        private static void CreateMonster(Vector2 position)
         {
-            var go = new GameObject("Monster");
+            var prefab = MonsterPrefabBuilder.GetOrBuild();
+            var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
             go.transform.position = position;
 
-            var rb = go.AddComponent<Rigidbody2D>();
-            rb.bodyType = RigidbodyType2D.Kinematic;
-            var col = go.AddComponent<CircleCollider2D>();
-            col.isTrigger = true;
-            col.radius = 0.45f;
+            var patrol = new GameObject("MonsterPatrol").transform;
+            var points = new List<Transform>();
+            Vector2[] spots =
+            {
+                new Vector2(-17.5f, 11f), new Vector2(0f, 10.5f), new Vector2(17.5f, 11f),
+                new Vector2(-7f, 10f), new Vector2(7f, 10f),
+                new Vector2(-18f, 0f), new Vector2(-7f, -1f), new Vector2(7f, -1f), new Vector2(18f, 0f),
+                new Vector2(-17.5f, -11f), new Vector2(-10f, -11f), new Vector2(10f, -11f), new Vector2(17.5f, -11f),
+            };
+            for (int i = 0; i < spots.Length; i++)
+            {
+                var point = new GameObject($"Point_{i:00}").transform;
+                point.SetParent(patrol, false);
+                point.position = spots[i];
+                points.Add(point);
+            }
 
-            var visual = new GameObject("Visual");
-            visual.transform.SetParent(go.transform, false);
-            visual.transform.localScale = new Vector3(0.9f, 0.9f, 1f);
-            var sr = visual.AddComponent<SpriteRenderer>();
-            sr.sprite = square;
-            sr.color = new Color(0.55f, 0.2f, 0.75f); // roxo: não confundir com a porta trancada (vermelha)
-            sr.sortingOrder = 9;
+            var so = new SerializedObject(go.GetComponent<MonsterController>());
+            var list = so.FindProperty("patrolPoints");
+            list.arraySize = points.Count;
+            for (int i = 0; i < points.Count; i++) list.GetArrayElementAtIndex(i).objectReferenceValue = points[i];
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
 
-            var monster = go.AddComponent<MonsterController>();
-            SetRef(monster, "config", config);
+        // NavMesh 2D (NavMeshPlus, ADR 0003). Só entram no bake objetos com NavMeshModifier:
+        // o chão (andável) e as paredes (Not Walkable). O bake é feito ao carregar a cena (NavMeshRuntimeBaker).
+        private static void CreateNavMesh()
+        {
+            var go = new GameObject("NavMesh");
+            go.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);
+            var surface = go.AddComponent<NavMeshSurface>();
+            surface.collectObjects = NavMeshPlus.Components.CollectObjects.All;
+            surface.useGeometry = UnityEngine.AI.NavMeshCollectGeometry.RenderMeshes;
+            surface.hideEditorLogs = true;
+            go.AddComponent<CollectSources2d>();
+            go.AddComponent<NavMeshRuntimeBaker>();
         }
 
         // ---------- Player, câmera, luz, HUD ----------
@@ -416,6 +442,9 @@ namespace SombraDaSanidade.EditorTools
             go.layer = layer;
             go.GetComponent<SpriteRenderer>().sortingOrder = 0;
             go.AddComponent<BoxCollider2D>();
+            var navBlock = go.AddComponent<NavMeshModifier>();
+            navBlock.overrideArea = true;
+            navBlock.area = 1; // Not Walkable
             var caster = go.AddComponent<ShadowCaster2D>();
             caster.selfShadows = false;
         }
