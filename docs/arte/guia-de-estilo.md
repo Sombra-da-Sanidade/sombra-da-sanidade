@@ -20,7 +20,7 @@ Cada regra de arte reforça uma regra de jogo:
 ## 2. Escala e técnica
 
 - **Tile:** 16x16 px. **PPU:** 16 (1 tile = 1 unidade do Unity).
-- **Personagens:** 24 a 28 px de altura dentro de um frame 16x32, largura de 10 a 14 px. Cabeça grande (cerca de 1/3 da altura), como em Yuppie Psycho. Espécime Vazio bem maior que Thomas: cerca de 55 px de altura num frame 48x64 (3x4 unidades no mundo), membros finos e longos.
+- **Personagens:** 24 a 28 px de altura dentro de um frame 24x32 (largura extra para braço e lanterna), corpo de 10 a 14 px. Cabeça grande (cerca de 1/3 da altura), como em Yuppie Psycho. Espécime Vazio bem maior que Thomas: cerca de 55 px de altura num frame 48x64 (3x4 unidades no mundo), membros finos e longos.
 - **Câmera:** Pixel Perfect Camera, resolução base 320x180 (escala inteira para 1280x720 e 1920x1080).
 - **Perspectiva:** top-down 3/4, como Yuppie Psycho: chão visto de cima, paredes mostram a face frontal (2 tiles de altura) com topo escuro.
 - **Importação no Unity:** Point (sem filtro), sem compressão, sem mipmap. O `PixelArtImporter` aplica isso sozinho.
@@ -75,11 +75,28 @@ Status: rascunho (R), revisado (V), final (F).
 |---|---|---|
 | Paleta | `art-src/palette.json` | R |
 | Tileset laboratório (21 tiles) | `art-src/Tiles/lab_tiles.json` | R |
-| Thomas Reis: idle, andar 4 dir., reparo | `art-src/Sprites/thomas.json` | a fazer |
+| Thomas Reis: idle e andar em 8 direções, reparo | `art-src/Sprites/thomas.json` | R |
+| Thomas Reis: retrato de diálogo (neutro, assustado) | `art-src/Portraits/thomas_portrait.json` | R |
 | Espécime Vazio: 10 animações (idle, andar e correr em 3 direções, escutar, grito, atordoado) + camada de brilho | `art-src/Monster/EspecimeB_sheet.json`, `EspecimeB_sheet_glow.json` | V (arte original da Frente 2, reduzida para 48x64) |
 | Itens: bateria, estabilizador, Adrena-Syn, HD | `art-src/Sprites/itens.json` | a fazer |
 
 Tiles do laboratório: `floor_a`, `floor_seam`, `floor_b` (rachadura), `floor_c` (mancha), `floor_grate`, `floor_hazard`, `wall_top`, `wall_face`, `wall_face_pipes`, `wall_terminal`, `breaker_off`, `breaker_on`, `door_top`, `door_bottom`, `server_top`, `server_bottom`, `server_bottom_empty`, `puddle`, `blood_smear`, `papers`, `ceiling_lamp`.
+
+### Ficha: Thomas Reis
+
+| Parte | Cores | Observação |
+|---|---|---|
+| Cabelo | `p` massa, `q` brilho só no topo | Silhueta escura, sem contorno |
+| Pele | `q` sombra, `r` base, `s` brilho | Olhos de 1 px no sprite |
+| Terno | `1` barra e sombra, `2` base, `3` ombros, `f` lado na sombra | Grafite com sombra azulada (hue shift) |
+| Camisa e gravata | `8`/`7` gola, `g` gravata | Gravata escura e discreta; vermelho fica para perigo |
+| Lanterna Lux-90 | `t` corpo, `u` lente | Único acento saturado do personagem |
+| Sombra | `1` | Elipse sob os pés |
+
+- Frame 24x32, pivô nos pés. ~26 px de altura, cabeça de 10x10.
+- 8 direções: `down`, `down_side`, `side`, `up_side`, `up` desenhadas; esquerda por flipX (`PlayerSpriteAnimator`). A direção segue a mira, não o movimento.
+- Clips: `idle_<dir>` 4 quadros a 6 fps, `walk_<dir>` 6 quadros a 10 fps, `repair` 4 quadros a 8 fps (de costas, mãos no painel, faísca azul).
+- Retrato 64x64 (`Art/Portraits/`): mais detalhe no rosto, crachá verde da Aethelgard no peito. Expressões `neutral` e `scared`.
 
 ## 6. Como editar ou criar arte
 
