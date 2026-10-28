@@ -31,7 +31,8 @@ Survival horror psicológico em 2D top-down feito em Unity para a disciplina de 
 | [docs/gdd/gdd.md](docs/gdd/gdd.md) | GDD resumido (fonte de verdade para o código) |
 | [docs/gdd/GDD-v1.0.pdf](docs/gdd/GDD-v1.0.pdf) | GDD completo entregue |
 | [docs/gdd/gdd-v1.1-propostas.md](docs/gdd/gdd-v1.1-propostas.md) | Propostas para responder ao feedback do professor |
-| [docs/equipe.md](docs/equipe.md) | Quem é dono de cada sistema |
+| [docs/equipe.md](docs/equipe.md) | As 5 frentes de trabalho e como escolher uma |
+| [docs/mini-demo.md](docs/mini-demo.md) | Plano da mini demo (29/10) |
 | [docs/decisoes/](docs/decisoes/) | Decisões técnicas registradas |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Fluxo de trabalho, branches, commits e cenas |
 
@@ -41,7 +42,7 @@ Survival horror psicológico em 2D top-down feito em Unity para a disciplina de 
 Assets/_Project/
   Scripts/      Core, Player, Flashlight, Monster, Sanity, Interaction, UI, Editor
   ScriptableObjects/Config/   valores de balanceamento (GDD seção 6)
-  Scenes/       Main, Wings (alas), Sandbox (testes por pessoa)
+  Scenes/       Main, Wings (alas), Sandbox (testes por frente)
   Prefabs/  Art/  Audio/
 docs/           GDD, decisões, equipe, índice de referências
 ```

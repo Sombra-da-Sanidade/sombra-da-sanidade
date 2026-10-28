@@ -27,23 +27,47 @@ Tudo em blocos cinzas. Arte, som, alucinações e narrativa ficam para depois.
 | EMP | `Flashlight/` | **a fazer** |
 
 Menus no Unity (**Sombra da Sanidade**):
-- **Criar minha Sandbox > <Nome>**: sua cena de teste com o mapa da demo completo.
-- **Gerar cena Demo (base)**: cria `Scenes/Main/Demo.unity`. Davi gera uma vez no 6000.5.10f1 e commita; depois disso só o dono da cena edita.
+- **Criar Sandbox > Frente N**: cena de teste da sua frente com o mapa da demo completo.
+- **Gerar cena Demo (base)**: cria `Scenes/Main/Demo.unity`. A Frente 4 gera uma vez no 6000.5.10f1 e commita; depois disso só ela edita a cena.
 - **Build WebGL**: gera `Builds/WebGL`.
 
-Procure `TODO(<seu nome>)` no código para achar o que é seu.
+Procure `TODO(Frente N)` no código para achar o que falta na sua frente.
 
-## Divisão
+## Divisão em 5 frentes
 
-| Pessoa | Entrega | Issue | Pode mexer em |
-|---|---|---|---|
-| Luis | EMP no clique direito: `TrySpend(empCost)`, se o monstro estiver no cone chama `Stun(empStunDuration)`, `NoiseBus.Emit`, `CameraFollow.Shake`. Ajuste fino da lanterna. | #6 | `Scripts/Flashlight/`, `Scripts/Player/` |
-| Rony | Monstro: NavMeshPlus (Surface na cena, Modifier nas paredes), patrulha por waypoints, perseguição, atração quando `IsPointInCone` o toca, ouvir ruído, stun, `TriggerGameOver(Monster)` ao encostar. | #4, #5 | `Scripts/Monster/`, prefab Monster |
-| Marley | Sanidade: dreno no escuro (`!flashlight.IsLit && !InSafeZone`), dreno perto do monstro, regen na Zona Segura; vinheta no Volume reagindo ao `Ratio`. Melhorar HUD se der tempo. | #8, #9 | `Scripts/Sanity/`, `Scripts/UI/`, Volume profile |
-| Thiago | Disjuntor: ao completar, liga Light2D de teto + trigger de Zona Segura por 60s (chama `SetInSafeZone`, monstro não entra). Ajustar o mapa da `Demo.unity` (dono da cena). | #10, #12 | `Scripts/Interaction/Breaker.cs`, `Scenes/Main/Demo.unity` |
-| Davi | Integração na `Demo.unity` (com o Thiago), playtest, números nos configs, build WebGL e publicação. | #7, #11 | `Scripts/Core/`, configs |
+Cada integrante escolhe **uma frente livre** e se atribui nas issues dela (como fazer: [equipe.md](equipe.md#como-pegar-uma-frente)).
 
-Regras: cada um testa **na própria Sandbox** e só edita os arquivos da sua linha. Não mude a assinatura dos métodos públicos dos stubs sem avisar no grupo.
+### Frente 1: Lanterna e EMP
+- **Essencial do MVP:** lanterna de cone, pulso EMP.
+- **Issues:** #6
+- **Entrega:** clique direito dispara o EMP: `TrySpend(empCost)`; se o monstro estiver no cone (`IsPointInCone`), chama `Stun(empStunDuration)`; `NoiseBus.Emit` e `CameraFollow.Shake`. Sem carga: feedback simples. Ajuste fino da lanterna (intensidade, alcance) no `FlashlightConfig`.
+- **Pode mexer em:** `Scripts/Flashlight/`, `Scripts/Player/`.
+
+### Frente 2: Monstro
+- **Essencial do MVP:** IA perseguidora imortal com NavMesh 2D.
+- **Issues:** #4, #5
+- **Entrega:** NavMeshPlus (Surface na cena, Modifier nas paredes), NavMeshAgent, patrulha por waypoints, perseguição, atração quando o cone da lanterna o toca, investigar ruídos (`Alert`), stun, `GameManager.Instance.TriggerGameOver(DeathCause.Monster)` ao encostar no jogador.
+- **Pode mexer em:** `Scripts/Monster/`, prefab Monster.
+
+### Frente 3: Sanidade e HUD
+- **Essencial do MVP:** dreno de sanidade.
+- **Issues:** #8, #9
+- **Entrega:** dreno no escuro (`!flashlight.IsLit && !InSafeZone`), dreno com o monstro próximo, regeneração na Zona Segura, vinheta no Volume reagindo ao `Ratio`. Melhorar o HUD provisório se sobrar tempo.
+- **Pode mexer em:** `Scripts/Sanity/`, `Scripts/UI/`, Volume profile.
+
+### Frente 4: Disjuntor e mapa
+- **Essencial do MVP:** reparo de disjuntores.
+- **Issues:** #10, #12
+- **Entrega:** ao completar o reparo, liga Light2D de teto + trigger de Zona Segura por 60s (chama `SetInSafeZone`, monstro não entra), depois libera novo reparo. Responsável pela cena `Demo.unity`: gerar, ajustar corredores e posições após o playtest.
+- **Pode mexer em:** `Scripts/Interaction/Breaker.cs`, `Scenes/Main/Demo.unity`.
+
+### Frente 5: Partida, HDs e build
+- **Essencial do MVP:** extração das 3 gavetas de HD, vitória e derrota.
+- **Issues:** #7, #11
+- **Entrega:** validar `GameManager`, `DriveServer` e `ExitDoor` (já implementados) na `Demo.unity`, conduzir a integração e o playtest, ajustar números nos configs, gerar o build WebGL e publicar o link. Acompanhar o onboarding (#2).
+- **Pode mexer em:** `Scripts/Core/`, `DriveServer.cs`, `ExitDoor.cs`, `ScriptableObjects/Config/`, `ProjectSettings/`, `Packages/`.
+
+Regras: cada um testa **na Sandbox da própria frente** e só edita os arquivos da sua frente. Não mude a assinatura dos métodos públicos dos contratos sem avisar no grupo.
 
 ## Cronograma
 
@@ -51,9 +75,9 @@ Regras: cada um testa **na própria Sandbox** e só edita os arquivos da sua lin
 |---|---|
 | Ter 27, noite | Merge da estrutura. Todos: instalar Unity 6000.5.10f1 (+ Web Build Support), clonar, criar Sandbox (issue #2). |
 | Qua 28, até 18h | Cada um abre o PR do seu sistema. |
-| Qua 28, 18h | O que não tiver PR, Davi completa a partir do stub. |
-| Qua 28, noite | Integração na `Demo.unity`, playtest, ajuste de números. |
-| Qui 29, manhã | Build WebGL, upload, testar o link em outro PC. Código congelado. |
+| Qua 28, 18h | Frente sem PR: o grupo redistribui e completa a partir do contrato. |
+| Qua 28, noite | Integração na `Demo.unity` (Frentes 4 e 5), playtest com todos, ajuste de números. |
+| Qui 29, manhã | Frente 5: build WebGL, upload, testar o link em outro PC. Código congelado. |
 
 ## Roteiro do playtest
 
