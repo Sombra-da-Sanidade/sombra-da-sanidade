@@ -47,8 +47,8 @@ Uma intenção por commit. Se a mensagem precisa de "e", são dois commits.
 
 Conflito em `.unity` é o maior risco do projeto. Regras:
 
-- **Cada cena tem um dono** (ver [docs/equipe.md](docs/equipe.md)). Só o dono edita. Para mudar a cena de outra pessoa, combine antes no grupo.
-- **Teste na sua Sandbox**: `Assets/_Project/Scenes/Sandbox/<SeuNome>.unity`. Pode bagunçar à vontade.
+- **Cada cena pertence a uma frente** (ver [docs/equipe.md](docs/equipe.md)). Só quem pegou a frente edita. Para mudar a cena de outra frente, combine antes no grupo.
+- **Teste na Sandbox da sua frente**: `Assets/_Project/Scenes/Sandbox/Frente<N>.unity` (menu **Sombra da Sanidade > Criar Sandbox**). Pode bagunçar à vontade.
 - **Monte tudo em prefabs**. A cena da ala só posiciona prefabs. Mudar o comportamento do monstro = editar o prefab do monstro, não a cena.
 - **Números ficam em ScriptableObjects** (`Assets/_Project/ScriptableObjects/Config/`). Ajustar balanceamento não deve exigir mexer em cena nem em código.
 - Sempre commite o `.meta` junto do arquivo. Nunca apague `.meta` na mão.

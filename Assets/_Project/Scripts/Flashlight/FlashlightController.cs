@@ -40,6 +40,7 @@ namespace SombraDaSanidade.Flashlight
         private void Update()
         {
             ReadToggle();
+            // TODO(Frente 1): pulso EMP no clique direito (issue #6). Ver docs/mini-demo.md.
             Aim();
             Drain();
             UpdateLight();
