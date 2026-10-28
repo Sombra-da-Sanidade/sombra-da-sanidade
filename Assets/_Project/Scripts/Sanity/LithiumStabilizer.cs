@@ -14,7 +14,9 @@ namespace SombraDaSanidade.Sanity
         [SerializeField] private SanityController sanity;
 
         public string Prompt => "Usar Estabilizador de Lítio";
-        public bool CanInteract => !used && sanity != null && sanity.Config != null;
+        // Com a sanidade cheia o prompt nem aparece, para o jogador não desperdiçar o item.
+        public bool CanInteract => !used && sanity != null && sanity.Config != null
+            && sanity.Value < sanity.Config.maxSanity;
         public float HoldDuration => 0f;
 
         private bool used;
