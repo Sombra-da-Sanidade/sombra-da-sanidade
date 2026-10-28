@@ -20,9 +20,9 @@ Tudo em blocos cinzas. Arte, som, alucinações e narrativa ficam para depois.
 | Interação segurando E (cancela se mover) | `Interaction/PlayerInteractor.cs` | pronto |
 | Servidor de HD | `Interaction/DriveServer.cs` | pronto |
 | Porta da eclusa | `Interaction/ExitDoor.cs` | pronto |
-| HUD provisório (bateria, HDs) | `UI/DemoHud.cs` | pronto |
+| HUD provisório (bateria, sanidade, HDs) | `UI/DemoHud.cs` | pronto |
 | Monstro | `Monster/MonsterController.cs` | **stub** (API pronta, lógica TODO) |
-| Sanidade | `Sanity/SanityController.cs` | **parcial** (valor, estados, morte; dreno TODO) |
+| Sanidade (dreno, efeitos, alucinações, pistas, Estabilizador) | `Sanity/` | pronto (ver [sanidade.md](sanidade.md)) |
 | Disjuntor | `Interaction/Breaker.cs` | **parcial** (reparo e ruído; Zona Segura TODO) |
 | EMP | `Flashlight/` | **a fazer** |
 
