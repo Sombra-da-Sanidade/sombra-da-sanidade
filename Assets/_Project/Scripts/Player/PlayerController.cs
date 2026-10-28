@@ -11,8 +11,10 @@ namespace SombraDaSanidade.Player
         [SerializeField] private PlayerConfig config;
 
         [Header("Referências")]
-        [Tooltip("Filho com o sprite. Gira para a direção da mira.")]
+        [Tooltip("Filho com o sprite. Gira para a direção da mira se rotateVisual estiver ligado.")]
         [SerializeField] private Transform visual;
+        [Tooltip("Desligue com sprite em vista 3/4 (PlayerSpriteAnimator escolhe a direção pela mira).")]
+        [SerializeField] private bool rotateVisual = true;
         [SerializeField] private float visualRotationOffset = -90f;
 
         public Vector2 Facing { get; private set; } = Vector2.down;
@@ -73,7 +75,7 @@ namespace SombraDaSanidade.Player
 
             Facing = dir.normalized;
 
-            if (visual != null)
+            if (visual != null && rotateVisual)
             {
                 float angle = Mathf.Atan2(Facing.y, Facing.x) * Mathf.Rad2Deg + visualRotationOffset;
                 visual.rotation = Quaternion.Euler(0f, 0f, angle);
