@@ -23,6 +23,10 @@ namespace SombraDaSanidade.Sanity
         public float safeZoneRegen = 2f;
         [Tooltip("Estabilizador de Lítio (GDD: +30).")]
         public float stabilizerAmount = 30f;
+        [Tooltip("Multiplicador de velocidade depois do Estabilizador (GDD 4.3: \"deixa Thomas lento\"). Valor não está no GDD.")]
+        public float stabilizerSlowMultiplier = 0.6f;
+        [Tooltip("Segundos lento depois do Estabilizador (GDD 4.3: \"alguns segundos\"). Valor não está no GDD.")]
+        public float stabilizerSlowDuration = 4f;
 
         [Header("Limites dos estados (GDD 4.2)")]
         public float anxiousBelow = 75f;
@@ -30,5 +34,13 @@ namespace SombraDaSanidade.Sanity
         public float collapsedBelow = 15f;
         [Tooltip("Pistas de enigma aparecem abaixo deste valor (GDD 4.4: 35%).")]
         public float revealCluesBelow = 35f;
+
+        [Header("Alucinações (GDD 4.6)")]
+        [Tooltip("Alucinações começam abaixo deste valor (GDD: 35%).")]
+        public float hallucinationsBelow = 35f;
+        [Tooltip("Intervalo mínimo entre alucinações em segundos (GDD: 15).")]
+        public float hallucinationMinInterval = 15f;
+        [Tooltip("Intervalo máximo entre alucinações em segundos (GDD: 25).")]
+        public float hallucinationMaxInterval = 25f;
     }
 }
