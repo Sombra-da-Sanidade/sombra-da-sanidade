@@ -15,6 +15,7 @@ MonoBehaviour:
   maxSanity: 100
   darknessDrain: 1.5
   monsterProximityDrain: 3
+  monsterProximityRadius: 5
   adrenaSynCost: 20
   safeZoneRegen: 2
   stabilizerAmount: 30

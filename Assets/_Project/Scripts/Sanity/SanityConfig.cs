@@ -13,6 +13,8 @@ namespace SombraDaSanidade.Sanity
         public float darknessDrain = 1.5f;
         [Tooltip("Proximidade do monstro (GDD: -3%/s).")]
         public float monsterProximityDrain = 3f;
+        [Tooltip("Distância em que o monstro conta como próximo. Não está no GDD: ajustar no playtest.")]
+        public float monsterProximityRadius = 5f;
         [Tooltip("Custo imediato do Módulo Adrena-Syn (GDD: -20).")]
         public float adrenaSynCost = 20f;
 
