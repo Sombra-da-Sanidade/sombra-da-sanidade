@@ -24,6 +24,7 @@ namespace SombraDaSanidade.EditorTools
         public const string PrototypeScenePath = Root + "/Scenes/Sandbox/Prototipo.unity";
         public const string DemoScenePath = Root + "/Scenes/Main/Demo.unity";
         private const string WallLayerName = "Walls";
+        private const string UnlitSpriteMaterialPath = "Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Unlit-Default.mat";
 
         private static readonly Color WallColor = new Color(0.45f, 0.45f, 0.48f);
 
@@ -98,7 +99,9 @@ namespace SombraDaSanidade.EditorTools
             var player = CreatePlayer(square, playerConfig, flashlightConfig, sanityConfig, wallLayer, new Vector2(0f, -11f));
             CreateCamera(player.transform);
             CreateHud(player.GetComponent<FlashlightController>());
+            CreateSanityEffects(player.GetComponent<SanityController>(), square, wallLayer);
             CreateObjectives(square);
+            CreateSanityItems(square);
             CreateMonster(square, monsterConfig, new Vector2(16f, 10f));
 
             Directory.CreateDirectory(Path.GetDirectoryName(path));
@@ -310,11 +313,86 @@ namespace SombraDaSanidade.EditorTools
             var hud = new GameObject("DemoHud").AddComponent<DemoHud>();
             SetRef(hud, "flashlight", flashlight);
 
-            var sanity = flashlight.GetComponent<SanityController>();
-            SetRef(hud, "sanity", sanity);
+            SetRef(hud, "sanity", flashlight.GetComponent<SanityController>());
+        }
 
+        // ---------- Sanidade ----------
+
+        // Vinheta + aberração, batimento + tremor e alucinações (GDD 4.6, 7 e 9).
+        private static void CreateSanityEffects(SanityController sanity, Sprite square, int wallLayer)
+        {
             var vignette = new GameObject("SanityVignette").AddComponent<SanityVignette>();
             SetRef(vignette, "sanity", sanity);
+
+            var heartbeat = new GameObject("SanityHeartbeat").AddComponent<SanityHeartbeat>();
+            SetRef(heartbeat, "sanity", sanity);
+
+            var hallucination = new GameObject("SanityHallucination").AddComponent<SanityHallucination>();
+            var phantom = CreateBlock(hallucination.transform, square, "Phantom", Vector2.zero, new Vector2(0.9f, 0.9f), new Color(0.3f, 0.1f, 0.4f));
+            var phantomSr = phantom.GetComponent<SpriteRenderer>();
+            phantomSr.sortingOrder = 9;
+            var unlit = AssetDatabase.LoadAssetAtPath<Material>(UnlitSpriteMaterialPath);
+            if (unlit != null) phantomSr.sharedMaterial = unlit;
+            else Debug.LogWarning($"Material {UnlitSpriteMaterialPath} não encontrado: a alucinação só aparece sob luz.");
+            SetRef(hallucination, "sanity", sanity);
+            SetRef(hallucination, "phantom", phantomSr);
+            var so = new SerializedObject(hallucination);
+            so.FindProperty("obstacles").intValue = 1 << wallLayer;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // Estabilizadores e pistas em fósforo. Textos provisórios até a Frente 4 ter os puzzles.
+        private static void CreateSanityItems(Sprite square)
+        {
+            var parent = new GameObject("SanityItems").transform;
+
+            CreateStabilizer(parent, square, "Stabilizer_Sudoeste", new Vector2(-17f, -11f));
+            CreateStabilizer(parent, square, "Stabilizer_Leste", new Vector2(17f, -3f));
+
+            CreateClue(parent, "Clue_FusivelOeste", new Vector2(-7.5f, 2.2f), "FUSÍVEL 3-7-1", 0.06f);
+            CreateClue(parent, "Clue_FusivelLeste", new Vector2(7.5f, 2.2f), "FUSÍVEL 9-0-2", 0.06f);
+            CreateClue(parent, "Clue_Aviso", new Vector2(0f, -5.5f), "ELE SEGUE A LUZ", 0.1f);
+        }
+
+        private static void CreateStabilizer(Transform parent, Sprite square, string name, Vector2 position)
+        {
+            var go = CreateBlock(parent, square, name, position, new Vector2(0.4f, 0.6f), new Color(0.55f, 0.8f, 0.95f));
+            var col = go.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            col.size = new Vector2(2.5f, 2f); // compensa a escala pequena do bloco
+
+            var glow = new GameObject("Glow").AddComponent<Light2D>();
+            glow.transform.SetParent(go.transform, false);
+            glow.lightType = Light2D.LightType.Point;
+            glow.color = new Color(0.55f, 0.8f, 0.95f);
+            glow.intensity = 0.5f;
+            glow.pointLightOuterRadius = 1.2f;
+
+            go.AddComponent<LithiumStabilizer>();
+        }
+
+        // TextMesh usa material próprio (sem luz 2D): brilha no escuro como tinta de fósforo.
+        private static void CreateClue(Transform parent, string name, Vector2 position, string text, float characterSize)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+            go.transform.position = position;
+
+            var font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            var mesh = go.AddComponent<TextMesh>();
+            mesh.text = text;
+            mesh.font = font;
+            mesh.fontSize = 48;
+            mesh.characterSize = characterSize;
+            mesh.anchor = TextAnchor.MiddleCenter;
+            mesh.alignment = TextAlignment.Center;
+            mesh.color = new Color(0.45f, 1f, 0.55f, 0.85f);
+
+            var renderer = go.GetComponent<MeshRenderer>();
+            renderer.sharedMaterial = font.material;
+            renderer.sortingOrder = 8;
+
+            go.AddComponent<SanityClue>();
         }
 
         // ---------- Helpers ----------
