@@ -74,14 +74,23 @@ namespace SombraDaSanidade.EditorTools
 
             if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
 
+            // Garante que os assets existem antes de trocar de cena.
+            GetOrCreateConfig<PlayerConfig>("PlayerConfig");
+            GetOrCreateConfig<FlashlightConfig>("FlashlightConfig");
+            GetOrCreateConfig<SanityConfig>("SanityConfig");
+            GetOrCreateConfig<MonsterConfig>("MonsterConfig");
+            GetOrCreatePlaceholderSprite();
+            int wallLayer = EnsureLayer(WallLayerName);
+
+            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+
+            // Carrega de novo depois do NewScene: ele descarrega assets sem uso e as referências
+            // obtidas antes viram nulas na cena salva.
             var playerConfig = GetOrCreateConfig<PlayerConfig>("PlayerConfig");
             var flashlightConfig = GetOrCreateConfig<FlashlightConfig>("FlashlightConfig");
             var sanityConfig = GetOrCreateConfig<SanityConfig>("SanityConfig");
             var monsterConfig = GetOrCreateConfig<MonsterConfig>("MonsterConfig");
             var square = GetOrCreatePlaceholderSprite();
-            int wallLayer = EnsureLayer(WallLayerName);
-
-            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
             new GameObject("GameManager").AddComponent<GameManager>();
             CreateGlobalLight();
