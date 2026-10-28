@@ -15,7 +15,18 @@ MonoBehaviour:
   baseSpeed: 3.5
   maxSpeed: 4.8
   speedBonusPerDrive: 0.1
+  acceleration: 30
   followNoiseChance: 0.7
   hearingRadius: 6
+  waypointPause: 1
+  noiseMemory: 20
+  listenDuration: 3
+  detectionDelay: 0.8
+  chaseMemory: 1.5
+  lightSampleHeights:
+  - 0.2
+  - 1.4
+  - 2.6
+  safeZoneMargin: 0.6
   mercySanityThreshold: 15
   mercySearchDelay: 0.05

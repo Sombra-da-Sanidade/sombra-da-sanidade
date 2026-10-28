@@ -33,6 +33,7 @@ Survival horror psicológico em 2D top-down feito em Unity para a disciplina de 
 | [docs/gdd/gdd-v1.1-propostas.md](docs/gdd/gdd-v1.1-propostas.md) | Propostas para responder ao feedback do professor |
 | [docs/equipe.md](docs/equipe.md) | As 5 frentes de trabalho e como escolher uma |
 | [docs/mini-demo.md](docs/mini-demo.md) | Plano da mini demo (29/10) |
+| [docs/monstro.md](docs/monstro.md) | Espécime Vazio: estados, regras e contratos da IA |
 | [docs/decisoes/](docs/decisoes/) | Decisões técnicas registradas |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Fluxo de trabalho, branches, commits e cenas |
 

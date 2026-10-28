@@ -3,6 +3,7 @@ using System.Text;
 using SombraDaSanidade.Core;
 using SombraDaSanidade.Flashlight;
 using SombraDaSanidade.Interaction;
+using SombraDaSanidade.Monster;
 using SombraDaSanidade.Player;
 using SombraDaSanidade.Sanity;
 using UnityEditor;
@@ -99,6 +100,10 @@ namespace SombraDaSanidade.EditorTools
                     var clue = Object.FindAnyObjectByType<SanityClue>();
                     Check("Pista em fósforo escondida com a sanidade cheia", clue && !clue.IsRevealed);
                     if (failed) { Finish(); return; }
+                    // O monstro tem teste próprio (MonsterTest); aqui ele sairia patrulhando e poderia
+                    // encostar no jogador teleportado, deixando o teste do loop instável.
+                    var monster = Object.FindAnyObjectByType<MonsterController>();
+                    if (monster != null) monster.gameObject.SetActive(false);
                     batteryAtStart = flashlight.Battery;
                     stepStart = Time.time;
                     Next(10);
