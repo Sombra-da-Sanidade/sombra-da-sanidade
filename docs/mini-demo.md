@@ -21,7 +21,7 @@ Tudo em blocos cinzas. Arte, som, alucinações e narrativa ficam para depois.
 | Servidor de HD | `Interaction/DriveServer.cs` | pronto |
 | Porta da eclusa | `Interaction/ExitDoor.cs` | pronto |
 | HUD provisório (bateria, sanidade, HDs) | `UI/DemoHud.cs` | pronto |
-| Monstro | `Monster/MonsterController.cs` | **stub** (API pronta, lógica TODO) |
+| Monstro (patrulha, ruído, luz, EMP, Zona Segura, contato, sprites) | `Monster/` | pronto (ver [monstro.md](monstro.md)) |
 | Sanidade (dreno, efeitos, alucinações, pistas, Estabilizador) | `Sanity/` | pronto (ver [sanidade.md](sanidade.md)) |
 | Disjuntor | `Interaction/Breaker.cs` | **parcial** (reparo e ruído; Zona Segura TODO) |
 | EMP | `Flashlight/` | **a fazer** |
