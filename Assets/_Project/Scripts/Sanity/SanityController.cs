@@ -20,6 +20,7 @@ namespace SombraDaSanidade.Sanity
         [Tooltip("Espécime Vazio. Vazio: procura um na cena ao iniciar.")]
         [SerializeField] private MonsterController monster;
 
+        public SanityConfig Config => config;
         public float Value { get; private set; }
         public float Ratio => config.maxSanity > 0f ? Value / config.maxSanity : 0f;
         public SanityState State { get; private set; } = SanityState.Lucid;
@@ -95,6 +96,13 @@ namespace SombraDaSanidade.Sanity
         {
             safeZoneCount = Mathf.Max(0, safeZoneCount + (inside ? 1 : -1));
         }
+
+        // Atalhos no menu ⋮ do componente para testar efeitos sem esperar no escuro.
+        [ContextMenu("Debug: -25 de sanidade")]
+        private void DebugDrain() => Add(-25f);
+
+        [ContextMenu("Debug: +25 de sanidade")]
+        private void DebugRestore() => Add(25f);
 
         private void UpdateState()
         {
