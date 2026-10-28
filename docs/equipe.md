@@ -24,7 +24,7 @@ Escopo atual: itens **Essenciais do MVP** (GDD seção 12.1) para a mini demo. D
 | 4 | Disjuntor e mapa | Reparo de disjuntores (Zona Segura) | #10, #12 | `frente:4-disjuntor` | `Scripts/Interaction/Breaker.cs`, `Scenes/Main/Demo.unity` |
 | 5 | Partida, HDs e build | Extração das 3 gavetas de HD; vitória/derrota | #7, #11 | `frente:5-integracao` | `Scripts/Core/`, `DriveServer`, `ExitDoor`, configs, `ProjectSettings/`, `Packages/` |
 
-Comum a todos: **#2 (onboarding)**. Fora da mini demo: #3 (GDD v1.1) e #13 (direção de arte).
+Comum a todos: **#2 (onboarding)** e o [guia de estilo](arte/guia-de-estilo.md): qualquer sprite novo, de qualquer frente, segue a paleta e entra pelo `art-src/` (ver [CONTRIBUTING](../CONTRIBUTING.md#arte)). Fora da mini demo: #3 (GDD v1.1) e #13 (direção de arte).
 
 ## Responsabilidades de quem pega uma frente
 

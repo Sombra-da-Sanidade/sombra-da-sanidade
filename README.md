@@ -34,6 +34,7 @@ Survival horror psicológico em 2D top-down feito em Unity para a disciplina de 
 | [docs/equipe.md](docs/equipe.md) | As 5 frentes de trabalho e como escolher uma |
 | [docs/mini-demo.md](docs/mini-demo.md) | Plano da mini demo (29/10) |
 | [docs/monstro.md](docs/monstro.md) | Espécime Vazio: estados, regras e contratos da IA |
+| [docs/arte/guia-de-estilo.md](docs/arte/guia-de-estilo.md) | Direção de arte: paleta, escala, regras de desenho, fichas de personagem |
 | [docs/decisoes/](docs/decisoes/) | Decisões técnicas registradas |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Fluxo de trabalho, branches, commits e cenas |
 
@@ -44,8 +45,10 @@ Assets/_Project/
   Scripts/      Core, Player, Flashlight, Monster, Sanity, Interaction, UI, Editor
   ScriptableObjects/Config/   valores de balanceamento (GDD seção 6)
   Scenes/       Main, Wings (alas), Sandbox (testes por frente)
-  Prefabs/  Art/  Audio/
-docs/           GDD, decisões, equipe, índice de referências
+  Prefabs/  Art/  Audio/      Art/ tem PNG gerado de art-src/ (não editar à mão)
+art-src/        fonte da pixel art em texto (JSON) e paleta
+tools/art/      export_sprites.py: art-src/ -> Assets/_Project/Art/
+docs/           GDD, decisões, equipe, arte, índice de referências
 ```
 
 ## Equipe
