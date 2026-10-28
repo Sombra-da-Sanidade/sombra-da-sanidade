@@ -24,6 +24,10 @@ namespace SombraDaSanidade.Sanity
         [SerializeField] private Color calmColor = Color.black;
         [Tooltip("Cor perto do colapso.")]
         [SerializeField] private Color panicColor = new Color(0.35f, 0f, 0.02f);
+        [Tooltip("Sanidade (0-1) em que a vinheta começa a avermelhar.")]
+        [SerializeField, Range(0f, 1f)] private float redStartsAt = 0.5f;
+        [Tooltip("Sanidade (0-1) em que a vinheta fica totalmente vermelha.")]
+        [SerializeField, Range(0f, 1f)] private float fullRedAt = 0.1f;
 
         [Header("Aberração cromática")]
         [Tooltip("Distorção com sanidade zerada. Começa a aparecer no estado Ansioso.")]
@@ -96,7 +100,7 @@ namespace SombraDaSanidade.Sanity
 
             vignette.intensity.Override(Mathf.Clamp01(intensity));
             aberration.intensity.Override(Mathf.Clamp01(distortion));
-            vignette.color.Override(Color.Lerp(calmColor, panicColor, Mathf.InverseLerp(0.5f, 0.1f, ratio)));
+            vignette.color.Override(Color.Lerp(calmColor, panicColor, Mathf.InverseLerp(redStartsAt, fullRedAt, ratio)));
         }
 
         // A câmera gerada pelo menu vem com pós-processamento desligado.
