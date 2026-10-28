@@ -22,10 +22,11 @@ namespace SombraDaSanidade.Interaction
             doorRenderer.color = GameManager.Instance.HasAllDrives ? unlockedColor : lockedColor;
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
+        // Stay e não Enter: se o jogador já estiver na porta quando pegar o 3º HD, vence do mesmo jeito.
+        private void OnTriggerStay2D(Collider2D other)
         {
             if (!other.CompareTag("Player") || GameManager.Instance == null) return;
-            GameManager.Instance.TriggerVictory();
+            if (GameManager.Instance.HasAllDrives) GameManager.Instance.TriggerVictory();
         }
     }
 }
