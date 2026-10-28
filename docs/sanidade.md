@@ -1,8 +1,8 @@
 # Sanidade: o que já funciona
 
-Frente 3 (Sanidade e HUD), issues #8 e #9. Branch `feat/8-dreno-de-sanidade`.
+Frente 3 (Sanidade e HUD), issues #8 e #9.
 
-Resumo do sistema de sanidade como ele está no código hoje, com os valores do GDD v1.0 e onde cada coisa mora. Os números ficam em `ScriptableObjects/Config/SanityConfig.asset`, então dá para ajustar o balanceamento sem mexer em código.
+Resumo do sistema de sanidade como ele está no código hoje, com os valores do GDD v1.0 e onde cada coisa mora. As seções citadas seguem a numeração do PDF ([GDD-v1.0.pdf](gdd/GDD-v1.0.pdf)); no [gdd.md](gdd/gdd.md) resumido os números mudam (ex.: "Controles e interface" é a 7 no PDF e a 8 no resumo). Os números ficam em `ScriptableObjects/Config/SanityConfig.asset`, então dá para ajustar o balanceamento sem mexer em código.
 
 ## Como a sanidade muda
 
@@ -41,7 +41,7 @@ Qualquer objeto com `SanityClue` fica invisível com a sanidade alta e aparece, 
 
 ### Estabilizador de Lítio (GDD 4.3)
 
-Item azul-claro no chão, usado com **E** na hora (não há inventário). Dá +30 de sanidade e deixa o Thomas com 60% da velocidade por 4 s. O GDD só diz "lento por alguns segundos", então 60% e 4 s são valores de playtest (`stabilizerSlowMultiplier`, `stabilizerSlowDuration`).
+Item azul-claro no chão, usado com **E** na hora (não há inventário). Com a sanidade cheia o prompt não aparece, para o item não ser desperdiçado. Dá +30 de sanidade e deixa o Thomas com 60% da velocidade por 4 s. O GDD só diz "lento por alguns segundos", então 60% e 4 s são valores de playtest (`stabilizerSlowMultiplier`, `stabilizerSlowDuration`).
 
 ## Arquivos
 
@@ -58,6 +58,8 @@ Todos em `Assets/_Project/Scripts/Sanity/`:
 | `LithiumStabilizer.cs` | Item Estabilizador de Lítio |
 
 O menu **Sombra da Sanidade > Gerar cena de protótipo** (e as Sandboxes) já cria tudo isso na cena: efeitos, 2 estabilizadores e 3 pistas.
+
+Se o `SanityConfig` estiver vazio no Player, o `SanityController` e todos os efeitos acima se desligam com um erro no Console, em vez de gerar erro a cada frame.
 
 ## Como testar
 
