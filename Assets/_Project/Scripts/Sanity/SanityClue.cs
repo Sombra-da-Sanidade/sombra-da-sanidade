@@ -27,9 +27,11 @@ namespace SombraDaSanidade.Sanity
         private void Awake()
         {
             if (sanity == null) sanity = FindAnyObjectByType<SanityController>();
-            if (sanity == null)
+            if (sanity == null || sanity.Config == null)
             {
-                Debug.LogError($"{name}: SanityClue sem SanityController na cena.", this);
+                Debug.LogError($"{name}: SanityClue sem SanityController (ou sem SanityConfig) na cena.", this);
+                // Esconde para não entregar a pista com a sanidade cheia.
+                foreach (var r in GetComponentsInChildren<Renderer>(true)) r.enabled = false;
                 enabled = false;
                 return;
             }

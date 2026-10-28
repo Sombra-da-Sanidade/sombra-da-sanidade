@@ -42,9 +42,9 @@ namespace SombraDaSanidade.Sanity
         private void Awake()
         {
             if (sanity == null) sanity = FindAnyObjectByType<SanityController>();
-            if (sanity == null)
+            if (sanity == null || sanity.Config == null)
             {
-                Debug.LogError($"{name}: SanityVignette sem SanityController na cena.", this);
+                Debug.LogError($"{name}: SanityVignette sem SanityController (ou sem SanityConfig) na cena.", this);
                 enabled = false;
                 return;
             }

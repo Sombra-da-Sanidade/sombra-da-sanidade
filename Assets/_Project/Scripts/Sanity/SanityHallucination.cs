@@ -44,9 +44,9 @@ namespace SombraDaSanidade.Sanity
         private void Awake()
         {
             if (sanity == null) sanity = FindAnyObjectByType<SanityController>();
-            if (sanity == null || phantom == null)
+            if (sanity == null || sanity.Config == null || phantom == null)
             {
-                Debug.LogError($"{name}: SanityHallucination sem SanityController ou silhueta.", this);
+                Debug.LogError($"{name}: SanityHallucination sem SanityController, SanityConfig ou silhueta.", this);
                 enabled = false;
                 return;
             }

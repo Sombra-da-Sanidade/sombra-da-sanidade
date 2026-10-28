@@ -14,7 +14,7 @@ namespace SombraDaSanidade.Sanity
         [SerializeField] private SanityController sanity;
 
         public string Prompt => "Usar Estabilizador de Lítio";
-        public bool CanInteract => !used && sanity != null;
+        public bool CanInteract => !used && sanity != null && sanity.Config != null;
         public float HoldDuration => 0f;
 
         private bool used;
