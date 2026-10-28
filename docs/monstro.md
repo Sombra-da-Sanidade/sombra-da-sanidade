@@ -46,10 +46,11 @@ Não estão no GDD (ajustar no playtest): grito de 0,8 s (`detectionDelay`), mem
 
 ## Arte e animação
 
-- Folhas em `Art/Monster/`: `EspecimeB_sheet.png` (96×128 por quadro, 8 colunas, 10 animações) e `EspecimeB_sheet_glow.png` (LEDs, brasa e faíscas, na mesma grade). Design: Variante B do canvas de design do monstro.
+- Folhas em `Art/Monster/`: `EspecimeB_sheet.png` (48×64 por quadro, 16 px/unidade, 8 colunas, 10 animações) e `EspecimeB_sheet_glow.png` (LEDs, brasa e faíscas, na mesma grade). Design: Variante B do canvas de design do monstro, reduzida da versão 96×128 para a densidade de pixel dos tiles e para a paleta do projeto (rampa Espécime).
+- A fonte é texto: `art-src/Monster/EspecimeB_sheet*.json`. Edite lá (ou no Estúdio) e rode `python3 tools/art/export_sprites.py`; não edite o PNG direto. Ver [guia de estilo](arte/guia-de-estilo.md).
 - `MonsterSpriteAnimator` escolhe a animação pelo estado e a direção pela velocidade: `idle`, `walk_*`, `listen`, `scream`, `run_*` e `stun`. O lado esquerdo usa flipX.
 - O corpo usa Sprite-Lit (some no escuro). A camada de brilho usa Sprite-Unlit, e há uma Light2D pequena nos eletrodos que muda de cor com o estado. É isso que deixa ver a "silhueta" de longe no escuro.
-- Para trocar a arte (por exemplo, voltar para a Variante A), troque as texturas e o `frameSize` no componente e ajuste a tabela de animações.
+- Para trocar a arte (por exemplo, voltar para a Variante A), gere o JSON em `art-src/Monster/`, exporte, e ajuste `frameSize` no componente e a tabela de animações.
 
 ## Arquivos
 

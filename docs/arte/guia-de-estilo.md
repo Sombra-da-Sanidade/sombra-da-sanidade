@@ -20,14 +20,14 @@ Cada regra de arte reforça uma regra de jogo:
 ## 2. Escala e técnica
 
 - **Tile:** 16x16 px. **PPU:** 16 (1 tile = 1 unidade do Unity).
-- **Personagens:** 24 a 28 px de altura dentro de um frame 16x32, largura de 10 a 14 px. Cabeça grande (cerca de 1/3 da altura), como em Yuppie Psycho. Espécime Vazio bem maior que Thomas (36 a 40 px, frame 24x40), membros finos e longos.
+- **Personagens:** 24 a 28 px de altura dentro de um frame 16x32, largura de 10 a 14 px. Cabeça grande (cerca de 1/3 da altura), como em Yuppie Psycho. Espécime Vazio bem maior que Thomas: cerca de 55 px de altura num frame 48x64 (3x4 unidades no mundo), membros finos e longos.
 - **Câmera:** Pixel Perfect Camera, resolução base 320x180 (escala inteira para 1280x720 e 1920x1080).
 - **Perspectiva:** top-down 3/4, como Yuppie Psycho: chão visto de cima, paredes mostram a face frontal (2 tiles de altura) com topo escuro.
 - **Importação no Unity:** Point (sem filtro), sem compressão, sem mipmap. O `PixelArtImporter` aplica isso sozinho.
 
 ## 3. Paleta
 
-32 cores, definidas em [`art-src/palette.json`](../../art-src/palette.json). Arquivo `.gpl` para Aseprite/LibreSprite/GIMP: [`art-src/sombra.gpl`](../../art-src/sombra.gpl). Use **só** essas cores.
+38 cores, definidas em [`art-src/palette.json`](../../art-src/palette.json). Arquivo `.gpl` para Aseprite/LibreSprite/GIMP: [`art-src/sombra.gpl`](../../art-src/sombra.gpl). Use **só** essas cores.
 
 | Rampa | Chaves | Uso |
 |---|---|---|
@@ -37,7 +37,8 @@ Cada regra de arte reforça uma regra de jogo:
 | Emergência | `k` a `o` | Sangue, alarme, disjuntor queimado, luz de emergência |
 | Pele | `p` a `s` | Personagens humanos, couro, madeira |
 | Âmbar | `t`, `u` | Lâmpadas (Zona Segura), faixas de aviso |
-| Hipnos | `v`, `w` | Carne do Espécime Vazio, alucinações |
+| Hipnos | `v`, `w` | Alucinações, Revelação pela Loucura |
+| Espécime | `x y z` (trapos verde-doente), `A B C` (carne, cérebro exposto) | Só no Espécime Vazio |
 
 ## 4. Regras de desenho
 
@@ -75,7 +76,7 @@ Status: rascunho (R), revisado (V), final (F).
 | Paleta | `art-src/palette.json` | R |
 | Tileset laboratório (21 tiles) | `art-src/Tiles/lab_tiles.json` | R |
 | Thomas Reis: idle, andar 4 dir., reparo | `art-src/Sprites/thomas.json` | a fazer |
-| Espécime Vazio: patrulha, corrida, atordoado | `art-src/Sprites/especime.json` | a fazer |
+| Espécime Vazio: 10 animações (idle, andar e correr em 3 direções, escutar, grito, atordoado) + camada de brilho | `art-src/Monster/EspecimeB_sheet.json`, `EspecimeB_sheet_glow.json` | V (arte original da Frente 2, reduzida para 48x64) |
 | Itens: bateria, estabilizador, Adrena-Syn, HD | `art-src/Sprites/itens.json` | a fazer |
 
 Tiles do laboratório: `floor_a`, `floor_seam`, `floor_b` (rachadura), `floor_c` (mancha), `floor_grate`, `floor_hazard`, `wall_top`, `wall_face`, `wall_face_pipes`, `wall_terminal`, `breaker_off`, `breaker_on`, `door_top`, `door_bottom`, `server_top`, `server_bottom`, `server_bottom_empty`, `puddle`, `blood_smear`, `papers`, `ceiling_lamp`.
