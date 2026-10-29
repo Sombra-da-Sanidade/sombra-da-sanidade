@@ -195,12 +195,18 @@ namespace SombraDaSanidade.EditorTools
             PlayerController player, NavMeshAgent agent)
         {
             // Corredor externo direito: mira acima da cabeça, deixando pés e tronco fora do cone.
+            // O feixe sai da lente na mão do Thomas, então a mira é calculada a partir dela: a borda de
+            // baixo do cone fica 5° abaixo da cabeça.
             agent.Warp(new Vector3(18f, -6f, 0f));
             Teleport(player, new Vector2(16.5f, -6f));
-            float angle = 80f * Mathf.Deg2Rad;
-            SetFacing(player, new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)));
             Physics2D.SyncTransforms();
             Vector2 feet = monster.transform.position;
+            var flashlightConfig = (FlashlightConfig)new SerializedObject(flashlight)
+                .FindProperty("config").objectReferenceValue;
+            Vector2 origin = flashlight.transform.Find("FlashlightPivot").position;
+            Vector2 toHead = feet + Vector2.up * 2.6f - origin;
+            float angle = (Mathf.Atan2(toHead.y, toHead.x) * Mathf.Rad2Deg + flashlightConfig.coneAngle * 0.5f - 5f) * Mathf.Deg2Rad;
+            SetFacing(player, new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)));
             Check("Regressão EMP: pés e tronco fora do cone, cabeça dentro",
                 !flashlight.IsPointInCone(feet)
                 && !flashlight.IsPointInCone(feet + Vector2.up * 0.2f)
@@ -208,10 +214,8 @@ namespace SombraDaSanidade.EditorTools
                 && flashlight.IsPointInCone(feet + Vector2.up * 2.6f));
             Check("Detecção reconhece a cabeça iluminada", monster.IsLitByFlashlight());
 
-            var config = (FlashlightConfig)new SerializedObject(flashlight)
-                .FindProperty("config").objectReferenceValue;
-            flashlight.Recharge(config.maxBattery);
-            flashlight.TrySpend(flashlight.Battery - config.empCost);
+            flashlight.Recharge(flashlightConfig.maxBattery);
+            flashlight.TrySpend(flashlight.Battery - flashlightConfig.empCost);
 
             int noises = 0;
             bool stunnedAtNoise = false;
