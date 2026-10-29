@@ -116,10 +116,29 @@ namespace SombraDaSanidade.Monster
             }
         }
 
-        private string DirectionSuffix()
+        private string DirectionSuffix() => DirectionSuffix(facing);
+
+        public static string DirectionSuffix(Vector2 facing)
         {
             if (Mathf.Abs(facing.x) > Mathf.Abs(facing.y)) return "side";
             return facing.y > 0f ? "up" : "down";
+        }
+
+        // Quadro de uma animação num instante, cortado da mesma folha do monstro.
+        // A alucinação de sanidade usa isto: trocou a arte do monstro, ela troca junto.
+        public Sprite FrameAt(string clipName, float time)
+        {
+            int index = IndexOf(clipName);
+            if (bodyFrames == null || index < 0) return null;
+            var clip = clips[index];
+            return bodyFrames[clip.row][FrameIndex(clip, time)];
+        }
+
+        private int FrameIndex(Clip clip, float time)
+        {
+            int count = Mathf.Max(1, Mathf.Min(clip.frames, bodyFrames[clip.row].Length));
+            int frame = Mathf.FloorToInt(time * clip.fps);
+            return clip.loop ? frame % count : Mathf.Min(frame, count - 1);
         }
 
         // A corrida acompanha a velocidade: com mais HDs ele corre mais rápido e a passada acelera junto.
@@ -140,9 +159,7 @@ namespace SombraDaSanidade.Monster
         {
             if (currentClip < 0) return;
             var clip = clips[currentClip];
-            int count = Mathf.Max(1, Mathf.Min(clip.frames, bodyFrames[clip.row].Length));
-            int frame = Mathf.FloorToInt(clipTime * clip.fps);
-            frame = clip.loop ? frame % count : Mathf.Min(frame, count - 1);
+            int frame = FrameIndex(clip, clipTime);
 
             bool flip = clip.name.EndsWith("_side") && facing.x < 0f;
             body.sprite = bodyFrames[clip.row][frame];
