@@ -33,7 +33,9 @@ O GDD (seção 7) pede que a sanidade seja comunicada na própria cena, não por
 
 ### Alucinações (GDD 4.6)
 
-Uma silhueta roxa escura parecida com o Espécime Vazio surge a 3–6 m do jogador, com linha de visão livre, avança devagar e some em cerca de 2 s. Ela aparece mesmo no escuro (material Unlit). Se o feixe da lanterna bater nela, ela se desfaz na hora: é o jeito de o jogador descobrir que não era real.
+Uma silhueta roxa escura do Espécime Vazio surge a 3–6 m do jogador, com linha de visão livre, avança devagar e some em cerca de 2 s. Ela aparece mesmo no escuro (material Unlit). Se o feixe da lanterna bater nela, ela se desfaz na hora: é o jeito de o jogador descobrir que não era real.
+
+A silhueta usa a arte do próprio monstro: a cada quadro, `SanityHallucination` pede ao `MonsterSpriteAnimator` da cena (`FrameAt`) o quadro da animação de andar na direção do jogador. Se a folha ou as animações do monstro mudarem, a alucinação acompanha sem mexer em nada. Sem monstro na cena, ela fica com o sprite que estiver no `Phantom`.
 
 ### Pistas em fósforo (GDD 1, 4.4 regra 5)
 

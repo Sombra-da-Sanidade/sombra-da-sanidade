@@ -377,7 +377,8 @@ namespace SombraDaSanidade.EditorTools
             SetRef(heartbeat, "sanity", sanity);
 
             var hallucination = new GameObject("SanityHallucination").AddComponent<SanityHallucination>();
-            var phantom = CreateBlock(hallucination.transform, square, "Phantom", Vector2.zero, new Vector2(0.9f, 0.9f), new Color(0.3f, 0.1f, 0.4f));
+            // Escala 1: em jogo o sprite vira um quadro da folha do monstro (SanityHallucination.monsterArt), no mesmo tamanho.
+            var phantom = CreateBlock(hallucination.transform, square, "Phantom", Vector2.zero, Vector2.one, new Color(0.3f, 0.1f, 0.4f));
             var phantomSr = phantom.GetComponent<SpriteRenderer>();
             phantomSr.sortingOrder = 9;
             var unlit = AssetDatabase.LoadAssetAtPath<Material>(UnlitSpriteMaterialPath);

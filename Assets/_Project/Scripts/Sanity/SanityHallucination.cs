@@ -1,6 +1,7 @@
 using System;
 using SombraDaSanidade.Core;
 using SombraDaSanidade.Flashlight;
+using SombraDaSanidade.Monster;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -16,6 +17,9 @@ namespace SombraDaSanidade.Sanity
 
         [Tooltip("Silhueta falsa. Usar material Unlit para ser vista no escuro, como o monstro de perto.")]
         [SerializeField] private SpriteRenderer phantom;
+
+        [Tooltip("Arte do monstro que a silhueta imita (anda na direção do jogador). Vazio: procura uma na cena. Sem monstro, fica o sprite da silhueta.")]
+        [SerializeField] private MonsterSpriteAnimator monsterArt;
 
         [Tooltip("Paredes: a silhueta não nasce dentro delas nem atrás delas.")]
         [SerializeField] private LayerMask obstacles;
@@ -51,6 +55,7 @@ namespace SombraDaSanidade.Sanity
                 return;
             }
 
+            if (monsterArt == null) monsterArt = FindAnyObjectByType<MonsterSpriteAnimator>();
             flashlight = sanity.GetComponent<FlashlightController>();
             phantomColor = phantom.color;
             phantom.gameObject.SetActive(false);
@@ -96,6 +101,7 @@ namespace SombraDaSanidade.Sanity
                 elapsed = 0f;
                 IsShowing = true;
                 SetAlpha(0f);
+                UpdateSprite();
                 Appeared?.Invoke(point);
                 return;
             }
@@ -121,6 +127,18 @@ namespace SombraDaSanidade.Sanity
 
             phantom.transform.position = Vector2.MoveTowards(
                 phantom.transform.position, sanity.transform.position, approachSpeed * Time.deltaTime);
+            UpdateSprite();
+        }
+
+        private void UpdateSprite()
+        {
+            if (monsterArt == null) return;
+            Vector2 toPlayer = sanity.transform.position - phantom.transform.position;
+            string suffix = MonsterSpriteAnimator.DirectionSuffix(toPlayer);
+            var frame = monsterArt.FrameAt("walk_" + suffix, elapsed);
+            if (frame == null) return;
+            phantom.sprite = frame;
+            phantom.flipX = suffix == "side" && toPlayer.x < 0f;
         }
 
         private void Hide()
