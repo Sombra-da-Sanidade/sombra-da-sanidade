@@ -16,6 +16,8 @@ namespace SombraDaSanidade.Player
     //   andando → walk_<dir> (run_<dir> com velocidade acima do normal, ex.: Adrena-Syn)
     //   parado → losing_mind (Alucinando/Colapsado), scared (Ansioso ou monstro perto) ou idle_<dir>
     // Com a lanterna desligada, ela vai para o cinto e as variantes "_free" têm as mãos livres.
+    // A posição da lente (pixel âmbar "u" da paleta) é lida da folha em cada quadro e exposta em LensOffset,
+    // para o feixe da lanterna sair da mão do Thomas e não dos pés.
     [RequireComponent(typeof(PlayerController))]
     public class PlayerSpriteAnimator : MonoBehaviour
     {
@@ -43,6 +45,12 @@ namespace SombraDaSanidade.Player
 
         [Header("Renderer")]
         [SerializeField] private SpriteRenderer body;
+
+        [Header("Lente da lanterna")]
+        [Tooltip("Cor da lente acesa na folha (paleta: u, ambar-2).")]
+        [SerializeField] private Color32 lensColor = new Color32(0xf6, 0xd8, 0x78, 0xff);
+        [Tooltip("Altura da lente (unidades, a partir dos pés) nos quadros em que ela some atrás do corpo.")]
+        [SerializeField] private float hiddenLensHeight = 0.55f;
 
         [Header("Limiares")]
         [Tooltip("Acima deste multiplicador de velocidade ele corre em vez de andar (Adrena-Syn: 1.35).")]
@@ -98,12 +106,16 @@ namespace SombraDaSanidade.Player
         private FlashlightController flashlight;
         private SanityController sanity;
         private Sprite[] frames;
+        private Vector2?[] lensByFrame;
         private int currentClip = -1;
         private float clipTime;
         private bool reverse;
 
         private bool lightWasOn = true;
         private bool stowing;
+
+        // Posição da lente relativa ao transform do jogador, já espelhada. Usado pelo FlashlightController.
+        public Vector2 LensOffset { get; private set; }
 
         private void Awake()
         {
@@ -118,6 +130,7 @@ namespace SombraDaSanidade.Player
                 return;
             }
             frames = Slice(sheet);
+            lensByFrame = FindLenses(sheet);
             if (flashlight != null) lightWasOn = flashlight.IsSwitchedOn;
             Play(IndexOf("idle_down"), false);
             Apply(false);
@@ -217,6 +230,54 @@ namespace SombraDaSanidade.Player
             if (frame < 0 || frame >= frames.Length) return;
             body.sprite = frames[frame];
             body.flipX = flip;
+            UpdateLens(frame, flip);
+        }
+
+        // Quadro sem lente visível (de costas, mãos livres): centro do corpo na altura padrão.
+        private void UpdateLens(int frame, bool flip)
+        {
+            Vector2 local = new Vector2(0f, hiddenLensHeight);
+            var found = lensByFrame != null && frame < lensByFrame.Length ? lensByFrame[frame] : null;
+            if (found.HasValue)
+            {
+                local = found.Value;
+                if (flip) local.x = -local.x;
+            }
+            LensOffset = (Vector2)body.transform.localPosition + local;
+        }
+
+        // Procura o pixel da lente em cada quadro. Precisa da textura legível (PixelArtImporter liga isso em Art/Sprites).
+        private Vector2?[] FindLenses(Texture2D tex)
+        {
+            if (!tex.isReadable)
+            {
+                Debug.LogWarning($"{name}: {tex.name} não está legível; o feixe sai da altura padrão.", this);
+                return null;
+            }
+            var pixels = tex.GetPixels32();
+            int cols = tex.width / frameSize.x;
+            var result = new Vector2?[frames.Length];
+            for (int i = 0; i < result.Length; i++)
+            {
+                int x0 = (i % cols) * frameSize.x;
+                int y0 = tex.height - (i / cols + 1) * frameSize.y;
+                Vector2 sum = Vector2.zero;
+                int count = 0;
+                for (int y = 0; y < frameSize.y; y++)
+                {
+                    for (int x = 0; x < frameSize.x; x++)
+                    {
+                        var c = pixels[(y0 + y) * tex.width + x0 + x];
+                        if (c.a == 0 || c.r != lensColor.r || c.g != lensColor.g || c.b != lensColor.b) continue;
+                        sum += new Vector2(x + 0.5f, y + 0.5f);
+                        count++;
+                    }
+                }
+                if (count == 0) continue;
+                Vector2 px = sum / count - new Vector2(pivot.x * frameSize.x, pivot.y * frameSize.y);
+                result[i] = px / pixelsPerUnit;
+            }
+            return result;
         }
 
         private static int IndexOf(string clipName)
