@@ -11,5 +11,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/Scenes/Main/Alfa.unity
     guid: 300a7f15b2e08fa42b6f2fcbc9137533
+  - enabled: 1
+    path: Assets/_Project/Scenes/Wings/AlaMedica.unity
+    guid: 1dac55d3e81e1743982e2790329d9d6b
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
