@@ -49,6 +49,8 @@ namespace SombraDaSanidade.EditorTools
             importer.mipmapEnabled = false;
             importer.alphaIsTransparency = true;
             importer.wrapMode = TextureWrapMode.Clamp;
+            // O PlayerSpriteAnimator lê a folha do personagem para achar a lente da lanterna em cada quadro.
+            importer.isReadable = category == "Sprites";
 
             var sheet = LoadSheet(category, assetPath);
             if (sheet == null || sheet.frames == null || sheet.frames.Length == 0)
