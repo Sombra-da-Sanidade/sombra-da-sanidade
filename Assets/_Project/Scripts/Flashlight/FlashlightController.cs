@@ -30,6 +30,7 @@ namespace SombraDaSanidade.Flashlight
         public event Action<bool> LitChanged;
 
         private Light2D light2D;
+        private PlayerSpriteAnimator spriteAnimator;
         private bool wasLit;
         private MonsterController monster;
         private CameraFollow cameraFollow;
@@ -49,6 +50,7 @@ namespace SombraDaSanidade.Flashlight
             }
 
             if (pivot != null) light2D = pivot.GetComponent<Light2D>();
+            spriteAnimator = player.GetComponent<PlayerSpriteAnimator>();
             Battery = config.maxBattery;
             ApplyConeShape();
         }
@@ -174,6 +176,15 @@ namespace SombraDaSanidade.Flashlight
             if (pivot == null || player == null) return;
             float angle = Mathf.Atan2(player.Facing.y, player.Facing.x) * Mathf.Rad2Deg;
             pivot.rotation = Quaternion.Euler(0f, 0f, angle - 90f);
+
+            // O feixe sai da lente desenhada no sprite. Encostado numa parede, a lente pode ficar dentro
+            // do collider: recua até a borda para a luz não nascer dentro da sombra.
+            // Posição local: o pivô é filho do jogador e acompanha teleportes no mesmo quadro.
+            Vector2 center = player.transform.position;
+            Vector2 offset = spriteAnimator != null && spriteAnimator.enabled ? spriteAnimator.LensOffset : Vector2.zero;
+            var hit = Physics2D.Linecast(center, center + offset, obstacles);
+            if (hit.collider != null) offset = offset.normalized * Mathf.Max(0f, hit.distance - 0.05f);
+            pivot.localPosition = offset;
         }
 
         private void Drain()
