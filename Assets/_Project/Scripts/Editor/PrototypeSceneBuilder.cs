@@ -557,11 +557,14 @@ namespace SombraDaSanidade.EditorTools
         internal static void AddSceneToBuild(string path)
         {
             var scenes = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
-            if (scenes.Exists(s => s.path == path)) return;
+            bool isStart = path == AlfaSceneBuilder.ScenePath;
+            int index = scenes.FindIndex(s => s.path == path);
+            if (index >= 0 && (!isStart || index == 0)) return;
+            if (index >= 0) scenes.RemoveAt(index);
 
-            // A Demo sempre fica no índice 0, para ser a cena inicial da build.
+            // A Alfa sempre fica no índice 0, para ser a cena inicial da build.
             var entry = new EditorBuildSettingsScene(path, true);
-            if (path == DemoScenePath) scenes.Insert(0, entry);
+            if (isStart) scenes.Insert(0, entry);
             else scenes.Add(entry);
             EditorBuildSettings.scenes = scenes.ToArray();
         }
