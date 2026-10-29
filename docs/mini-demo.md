@@ -81,7 +81,7 @@ Regras: cada um testa **na Sandbox da própria frente** e só edita os arquivos 
 | Qua 28, até 18h | Cada um abre o PR do seu sistema. |
 | Qua 28, 18h | Frente sem PR: o grupo redistribui e completa a partir do contrato. |
 | Qua 28, noite | Integração na `Demo.unity` (Frentes 4 e 5), playtest com todos, ajuste de números. |
-| Qui 29, manhã | Frente 5: build WebGL, upload, testar o link em outro PC. Código congelado. |
+| Qui 29, manhã | Frente 5: build WebGL, `tools/publish-webgl.sh` (GitHub Pages), testar o link em outro PC. Código congelado. |
 
 ## Roteiro do playtest
 

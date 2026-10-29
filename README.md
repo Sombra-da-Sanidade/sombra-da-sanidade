@@ -4,6 +4,12 @@ Survival horror psicológico em 2D top-down feito em Unity para a disciplina de 
 
 > Thomas Reis, auditor de sistemas, precisa extrair 3 HDs do Complexo EREBUS e fugir pela eclusa. A lanterna protege a mente, mas atrai o Espécime Vazio, um perseguidor cego e imortal.
 
+## Jogar no navegador
+
+Mini demo (WebGL): https://sombra-da-sanidade.github.io/sombra-da-sanidade/
+
+Para publicar uma versão nova: gere o build pelo menu **Sombra da Sanidade > Build WebGL** e rode `tools/publish-webgl.sh`. O script envia `Builds/WebGL` para o branch `gh-pages`.
+
 ## Como abrir
 
 1. Instale o **Unity 6000.5.10f1** pelo Unity Hub (módulo WebGL Build Support recomendado).
