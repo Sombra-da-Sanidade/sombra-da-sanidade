@@ -7,17 +7,21 @@ namespace SombraDaSanidade.Interaction
     // Segurar E ejeta o HD: soma no GameManager (que acelera o monstro) e faz barulho.
     public class DriveServer : MonoBehaviour, IInteractable
     {
-        [SerializeField] private float ejectDuration = 2f;
-        [SerializeField] private float ejectNoiseRadius = 10f;
+        [SerializeField] private InteractionConfig config;
         [SerializeField] private SpriteRenderer indicator;
         [SerializeField] private Color loadedColor = new Color(0.3f, 1f, 0.45f);
         [SerializeField] private Color emptyColor = new Color(0.25f, 0.25f, 0.25f);
 
         public string Prompt => "Ejetar HD";
-        public bool CanInteract => !ejected;
-        public float HoldDuration => ejectDuration;
+        public bool CanInteract => !ejected && config != null;
+        public float HoldDuration => config.ejectDuration;
 
         private bool ejected;
+
+        private void Awake()
+        {
+            if (config == null) Debug.LogError($"{name}: DriveServer sem InteractionConfig.", this);
+        }
 
         private void Start()
         {
@@ -34,7 +38,7 @@ namespace SombraDaSanidade.Interaction
         {
             ejected = true;
             if (indicator != null) indicator.color = emptyColor;
-            NoiseBus.Emit(transform.position, ejectNoiseRadius);
+            NoiseBus.Emit(transform.position, config.ejectNoiseRadius);
             if (GameManager.Instance != null) GameManager.Instance.CollectDrive();
         }
     }
