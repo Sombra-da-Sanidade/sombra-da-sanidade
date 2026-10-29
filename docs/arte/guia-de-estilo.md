@@ -27,7 +27,7 @@ Cada regra de arte reforça uma regra de jogo:
 
 ## 3. Paleta
 
-38 cores, definidas em [`art-src/palette.json`](../../art-src/palette.json). Arquivo `.gpl` para Aseprite/LibreSprite/GIMP: [`art-src/sombra.gpl`](../../art-src/sombra.gpl). Use **só** essas cores.
+43 cores, definidas em [`art-src/palette.json`](../../art-src/palette.json). Arquivo `.gpl` para Aseprite/LibreSprite/GIMP: [`art-src/sombra.gpl`](../../art-src/sombra.gpl). Use **só** essas cores.
 
 | Rampa | Chaves | Uso |
 |---|---|---|
@@ -39,6 +39,7 @@ Cada regra de arte reforça uma regra de jogo:
 | Âmbar | `t`, `u` | Lâmpadas (Zona Segura), faixas de aviso |
 | Hipnos | `v`, `w` | Alucinações, Revelação pela Loucura |
 | Espécime | `x y z` (trapos verde-doente), `A B C` (carne, cérebro exposto) | Só no Espécime Vazio |
+| Thomas | `D E F` (jaqueta verde-acinzentada), `G H` (calça cáqui) | Só no Thomas |
 
 ## 4. Regras de desenho
 
@@ -52,7 +53,7 @@ Tiradas da prática do Penusbmic (tutoriais de paleta, tileset e personagem) e d
 6. **Detalhe concentrado:** o objeto que importa (disjuntor, HD, porta) recebe o detalhe; o entorno fica simples.
 7. **Variações de tile:** um tile liso dominante (60%+) e variações raras (rachadura, mancha, junta). Repetição visível quebra a imersão.
 8. **Animação:** poucos frames, bem escolhidos (idle 2 a 4, andar 4 a 6). Exagero na pose, não na quantidade.
-9. **Uma cor de destaque por personagem:** corpo em tons escuros e um único acento saturado (o laranja do casaco do herói do Penusbmic, a gravata vermelha em Yuppie Psycho). Para Thomas: terno escuro, lanterna em âmbar.
+9. **Uma cor de destaque por personagem:** corpo em tons escuros e um único acento saturado (o laranja do casaco do herói do Penusbmic, a gravata vermelha em Yuppie Psycho). Para Thomas: jaqueta verde-acinzentada e calça cáqui apagadas, lanterna em âmbar.
 10. **Sombra no chão:** elipse escura (`1` ou `2`) sob os pés de todo personagem e objeto solto. Ancora o sprite no top-down.
 11. **Rosto mínimo:** em jogo, olhos de 1 a 2 px e quase nada mais. O detalhe do rosto vai para o retrato de diálogo (64 a 96 px), como em Yuppie Psycho.
 
@@ -75,7 +76,7 @@ Status: rascunho (R), revisado (V), final (F).
 |---|---|---|
 | Paleta | `art-src/palette.json` | R |
 | Tileset laboratório (21 tiles) | `art-src/Tiles/lab_tiles.json` | R |
-| Thomas Reis: idle e andar em 8 direções, reparo | `art-src/Sprites/thomas.json` | R |
+| Thomas Reis: idle, andar e correr em 8 direções (com e sem a lanterna na mão), reparo, assustado, guardar a lanterna, perdendo a sanidade, colapso | `art-src/Sprites/thomas.json` | R |
 | Thomas Reis: retrato de diálogo (neutro, assustado) | `art-src/Portraits/thomas_portrait.json` | R |
 | Espécime Vazio: 10 animações (idle, andar e correr em 3 direções, escutar, grito, atordoado) + camada de brilho | `art-src/Monster/EspecimeB_sheet.json`, `EspecimeB_sheet_glow.json` | V (arte original da Frente 2, reduzida para 48x64) |
 | Itens: bateria, estabilizador, Adrena-Syn, HD | `art-src/Sprites/itens.json` | a fazer |
@@ -84,19 +85,36 @@ Tiles do laboratório: `floor_a`, `floor_seam`, `floor_b` (rachadura), `floor_c`
 
 ### Ficha: Thomas Reis
 
+Técnico, não executivo: o auditor foi mandado para consertar um apagão (GDD 8.2). Sem terno nem maleta.
+
 | Parte | Cores | Observação |
 |---|---|---|
-| Cabelo | `p` massa, `q` brilho só no topo | Silhueta escura, sem contorno |
-| Pele | `q` sombra, `r` base, `s` brilho | Olhos de 1 px no sprite |
-| Terno | `1` barra e sombra, `2` base, `3` ombros, `f` lado na sombra | Grafite com sombra azulada (hue shift) |
-| Camisa e gravata | `8`/`7` gola, `g` gravata | Gravata escura e discreta; vermelho fica para perigo |
-| Lanterna Lux-90 | `t` corpo, `u` lente | Único acento saturado do personagem |
+| Cabelo | `p` massa, `1` sombra | Silhueta escura, franja de lado, sem contorno |
+| Pele | `r` sombra, `s` base | Olhos de 1 px (`0`) |
+| Jaqueta de trabalho | `D` sombra, `E` lado escuro e manga, `F` base | Verde-acinzentada, aberta sobre a camisa |
+| Camisa e crachá | `8`/`7` camisa, `8` + `g` crachá | Faixa estreita no centro do peito |
+| Cinto | `p` cinto, `t` fivela e multímetro | |
+| Calça e sapato | `G` sombra, `H` base, `p` sapato | Cáqui apagado |
+| Lanterna Lux-90 | `6`/`5` corpo, `u` lente acesa | Único acento saturado do personagem |
 | Sombra | `1` | Elipse sob os pés |
 
-- Frame 24x32, pivô nos pés. ~26 px de altura, cabeça de 10x10.
+- Frame 24x32, pivô nos pés. ~26 px de altura (desenho de 16 px de largura no centro do frame).
 - 8 direções: `down`, `down_side`, `side`, `up_side`, `up` desenhadas; esquerda por flipX (`PlayerSpriteAnimator`). A direção segue a mira, não o movimento.
-- Clips: `idle_<dir>` 4 quadros a 6 fps, `walk_<dir>` 6 quadros a 10 fps, `repair` 4 quadros a 8 fps (de costas, mãos no painel, faísca azul).
-- Retrato 64x64 (`Art/Portraits/`): mais detalhe no rosto, crachá verde da Aethelgard no peito. Expressões `neutral` e `scared`.
+- Animação por partes, 8 quadros por ciclo: no passo o corpo desce 1 px no apoio, a perna que passa levanta 2 px e os braços balançam ao contrário das pernas (a mão some atrás do tronco quando vai para trás).
+- Clips (todos com 8 quadros):
+
+| Clip | fps | Quando |
+|---|---|---|
+| `idle_<dir>` / `walk_<dir>` | 6 / 10 | Parado / andando com a lanterna na mão |
+| `idle_<dir>_free` / `walk_<dir>_free` | 6 / 10 | Lanterna desligada, presa no cinto, braços livres |
+| `run_<dir>` / `run_<dir>_free` | 14 | Velocidade acima do normal (Adrena-Syn) |
+| `repair` | 8 | De costas, mãos no painel, faísca azul |
+| `scared` | 8 | Parado com sanidade Ansioso ou o monstro perto |
+| `stow_light` | 10, uma vez | Desligou a lanterna parado (ao contrário: sacar quando liga) |
+| `losing_mind` | 10 | Parado com sanidade Alucinando ou Colapsado |
+| `collapse` | 8, uma vez | Sanidade 0 (roda em tempo real, o Game Over congela o tempo) |
+
+- Retrato 64x64 (`Art/Portraits/`): ainda é o do design anterior (terno); precisa ser refeito com a jaqueta.
 
 ## 6. Como editar ou criar arte
 
