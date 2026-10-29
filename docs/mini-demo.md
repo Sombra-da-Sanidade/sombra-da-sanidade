@@ -31,7 +31,7 @@ Tudo em blocos cinzas. Arte, som, alucinações e narrativa ficam para depois.
 Menus no Unity (**Sombra da Sanidade**):
 - **Criar Sandbox > Frente N**: cena de teste da sua frente com o mapa da demo completo.
 - **Gerar cena Demo (base)**: cria `Scenes/Main/Demo.unity`. A Frente 4 gera uma vez no 6000.5.10f1 e commita; depois disso só ela edita a cena.
-- **Build WebGL**: gera `Builds/WebGL`.
+- **Build WebGL**: gera `Builds/WebGL` com a `Alfa.unity` (cena inicial, índice 0 no Build Settings).
 - **Arte > Gerar cena de teste de arte**: sala com o tileset, o Thomas e Light2D (`Sandbox/ArteTeste.unity`).
 - **Arte > Gerar Tile assets do laboratório**: cria os `Tile` em `Art/Tiles/Lab/` para usar no Tile Palette.
 
