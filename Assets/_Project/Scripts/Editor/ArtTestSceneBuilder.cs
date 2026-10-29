@@ -168,7 +168,7 @@ namespace SombraDaSanidade.EditorTools
             return AssetDatabase.LoadAllAssetsAtPath(SheetPath).OfType<Sprite>().ToDictionary(s => s.name, s => s);
         }
 
-        private static Dictionary<string, Tile> LoadOrCreateTiles()
+        internal static Dictionary<string, Tile> LoadOrCreateTiles()
         {
             var sprites = LoadSprites();
             if (sprites.Count == 0)
