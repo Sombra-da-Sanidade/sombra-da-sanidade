@@ -58,4 +58,3 @@ Unity -batchmode -projectPath . -executeMethod SombraDaSanidade.EditorTools.Smok
 ## Pendências
 
 - **Zona Segura do disjuntor (Frente 4):** a lâmpada de teto é só desenho até o `Breaker` acender a luz e ligar o `MonsterRepellent`.
-- **Ordem das cenas (Frente 5):** a `Alfa.unity` entrou na lista de cenas da build depois da `Prototipo.unity`. Para a build do alfa começar nela, ela tem que ir para o índice 0.

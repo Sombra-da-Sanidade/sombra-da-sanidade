@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
@@ -14,13 +15,17 @@ namespace SombraDaSanidade.EditorTools
         [MenuItem("Sombra da Sanidade/Build WebGL", priority = 40)]
         public static void Build()
         {
-            string scene = File.Exists(PrototypeSceneBuilder.DemoScenePath)
-                ? PrototypeSceneBuilder.DemoScenePath
-                : PrototypeSceneBuilder.PrototypeScenePath;
-
-            if (!File.Exists(scene))
+            // A Alfa (mapa com tiles) é a cena da mini demo; Demo e Protótipo ficam de reserva.
+            string scene = new[]
             {
-                Debug.LogError("Nenhuma cena para build. Use Sombra da Sanidade > Gerar cena Demo (base).");
+                AlfaSceneBuilder.ScenePath,
+                PrototypeSceneBuilder.DemoScenePath,
+                PrototypeSceneBuilder.PrototypeScenePath
+            }.FirstOrDefault(File.Exists);
+
+            if (scene == null)
+            {
+                Debug.LogError("Nenhuma cena para build. Use Sombra da Sanidade > Gerar cena Alfa (tiles).");
                 if (Application.isBatchMode) EditorApplication.Exit(1);
                 return;
             }
