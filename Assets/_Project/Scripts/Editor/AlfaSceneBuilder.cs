@@ -38,9 +38,12 @@ namespace SombraDaSanidade.EditorTools
         }
 
         // Batchmode: -executeMethod SombraDaSanidade.EditorTools.AlfaSceneBuilder.Build
-        public static void Build()
+        public static void Build() => Build(LayoutFile, ScenePath, drivesRequired: 3, wing: null);
+
+        // wing nulo = nome da ala pela posição no mapa (Alfa tem as 3 alas lado a lado).
+        private static void Build(string layoutFile, string scenePath, int drivesRequired, string wing)
         {
-            var map = LoadLayout();
+            var map = LoadLayout(layoutFile);
             if (map == null) return;
 
             // Assets antes de trocar de cena (mesmo motivo do PrototypeSceneBuilder).
@@ -56,7 +59,10 @@ namespace SombraDaSanidade.EditorTools
             var flashlightConfig = PrototypeSceneBuilder.GetOrCreateConfig<FlashlightConfig>("FlashlightConfig");
             var sanityConfig = PrototypeSceneBuilder.GetOrCreateConfig<SanityConfig>("SanityConfig");
 
-            new GameObject("GameManager").AddComponent<GameManager>();
+            var gm = new GameObject("GameManager").AddComponent<GameManager>();
+            var gmSo = new SerializedObject(gm);
+            gmSo.FindProperty("drivesRequired").intValue = drivesRequired;
+            gmSo.ApplyModifiedPropertiesWithoutUndo();
             PrototypeSceneBuilder.CreateGlobalLight();
             BuildTilemaps(map, tiles);
             BuildWallColliders(map, wallLayer);
@@ -79,8 +85,8 @@ namespace SombraDaSanidade.EditorTools
                     var inFront = center + Vector2.down;   // célula de chão logo abaixo da face da parede
                     switch (c)
                     {
-                        case 'S': CreateServer(objectives, square, $"DriveServer_{Wing(x, map.Width)}", inFront, center); break;
-                        case 'K': CreateBreaker(objectives, square, $"Breaker_{Wing(x, map.Width)}_{++breakers}", inFront); break;
+                        case 'S': CreateServer(objectives, square, $"DriveServer_{wing ?? Wing(x, map.Width)}", inFront, center); break;
+                        case 'K': CreateBreaker(objectives, square, $"Breaker_{wing ?? Wing(x, map.Width)}_{++breakers}", inFront); break;
                         case 'E': exitCells.Add(new Vector2Int(x, y)); break;
                         case '@': playerSpawn = center; break;
                         case 'M': monsterSpawn = center; break;
@@ -98,10 +104,10 @@ namespace SombraDaSanidade.EditorTools
             PrototypeSceneBuilder.CreateSanityEffects(player.GetComponent<SanityController>(), square, wallLayer);
             PrototypeSceneBuilder.CreateMonster(monsterSpawn, patrol);
 
-            Directory.CreateDirectory(Path.GetDirectoryName(ScenePath));
-            EditorSceneManager.SaveScene(scene, ScenePath);
-            PrototypeSceneBuilder.AddSceneToBuild(ScenePath);
-            Debug.Log($"Cena Alfa gerada em {ScenePath} ({map.Width}x{map.Height} tiles)");
+            Directory.CreateDirectory(Path.GetDirectoryName(scenePath));
+            EditorSceneManager.SaveScene(scene, scenePath);
+            PrototypeSceneBuilder.AddSceneToBuild(scenePath);
+            Debug.Log($"Cena gerada em {scenePath} ({map.Width}x{map.Height} tiles)");
         }
 
         // ---------- Planta ----------
@@ -114,12 +120,12 @@ namespace SombraDaSanidade.EditorTools
             public bool IsFloor(int x, int y) => FloorChars.IndexOf(this[x, y]) >= 0;
         }
 
-        private static Layout LoadLayout()
+        private static Layout LoadLayout(string layoutFile)
         {
-            string path = Path.Combine(Path.GetDirectoryName(Application.dataPath), LayoutFile);
+            string path = Path.Combine(Path.GetDirectoryName(Application.dataPath), layoutFile);
             if (!File.Exists(path))
             {
-                Debug.LogError($"Planta do mapa não encontrada: {LayoutFile}");
+                Debug.LogError($"Planta do mapa não encontrada: {layoutFile}");
                 return null;
             }
             // Linhas de comentário começam com "# " (com espaço); as do mapa não têm espaço.
