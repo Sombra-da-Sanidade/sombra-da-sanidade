@@ -25,7 +25,7 @@ Tudo em blocos cinzas. Arte, som, alucinações e narrativa ficam para depois.
 | HUD provisório (bateria, sanidade, HDs) | `UI/DemoHud.cs` | pronto |
 | Monstro (patrulha, ruído, luz, EMP, Zona Segura, contato, sprites) | `Monster/` | pronto (ver [monstro.md](monstro.md)) |
 | Sanidade (dreno, efeitos, alucinações, pistas, Estabilizador) | `Sanity/` | pronto (ver [sanidade.md](sanidade.md)) |
-| Disjuntor | `Interaction/Breaker.cs` | **parcial** (reparo e ruído; Zona Segura TODO) |
+| Disjuntor e Zona Segura | `Interaction/Breaker.cs`, `Interaction/SafeZone.cs` | pronto (reparo, ruído, lâmpada de 60 s, sanidade, monstro bloqueado) |
 | EMP | `Flashlight/` | pronto |
 
 Menus no Unity (**Sombra da Sanidade**):
