@@ -34,6 +34,7 @@ namespace SombraDaSanidade.Flashlight
         private MonsterController monster;
         private CameraFollow cameraFollow;
         private float empFeedbackUntil;
+        private string empFeedbackMessage;
         private GUIStyle empFeedbackStyle;
 
         private const float EmpFeedbackDuration = 1.5f;
@@ -113,20 +114,20 @@ namespace SombraDaSanidade.Flashlight
         {
             if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) return;
 
-            // Com a luz apagada, a tentativa só dá o retorno tátil da câmera.
+            // Com a luz apagada, a tentativa avisa o motivo e mantém o tremor combinado.
             if (!IsSwitchedOn)
             {
-                empFeedbackUntil = 0f;
+                ShowEmpFeedback("Lanterna desligada");
                 ShakeEmp();
                 return;
             }
 
             // Consultar antes do gasto: o último disparo pode zerar a bateria e apagar o cone.
             bool hitsMonster = monster != null && monster.isActiveAndEnabled
-                && IsPointInCone(monster.transform.position);
+                && monster.IsLitByFlashlight();
             if (!TrySpend(config.empCost))
             {
-                empFeedbackUntil = Time.unscaledTime + EmpFeedbackDuration;
+                ShowEmpFeedback("Carga insuficiente para EMP");
                 return;
             }
 
@@ -141,6 +142,12 @@ namespace SombraDaSanidade.Flashlight
         {
             if (cameraFollow != null)
                 cameraFollow.Shake(config.empShakeDuration, config.empShakeMagnitude);
+        }
+
+        private void ShowEmpFeedback(string message)
+        {
+            empFeedbackMessage = message;
+            empFeedbackUntil = Time.unscaledTime + EmpFeedbackDuration;
         }
 
         private void OnGUI()
@@ -159,7 +166,7 @@ namespace SombraDaSanidade.Flashlight
             }
 
             GUI.Label(new Rect(16f, Screen.height - 72f, Screen.width - 32f, 32f),
-                "Carga insuficiente para EMP", empFeedbackStyle);
+                empFeedbackMessage, empFeedbackStyle);
         }
 
         private void Aim()

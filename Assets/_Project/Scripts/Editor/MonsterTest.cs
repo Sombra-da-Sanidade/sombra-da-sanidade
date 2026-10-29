@@ -129,7 +129,7 @@ namespace SombraDaSanidade.EditorTools
                     if (t < 1.4f) return;
                     float dc = Vector2.Distance(monster.transform.position, player.transform.position);
                     Check($"Corre na direção do jogador ({distMark:0.0} -> {dc:0.0} m)", dc < distMark - 0.3f);
-                    monster.Stun(4f);
+                    CheckEmp(flashlight, monster, player, agent);
                     // Jogador some no escuro, longe dali.
                     SetLight(flashlight, false);
                     Teleport(player, new Vector2(0f, -11f));
@@ -190,6 +190,67 @@ namespace SombraDaSanidade.EditorTools
             rb.position = position;
             player.transform.position = position;
         }
+
+        private static void CheckEmp(FlashlightController flashlight, MonsterController monster,
+            PlayerController player, NavMeshAgent agent)
+        {
+            // Corredor externo direito: mira acima da cabeça, deixando pés e tronco fora do cone.
+            agent.Warp(new Vector3(18f, -6f, 0f));
+            Teleport(player, new Vector2(16.5f, -6f));
+            float angle = 80f * Mathf.Deg2Rad;
+            SetFacing(player, new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)));
+            Physics2D.SyncTransforms();
+            Vector2 feet = monster.transform.position;
+            Check("Regressão EMP: pés e tronco fora do cone, cabeça dentro",
+                !flashlight.IsPointInCone(feet)
+                && !flashlight.IsPointInCone(feet + Vector2.up * 0.2f)
+                && !flashlight.IsPointInCone(feet + Vector2.up * 1.4f)
+                && flashlight.IsPointInCone(feet + Vector2.up * 2.6f));
+            Check("Detecção reconhece a cabeça iluminada", monster.IsLitByFlashlight());
+
+            var config = (FlashlightConfig)new SerializedObject(flashlight)
+                .FindProperty("config").objectReferenceValue;
+            flashlight.Recharge(config.maxBattery);
+            flashlight.TrySpend(flashlight.Battery - config.empCost);
+
+            int noises = 0;
+            bool stunnedAtNoise = false;
+            System.Action<Vector2, float> onNoise = (_, _) =>
+            {
+                noises++;
+                stunnedAtNoise = monster.IsStunned;
+            };
+            NoiseBus.NoiseEmitted += onNoise;
+            try
+            {
+                FireEmp(flashlight);
+                Check("EMP acerta cabeça com carga exata e zera a bateria",
+                    monster.IsStunned && Mathf.Approximately(flashlight.Battery, 0f));
+                Check("EMP atordoa antes de emitir ruído", noises == 1 && stunnedAtNoise);
+
+                FireEmp(flashlight);
+                Check("Sem carga mostra aviso e não emite outro ruído",
+                    EmpFeedback(flashlight) == "Carga insuficiente para EMP" && noises == 1);
+                SetLight(flashlight, false);
+                FireEmp(flashlight);
+                Check("Lanterna desligada mostra aviso sem ruído ou gasto",
+                    EmpFeedback(flashlight) == "Lanterna desligada" && noises == 1
+                    && Mathf.Approximately(flashlight.Battery, 0f));
+            }
+            finally
+            {
+                NoiseBus.NoiseEmitted -= onNoise;
+            }
+        }
+
+        // Exercita o mesmo disparo do clique direito sem depender de input em batchmode.
+        private static void FireEmp(FlashlightController flashlight) =>
+            typeof(FlashlightController).GetMethod("TryFireEmp", BindingFlags.Instance | BindingFlags.NonPublic)
+                .Invoke(flashlight, null);
+
+        private static string EmpFeedback(FlashlightController flashlight) =>
+            (string)typeof(FlashlightController).GetField("empFeedbackMessage", BindingFlags.Instance | BindingFlags.NonPublic)
+                .GetValue(flashlight);
 
         // Propriedades com private set: o teste ajusta por reflexão para não abrir a API do jogador e da lanterna.
         private static void SetFacing(PlayerController player, Vector2 dir) =>
