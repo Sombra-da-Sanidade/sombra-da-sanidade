@@ -45,11 +45,14 @@ namespace SombraDaSanidade.EditorTools
 
         public static void RunBatch() => Start(batch: true);
 
-        private static void Start(bool batch)
+        // Mesmo teste na cena do alfa montada com tiles (AlfaSceneBuilder).
+        public static void RunBatchAlfa() => Start(batch: true, AlfaSceneBuilder.ScenePath);
+
+        private static void Start(bool batch, string sceneOverride = null)
         {
-            string scene = System.IO.File.Exists(PrototypeSceneBuilder.DemoScenePath)
+            string scene = sceneOverride ?? (System.IO.File.Exists(PrototypeSceneBuilder.DemoScenePath)
                 ? PrototypeSceneBuilder.DemoScenePath
-                : PrototypeSceneBuilder.PrototypeScenePath;
+                : PrototypeSceneBuilder.PrototypeScenePath);
 
             if (!batch && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
             EditorSceneManager.OpenScene(scene);

@@ -27,7 +27,7 @@ namespace SombraDaSanidade.EditorTools
         private const string ThomasSheetPath = Root + "/Art/Sprites/thomas.png";
         public const string PrototypeScenePath = Root + "/Scenes/Sandbox/Prototipo.unity";
         public const string DemoScenePath = Root + "/Scenes/Main/Demo.unity";
-        private const string WallLayerName = "Walls";
+        internal const string WallLayerName = "Walls";
         private const string UnlitSpriteMaterialPath = "Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Unlit-Default.mat";
 
         private static readonly Color WallColor = new Color(0.45f, 0.45f, 0.48f);
@@ -169,7 +169,7 @@ namespace SombraDaSanidade.EditorTools
             SetRef(exit, "doorRenderer", door.GetComponent<SpriteRenderer>());
         }
 
-        private static void CreateDriveServer(Transform parent, Sprite square, string name, Vector2 position)
+        internal static void CreateDriveServer(Transform parent, Sprite square, string name, Vector2 position)
         {
             var go = CreateBlock(parent, square, name, position, new Vector2(1.2f, 1.2f), new Color(0.15f, 0.25f, 0.2f));
             var col = go.AddComponent<BoxCollider2D>();
@@ -191,7 +191,7 @@ namespace SombraDaSanidade.EditorTools
             SetRef(server, "indicator", led.GetComponent<SpriteRenderer>());
         }
 
-        private static void CreateBreaker(Transform parent, Sprite square, string name, Vector2 position)
+        internal static void CreateBreaker(Transform parent, Sprite square, string name, Vector2 position)
         {
             var go = CreateBlock(parent, square, name, position, new Vector2(0.8f, 1f), new Color(0.75f, 0.6f, 0.15f));
             var col = go.AddComponent<BoxCollider2D>();
@@ -204,12 +204,6 @@ namespace SombraDaSanidade.EditorTools
         // nos cruzamentos dos corredores em loop. Se o prefab não existir, é gerado agora.
         private static void CreateMonster(Vector2 position)
         {
-            var prefab = MonsterPrefabBuilder.GetOrBuild();
-            var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
-            go.transform.position = position;
-
-            var patrol = new GameObject("MonsterPatrol").transform;
-            var points = new List<Transform>();
             Vector2[] spots =
             {
                 new Vector2(-17.5f, 11f), new Vector2(0f, 10.5f), new Vector2(17.5f, 11f),
@@ -217,7 +211,18 @@ namespace SombraDaSanidade.EditorTools
                 new Vector2(-18f, 0f), new Vector2(-7f, -1f), new Vector2(7f, -1f), new Vector2(18f, 0f),
                 new Vector2(-17.5f, -11f), new Vector2(-10f, -11f), new Vector2(10f, -11f), new Vector2(17.5f, -11f),
             };
-            for (int i = 0; i < spots.Length; i++)
+            CreateMonster(position, spots);
+        }
+
+        internal static void CreateMonster(Vector2 position, IReadOnlyList<Vector2> spots)
+        {
+            var prefab = MonsterPrefabBuilder.GetOrBuild();
+            var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            go.transform.position = position;
+
+            var patrol = new GameObject("MonsterPatrol").transform;
+            var points = new List<Transform>();
+            for (int i = 0; i < spots.Count; i++)
             {
                 var point = new GameObject($"Point_{i:00}").transform;
                 point.SetParent(patrol, false);
@@ -234,7 +239,7 @@ namespace SombraDaSanidade.EditorTools
 
         // NavMesh 2D (NavMeshPlus, ADR 0003). Só entram no bake objetos com NavMeshModifier:
         // o chão (andável) e as paredes (Not Walkable). O bake é feito ao carregar a cena (NavMeshRuntimeBaker).
-        private static void CreateNavMesh()
+        internal static void CreateNavMesh()
         {
             var go = new GameObject("NavMesh");
             go.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);
@@ -248,7 +253,7 @@ namespace SombraDaSanidade.EditorTools
 
         // ---------- Player, câmera, luz, HUD ----------
 
-        private static void CreateGlobalLight()
+        internal static void CreateGlobalLight()
         {
             var go = new GameObject("Global Light 2D");
             var light = go.AddComponent<Light2D>();
@@ -257,7 +262,7 @@ namespace SombraDaSanidade.EditorTools
             light.color = new Color(0.55f, 0.6f, 0.75f);
         }
 
-        private static GameObject CreatePlayer(Sprite square, PlayerConfig playerConfig, FlashlightConfig flashlightConfig,
+        internal static GameObject CreatePlayer(Sprite square, PlayerConfig playerConfig, FlashlightConfig flashlightConfig,
             SanityConfig sanityConfig, int wallLayer, Vector2 position)
         {
             var player = new GameObject("Player");
@@ -339,7 +344,7 @@ namespace SombraDaSanidade.EditorTools
             return player;
         }
 
-        private static void CreateCamera(Transform target)
+        internal static void CreateCamera(Transform target)
         {
             var go = new GameObject("Main Camera");
             go.tag = "MainCamera";
@@ -357,7 +362,7 @@ namespace SombraDaSanidade.EditorTools
             follow.Target = target;
         }
 
-        private static void CreateHud(FlashlightController flashlight)
+        internal static void CreateHud(FlashlightController flashlight)
         {
             var hud = new GameObject("DemoHud").AddComponent<DemoHud>();
             SetRef(hud, "flashlight", flashlight);
@@ -368,7 +373,7 @@ namespace SombraDaSanidade.EditorTools
         // ---------- Sanidade ----------
 
         // Vinheta + aberração, batimento + tremor e alucinações (GDD 4.6, 7 e 9).
-        private static void CreateSanityEffects(SanityController sanity, Sprite square, int wallLayer)
+        internal static void CreateSanityEffects(SanityController sanity, Sprite square, int wallLayer)
         {
             var vignette = new GameObject("SanityVignette").AddComponent<SanityVignette>();
             SetRef(vignette, "sanity", sanity);
@@ -404,7 +409,7 @@ namespace SombraDaSanidade.EditorTools
             CreateClue(parent, "Clue_Aviso", new Vector2(0f, -5.5f), "ELE SEGUE A LUZ", 0.1f);
         }
 
-        private static void CreateStabilizer(Transform parent, Sprite square, string name, Vector2 position)
+        internal static void CreateStabilizer(Transform parent, Sprite square, string name, Vector2 position)
         {
             var go = CreateBlock(parent, square, name, position, new Vector2(0.4f, 0.6f), new Color(0.55f, 0.8f, 0.95f));
             var col = go.AddComponent<BoxCollider2D>();
@@ -422,7 +427,7 @@ namespace SombraDaSanidade.EditorTools
         }
 
         // TextMesh usa material próprio (sem luz 2D): brilha no escuro como tinta de fósforo.
-        private static void CreateClue(Transform parent, string name, Vector2 position, string text, float characterSize)
+        internal static void CreateClue(Transform parent, string name, Vector2 position, string text, float characterSize)
         {
             var go = new GameObject(name);
             go.transform.SetParent(parent, false);
@@ -447,7 +452,7 @@ namespace SombraDaSanidade.EditorTools
 
         // ---------- Helpers ----------
 
-        private static GameObject CreateBlock(Transform parent, Sprite square, string name, Vector2 position, Vector2 size, Color color)
+        internal static GameObject CreateBlock(Transform parent, Sprite square, string name, Vector2 position, Vector2 size, Color color)
         {
             var go = new GameObject(name);
             go.transform.SetParent(parent, false);
@@ -484,14 +489,14 @@ namespace SombraDaSanidade.EditorTools
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private static void SetRef(Object target, string field, Object value)
+        internal static void SetRef(Object target, string field, Object value)
         {
             var so = new SerializedObject(target);
             so.FindProperty(field).objectReferenceValue = value;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private static T GetOrCreateConfig<T>(string name) where T : ScriptableObject
+        internal static T GetOrCreateConfig<T>(string name) where T : ScriptableObject
         {
             string path = $"{ConfigDir}/{name}.asset";
             var asset = AssetDatabase.LoadAssetAtPath<T>(path);
@@ -504,7 +509,7 @@ namespace SombraDaSanidade.EditorTools
             return asset;
         }
 
-        private static Sprite GetOrCreatePlaceholderSprite()
+        internal static Sprite GetOrCreatePlaceholderSprite()
         {
             var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(PlaceholderSpritePath);
             if (sprite != null) return sprite;
@@ -529,7 +534,7 @@ namespace SombraDaSanidade.EditorTools
             return AssetDatabase.LoadAssetAtPath<Sprite>(PlaceholderSpritePath);
         }
 
-        private static int EnsureLayer(string name)
+        internal static int EnsureLayer(string name)
         {
             int existing = LayerMask.NameToLayer(name);
             if (existing >= 0) return existing;
@@ -549,7 +554,7 @@ namespace SombraDaSanidade.EditorTools
             return 0;
         }
 
-        private static void AddSceneToBuild(string path)
+        internal static void AddSceneToBuild(string path)
         {
             var scenes = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
             if (scenes.Exists(s => s.path == path)) return;
