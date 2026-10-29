@@ -32,6 +32,29 @@ Teste em batch:
 Unity -batchmode -projectPath . -executeMethod SombraDaSanidade.EditorTools.SmokeTest.RunBatchAlfa
 ```
 
+## Ala Médica (issue #12)
+
+Cena `Assets/_Project/Scenes/Wings/AlaMedica.unity`, gerada pelo mesmo builder a partir de `art-src/Maps/ala-medica.txt` (menu **Sombra da Sanidade > Gerar cena Ala Médica (tiles)**). 72×50 tiles.
+
+| Sala | Onde | O que tem |
+|---|---|---|
+| Antessala | embaixo | Início do jogador, porta para o saguão, estabilizador, armário |
+| Enfermaria | oeste | Disjuntor com lâmpada, 3 armários |
+| Laboratório | leste | Disjuntor com lâmpada, estabilizador, 2 armários |
+| Salão central | meio | Disjuntor com lâmpada (atalho entre as alas laterais) |
+| Arquivo | em cima | HD-01, onde o monstro começa |
+
+- **Dois loops:** o anel externo (Antessala → Enfermaria → Arquivo → Laboratório → Antessala) e o atalho pelo Salão central, que divide o anel em duas voltas menores. Sem becos (GDD 4.1).
+- **Saída:** a porta abre com 1 HD (`GameManager.drivesRequired = 1`, definido pelo builder).
+- **Armários (`A`):** só blocos cinzas marcando a posição; o loot de 60% (GDD 6) vem depois.
+- **Duração:** a meta de 3 a 5 min (GDD 7) precisa ser medida no playtest. Se ficar curta, alongar os corredores do anel no `.txt`.
+
+Teste em batch:
+
+```bash
+Unity -batchmode -projectPath . -executeMethod SombraDaSanidade.EditorTools.SmokeTest.RunBatchAlaMedica
+```
+
 ## Pendências
 
 - **Zona Segura do disjuntor (Frente 4):** a lâmpada de teto é só desenho até o `Breaker` acender a luz e ligar o `MonsterRepellent`.

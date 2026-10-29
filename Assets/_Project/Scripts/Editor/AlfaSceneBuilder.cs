@@ -21,14 +21,17 @@ namespace SombraDaSanidade.EditorTools
     // Ala Executiva ligadas por corredores em loop (GDD 4.1). Jogador, monstro, HUD e sanidade vêm do
     // PrototypeSceneBuilder, então a cena se comporta igual ao protótipo.
     // Menu: Sombra da Sanidade > Gerar cena Alfa (tiles). Mudar o mapa = editar o .txt e gerar de novo.
+    // A mesma montagem gera a Ala Médica (issue #12) a partir de art-src/Maps/ala-medica.txt.
     public static class AlfaSceneBuilder
     {
         private const string Root = "Assets/_Project";
         public const string ScenePath = Root + "/Scenes/Main/Alfa.unity";
         private const string LayoutFile = "art-src/Maps/alfa.txt";
+        public const string AlaMedicaScenePath = Root + "/Scenes/Wings/AlaMedica.unity";
+        private const string AlaMedicaLayoutFile = "art-src/Maps/ala-medica.txt";
 
         // Caracteres que são chão (o resto é parede/teto).
-        private const string FloorChars = ".,hwpbL@Mmi";
+        private const string FloorChars = ".,hwpbL@MmiA";
 
         [MenuItem("Sombra da Sanidade/Gerar cena Alfa (tiles)", priority = 2)]
         public static void BuildFromMenu()
@@ -37,10 +40,24 @@ namespace SombraDaSanidade.EditorTools
             Build();
         }
 
-        // Batchmode: -executeMethod SombraDaSanidade.EditorTools.AlfaSceneBuilder.Build
-        public static void Build()
+        [MenuItem("Sombra da Sanidade/Gerar cena Ala Médica (tiles)", priority = 3)]
+        public static void BuildAlaMedicaFromMenu()
         {
-            var map = LoadLayout();
+            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            BuildAlaMedica();
+        }
+
+        // Batchmode: -executeMethod SombraDaSanidade.EditorTools.AlfaSceneBuilder.Build
+        public static void Build() => Build(LayoutFile, ScenePath, drivesRequired: 3, wing: null);
+
+        // Batchmode: -executeMethod SombraDaSanidade.EditorTools.AlfaSceneBuilder.BuildAlaMedica
+        // A ala só tem o HD-01, então a porta para o saguão abre com 1 HD.
+        public static void BuildAlaMedica() => Build(AlaMedicaLayoutFile, AlaMedicaScenePath, drivesRequired: 1, wing: "Medica");
+
+        // wing nulo = nome da ala pela posição no mapa (Alfa tem as 3 alas lado a lado).
+        private static void Build(string layoutFile, string scenePath, int drivesRequired, string wing)
+        {
+            var map = LoadLayout(layoutFile);
             if (map == null) return;
 
             // Assets antes de trocar de cena (mesmo motivo do PrototypeSceneBuilder).
@@ -56,7 +73,10 @@ namespace SombraDaSanidade.EditorTools
             var flashlightConfig = PrototypeSceneBuilder.GetOrCreateConfig<FlashlightConfig>("FlashlightConfig");
             var sanityConfig = PrototypeSceneBuilder.GetOrCreateConfig<SanityConfig>("SanityConfig");
 
-            new GameObject("GameManager").AddComponent<GameManager>();
+            var gm = new GameObject("GameManager").AddComponent<GameManager>();
+            var gmSo = new SerializedObject(gm);
+            gmSo.FindProperty("drivesRequired").intValue = drivesRequired;
+            gmSo.ApplyModifiedPropertiesWithoutUndo();
             PrototypeSceneBuilder.CreateGlobalLight();
             BuildTilemaps(map, tiles);
             BuildWallColliders(map, wallLayer);
@@ -64,6 +84,7 @@ namespace SombraDaSanidade.EditorTools
 
             var objectives = new GameObject("Objectives").transform;
             var items = new GameObject("SanityItems").transform;
+            Transform lockers = null;
             Vector2 playerSpawn = new Vector2(map.Width / 2f, 3.5f);
             Vector2 monsterSpawn = playerSpawn + Vector2.up * 18f;
             var patrol = new List<Vector2>();
@@ -79,13 +100,17 @@ namespace SombraDaSanidade.EditorTools
                     var inFront = center + Vector2.down;   // célula de chão logo abaixo da face da parede
                     switch (c)
                     {
-                        case 'S': CreateServer(objectives, square, $"DriveServer_{Wing(x, map.Width)}", inFront, center); break;
-                        case 'K': CreateBreaker(objectives, square, $"Breaker_{Wing(x, map.Width)}_{++breakers}", inFront); break;
+                        case 'S': CreateServer(objectives, square, $"DriveServer_{wing ?? Wing(x, map.Width)}", inFront, center); break;
+                        case 'K': CreateBreaker(objectives, square, $"Breaker_{wing ?? Wing(x, map.Width)}_{++breakers}", inFront); break;
                         case 'E': exitCells.Add(new Vector2Int(x, y)); break;
                         case '@': playerSpawn = center; break;
                         case 'M': monsterSpawn = center; break;
                         case 'm': patrol.Add(center); break;
                         case 'i': PrototypeSceneBuilder.CreateStabilizer(items, square, $"Stabilizer_{x}_{y}", center); break;
+                        case 'A':
+                            if (lockers == null) lockers = new GameObject("Lockers").transform;
+                            CreateLocker(lockers, square, $"Locker_{x}_{y}", center);
+                            break;
                     }
                 }
             }
@@ -98,10 +123,10 @@ namespace SombraDaSanidade.EditorTools
             PrototypeSceneBuilder.CreateSanityEffects(player.GetComponent<SanityController>(), square, wallLayer);
             PrototypeSceneBuilder.CreateMonster(monsterSpawn, patrol);
 
-            Directory.CreateDirectory(Path.GetDirectoryName(ScenePath));
-            EditorSceneManager.SaveScene(scene, ScenePath);
-            PrototypeSceneBuilder.AddSceneToBuild(ScenePath);
-            Debug.Log($"Cena Alfa gerada em {ScenePath} ({map.Width}x{map.Height} tiles)");
+            Directory.CreateDirectory(Path.GetDirectoryName(scenePath));
+            EditorSceneManager.SaveScene(scene, scenePath);
+            PrototypeSceneBuilder.AddSceneToBuild(scenePath);
+            Debug.Log($"Cena gerada em {scenePath} ({map.Width}x{map.Height} tiles)");
         }
 
         // ---------- Planta ----------
@@ -114,12 +139,12 @@ namespace SombraDaSanidade.EditorTools
             public bool IsFloor(int x, int y) => FloorChars.IndexOf(this[x, y]) >= 0;
         }
 
-        private static Layout LoadLayout()
+        private static Layout LoadLayout(string layoutFile)
         {
-            string path = Path.Combine(Path.GetDirectoryName(Application.dataPath), LayoutFile);
+            string path = Path.Combine(Path.GetDirectoryName(Application.dataPath), layoutFile);
             if (!File.Exists(path))
             {
-                Debug.LogError($"Planta do mapa não encontrada: {LayoutFile}");
+                Debug.LogError($"Planta do mapa não encontrada: {layoutFile}");
                 return null;
             }
             // Linhas de comentário começam com "# " (com espaço); as do mapa não têm espaço.
@@ -270,6 +295,15 @@ namespace SombraDaSanidade.EditorTools
         {
             PrototypeSceneBuilder.CreateBreaker(parent, square, name, floorCell);
             parent.Find(name).GetComponent<SpriteRenderer>().enabled = false;   // o desenho é o tile breaker_off
+        }
+
+        // Armário em bloco cinza, encostado na parede. Só marca a posição: o loot (GDD 6: 60% de bateria
+        // ou sedativo por armário) entra depois.
+        private static void CreateLocker(Transform parent, Sprite square, string name, Vector2 cell)
+        {
+            var go = PrototypeSceneBuilder.CreateBlock(parent, square, name, cell + Vector2.up * 0.2f,
+                new Vector2(0.9f, 0.6f), new Color(0.32f, 0.34f, 0.36f));
+            go.GetComponent<SpriteRenderer>().sortingOrder = -4;
         }
 
         // Eclusa: as portas são tiles; o trigger fica no chão em frente e uma faixa de luz mostra o estado

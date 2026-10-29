@@ -48,6 +48,9 @@ namespace SombraDaSanidade.EditorTools
         // Mesmo teste na cena do alfa montada com tiles (AlfaSceneBuilder).
         public static void RunBatchAlfa() => Start(batch: true, AlfaSceneBuilder.ScenePath);
 
+        // Ala Médica (issue #12): a porta abre com o HD-01, então "todos os HDs" aqui é 1.
+        public static void RunBatchAlaMedica() => Start(batch: true, AlfaSceneBuilder.AlaMedicaScenePath);
+
         private static void Start(bool batch, string sceneOverride = null)
         {
             string scene = sceneOverride ?? (System.IO.File.Exists(PrototypeSceneBuilder.DemoScenePath)
@@ -166,10 +169,10 @@ namespace SombraDaSanidade.EditorTools
                 case 8:
                     if (gm.DrivesCollected < 1 && Time.time - stepStart < 4f) { waitFrames = 5; return; }
                     Release();
-                    CheckInput($"Segurar E coleta um HD ({gm.DrivesCollected}/3)", gm.DrivesCollected == 1);
+                    CheckInput($"Segurar E coleta um HD ({gm.DrivesCollected}/{gm.DrivesRequired})", gm.DrivesCollected == 1);
                     foreach (var s in Object.FindObjectsByType<DriveServer>())
                         if (s.CanInteract) s.CompleteInteract();
-                    Check($"3 HDs coletados ({gm.DrivesCollected}/3)", gm.HasAllDrives);
+                    Check($"Todos os HDs coletados ({gm.DrivesCollected}/{gm.DrivesRequired})", gm.HasAllDrives);
                     var door = Object.FindAnyObjectByType<ExitDoor>();
                     Teleport(player, door.transform.position + Vector3.up * 0.3f);
                     stepStart = Time.realtimeSinceStartup;
@@ -178,7 +181,7 @@ namespace SombraDaSanidade.EditorTools
 
                 case 9:
                     if (gm.State != GameState.Victory && Time.realtimeSinceStartup - stepStart < 2f) { waitFrames = 5; return; }
-                    Check("Encostar na porta com 3 HDs dá vitória", gm.State == GameState.Victory);
+                    Check("Encostar na porta com todos os HDs dá vitória", gm.State == GameState.Victory);
                     Finish();
                     break;
             }
