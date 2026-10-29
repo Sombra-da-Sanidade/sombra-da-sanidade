@@ -319,9 +319,10 @@ namespace SombraDaSanidade.Monster
 
         // ---------- Sentidos ----------
 
-        private bool IsLitByFlashlight()
+        // Consulta compartilhada pela detecção e pelo EMP: as mesmas alturas, alcance e paredes.
+        public bool IsLitByFlashlight()
         {
-            if (flashlight == null || !flashlight.IsLit) return false;
+            if (config == null || flashlight == null || !flashlight.IsLit) return false;
             Vector2 feet = transform.position;
             var heights = config.lightSampleHeights;
             if (heights == null || heights.Length == 0) return flashlight.IsPointInCone(feet);

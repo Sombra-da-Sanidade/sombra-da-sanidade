@@ -27,5 +27,11 @@ namespace SombraDaSanidade.Flashlight
         public float empCost = 40f;
         [Tooltip("Tempo de atordoamento do monstro em segundos (GDD: 4s).")]
         public float empStunDuration = 4f;
+        [Tooltip("Raio do ruído emitido pelo EMP. Valor inicial para playtest; ajustar conforme necessário.")]
+        [Min(0f)] public float empNoiseRadius = 8f;
+        [Tooltip("Duração do tremor no disparo e na tentativa com a luz apagada. Ajustar no playtest.")]
+        [Min(0f)] public float empShakeDuration = 0.2f;
+        [Tooltip("Intensidade do tremor do EMP. Ajustar no playtest.")]
+        [Min(0f)] public float empShakeMagnitude = 0.15f;
     }
 }

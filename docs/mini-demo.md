@@ -26,7 +26,7 @@ Tudo em blocos cinzas. Arte, som, alucinações e narrativa ficam para depois.
 | Monstro (patrulha, ruído, luz, EMP, Zona Segura, contato, sprites) | `Monster/` | pronto (ver [monstro.md](monstro.md)) |
 | Sanidade (dreno, efeitos, alucinações, pistas, Estabilizador) | `Sanity/` | pronto (ver [sanidade.md](sanidade.md)) |
 | Disjuntor | `Interaction/Breaker.cs` | **parcial** (reparo e ruído; Zona Segura TODO) |
-| EMP | `Flashlight/` | **a fazer** |
+| EMP | `Flashlight/` | pronto |
 
 Menus no Unity (**Sombra da Sanidade**):
 - **Criar Sandbox > Frente N**: cena de teste da sua frente com o mapa da demo completo.
@@ -44,7 +44,7 @@ Cada integrante escolhe **uma frente livre** e se atribui nas issues dela (como 
 ### Frente 1: Lanterna e EMP
 - **Essencial do MVP:** lanterna de cone, pulso EMP.
 - **Issues:** #6
-- **Entrega:** clique direito dispara o EMP: `TrySpend(empCost)`; se o monstro estiver no cone (`IsPointInCone`), chama `Stun(empStunDuration)`; `NoiseBus.Emit` e `CameraFollow.Shake`. Sem carga: feedback simples. Ajuste fino da lanterna (intensidade, alcance) no `FlashlightConfig`.
+- **Entrega:** clique direito dispara o EMP: `TrySpend(empCost)`; se o monstro estiver iluminado (`MonsterController.IsLitByFlashlight`, com as mesmas alturas usadas pela detecção), chama `Stun(empStunDuration)`; depois `NoiseBus.Emit` e `CameraFollow.Shake`. Sem carga: aviso visual. Com a lanterna desligada: aviso “Lanterna desligada” e tremor, sem gasto, ruído ou atordoamento. Ajuste fino da lanterna e dos efeitos do EMP no `FlashlightConfig`.
 - **Pode mexer em:** `Scripts/Flashlight/`, `Scripts/Player/`.
 
 ### Frente 2: Monstro

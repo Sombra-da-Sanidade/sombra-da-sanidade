@@ -1,4 +1,6 @@
 using System;
+using SombraDaSanidade.Core;
+using SombraDaSanidade.Monster;
 using SombraDaSanidade.Player;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -29,6 +31,13 @@ namespace SombraDaSanidade.Flashlight
 
         private Light2D light2D;
         private bool wasLit;
+        private MonsterController monster;
+        private CameraFollow cameraFollow;
+        private float empFeedbackUntil;
+        private string empFeedbackMessage;
+        private GUIStyle empFeedbackStyle;
+
+        private const float EmpFeedbackDuration = 1.5f;
 
         private void Awake()
         {
@@ -44,11 +53,18 @@ namespace SombraDaSanidade.Flashlight
             ApplyConeShape();
         }
 
+        private void Start()
+        {
+            monster = FindAnyObjectByType<MonsterController>();
+            var cam = Camera.main;
+            if (cam != null) cameraFollow = cam.GetComponent<CameraFollow>();
+        }
+
         private void Update()
         {
             ReadToggle();
-            // TODO(Frente 1): pulso EMP no clique direito (issue #6). Ver docs/mini-demo.md.
             Aim();
+            ReadEmp();
             Drain();
             UpdateLight();
         }
@@ -86,6 +102,71 @@ namespace SombraDaSanidade.Flashlight
             bool pressed = (kb != null && kb.fKey.wasPressedThisFrame)
                 || (mouse != null && mouse.leftButton.wasPressedThisFrame);
             if (pressed) IsSwitchedOn = !IsSwitchedOn;
+        }
+
+        private void ReadEmp()
+        {
+            var mouse = Mouse.current;
+            if (mouse != null && mouse.rightButton.wasPressedThisFrame) TryFireEmp();
+        }
+
+        private void TryFireEmp()
+        {
+            if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) return;
+
+            // Com a luz apagada, a tentativa avisa o motivo e mantém o tremor combinado.
+            if (!IsSwitchedOn)
+            {
+                ShowEmpFeedback("Lanterna desligada");
+                ShakeEmp();
+                return;
+            }
+
+            // Consultar antes do gasto: o último disparo pode zerar a bateria e apagar o cone.
+            bool hitsMonster = monster != null && monster.isActiveAndEnabled
+                && monster.IsLitByFlashlight();
+            if (!TrySpend(config.empCost))
+            {
+                ShowEmpFeedback("Carga insuficiente para EMP");
+                return;
+            }
+
+            empFeedbackUntil = 0f;
+            if (hitsMonster) monster.Stun(config.empStunDuration);
+            // Atordoar primeiro evita que o alvo reaja ao ruído do próprio EMP (GDD 4.3 e 6.3).
+            NoiseBus.Emit(transform.position, config.empNoiseRadius);
+            ShakeEmp();
+        }
+
+        private void ShakeEmp()
+        {
+            if (cameraFollow != null)
+                cameraFollow.Shake(config.empShakeDuration, config.empShakeMagnitude);
+        }
+
+        private void ShowEmpFeedback(string message)
+        {
+            empFeedbackMessage = message;
+            empFeedbackUntil = Time.unscaledTime + EmpFeedbackDuration;
+        }
+
+        private void OnGUI()
+        {
+            if (Time.unscaledTime >= empFeedbackUntil) return;
+            if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) return;
+
+            if (empFeedbackStyle == null)
+            {
+                empFeedbackStyle = new GUIStyle(GUI.skin.label)
+                {
+                    alignment = TextAnchor.MiddleCenter,
+                    fontSize = 18
+                };
+                empFeedbackStyle.normal.textColor = new Color(1f, 0.6f, 0.4f);
+            }
+
+            GUI.Label(new Rect(16f, Screen.height - 72f, Screen.width - 32f, 32f),
+                empFeedbackMessage, empFeedbackStyle);
         }
 
         private void Aim()

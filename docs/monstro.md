@@ -33,7 +33,7 @@ Não estão no GDD (ajustar no playtest): grito de 0,8 s (`detectionDelay`), mem
 
 | Frente | O que usar |
 |---|---|
-| 1 (EMP) | `monster.Stun(config.empStunDuration)` quando `IsPointInCone(monster.transform.position)`. Depois `NoiseBus.Emit(...)`: atordoado, ele não reage ao ruído do próprio EMP. |
+| 1 (EMP) | Consulte `monster.IsLitByFlashlight()` antes de gastar carga: usa as mesmas alturas de `lightSampleHeights`, alcance e paredes da detecção (sem alturas configuradas, testa os pés). Se acertar, chame `monster.Stun(config.empStunDuration)`. Depois `NoiseBus.Emit(...)`: atordoado, ele não reage ao ruído do próprio EMP. |
 | 3 (Sanidade) | `transform.position` para a proximidade (já usado). `State`, `IsDetecting`, `StateChanged` e `Detected` para efeitos e áudio. |
 | 4 (Zona Segura) | Adicione `MonsterRepellent` no objeto da lâmpada de teto e ajuste `Radius` para o alcance da luz. Ligue o componente (`enabled = true`) quando o reparo terminar e desligue depois de 60 s. |
 | 5 (HDs) | Nada a fazer: o monstro já escuta `DriveCollected`. |
@@ -73,7 +73,8 @@ O menu **Sombra da Sanidade > Gerar cena de protótipo** (e as Sandboxes) já cr
 - o ruído e a investigação;
 - a lanterna apagada não atraindo;
 - a luz iniciando a perseguição, com o grito antes;
-- o EMP e a volta depois dele;
+- o EMP acertando só a cabeça iluminada com carga exata, o atordoamento antes do ruído e a volta depois dele;
+- os avisos de carga insuficiente e lanterna desligada, sem ruído ou gasto nas tentativas bloqueadas;
 - o +10% por HD;
 - a saída da Zona Segura;
 - o Game Over ao encostar.
