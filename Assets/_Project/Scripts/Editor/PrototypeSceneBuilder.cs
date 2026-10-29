@@ -84,7 +84,9 @@ namespace SombraDaSanidade.EditorTools
             GetOrCreateConfig<FlashlightConfig>("FlashlightConfig");
             GetOrCreateConfig<SanityConfig>("SanityConfig");
             GetOrCreateConfig<MonsterConfig>("MonsterConfig");
+            GetOrCreateConfig<InteractionConfig>("InteractionConfig");
             GetOrCreatePlaceholderSprite();
+            DriveServerPrefabBuilder.GetOrBuild();
             int wallLayer = EnsureLayer(WallLayerName);
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -169,26 +171,12 @@ namespace SombraDaSanidade.EditorTools
             SetRef(exit, "doorRenderer", door.GetComponent<SpriteRenderer>());
         }
 
+        // Frente 5: instancia o prefab do servidor (Prefabs/DriveServer.prefab). Se não existir, é gerado agora.
         internal static void CreateDriveServer(Transform parent, Sprite square, string name, Vector2 position)
         {
-            var go = CreateBlock(parent, square, name, position, new Vector2(1.2f, 1.2f), new Color(0.15f, 0.25f, 0.2f));
-            var col = go.AddComponent<BoxCollider2D>();
-            col.isTrigger = true;
-            col.size = new Vector2(1.5f, 1.5f);
-
-            var led = CreateBlock(go.transform, square, "Indicator", Vector2.zero, Vector2.one * 0.3f, Color.green);
-            led.transform.localPosition = new Vector3(0f, 0f, 0f);
-            led.GetComponent<SpriteRenderer>().sortingOrder = 6;
-
-            var glow = new GameObject("Glow").AddComponent<Light2D>();
-            glow.transform.SetParent(go.transform, false);
-            glow.lightType = Light2D.LightType.Point;
-            glow.color = new Color(0.3f, 1f, 0.45f);
-            glow.intensity = 0.6f;
-            glow.pointLightOuterRadius = 1.6f;
-
-            var server = go.AddComponent<DriveServer>();
-            SetRef(server, "indicator", led.GetComponent<SpriteRenderer>());
+            var go = (GameObject)PrefabUtility.InstantiatePrefab(DriveServerPrefabBuilder.GetOrBuild(), parent);
+            go.name = name;
+            go.transform.position = position;
         }
 
         internal static void CreateBreaker(Transform parent, Sprite square, string name, Vector2 position)

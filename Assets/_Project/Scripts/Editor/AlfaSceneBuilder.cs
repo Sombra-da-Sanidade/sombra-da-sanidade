@@ -46,6 +46,7 @@ namespace SombraDaSanidade.EditorTools
             // Assets antes de trocar de cena (mesmo motivo do PrototypeSceneBuilder).
             ArtTestSceneBuilder.LoadOrCreateTiles();
             PrototypeSceneBuilder.GetOrCreatePlaceholderSprite();
+            DriveServerPrefabBuilder.GetOrBuild();
             int wallLayer = PrototypeSceneBuilder.EnsureLayer(PrototypeSceneBuilder.WallLayerName);
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
