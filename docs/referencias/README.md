@@ -19,3 +19,7 @@ Ao revisar o GDD (ex.: v1.1), conferir primeiro os **Critérios de Avaliação**
 ## Arte (`arte/`)
 
 Imagens de referência visual (Yuppie Psycho, Penusbmic) para a direção de arte. Também ficam só local. `arte/FONTES.md` lista a origem de cada arquivo. Guia: [docs/arte/guia-de-estilo.md](../arte/guia-de-estilo.md).
+
+## Pesquisa (`pesquisa/`)
+
+Cópias locais das fontes da pesquisa de balanceamento (DbD, Identity V, Alien: Isolation, Left 4 Dead, Hamlet e jogos de referência do GDD): PDFs e páginas salvas em HTML. Também ficam só local. As notas, números e links ficam versionados em [docs/pesquisa/](../pesquisa/README.md).
