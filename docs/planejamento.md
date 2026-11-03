@@ -6,7 +6,7 @@ Todo item abaixo precisa reforçar o feedback do professor: **P** progresso, **D
 
 Fontes: [GDD resumido](gdd/gdd.md), [propostas v1.1](gdd/gdd-v1.1-propostas.md), [pesquisa](pesquisa/README.md), [skill check](skill-check-hd.md).
 
-Divisão do trabalho em 4 frentes: [equipe.md](equipe.md). Board: [projeto no GitHub](https://github.com/orgs/Sombra-da-Sanidade/projects/1).
+Divisão do trabalho em 5 frentes: [equipe.md](equipe.md). Board: [projeto no GitHub](https://github.com/orgs/Sombra-da-Sanidade/projects/1).
 
 ## Mapa de dependências
 
@@ -27,7 +27,7 @@ Divisão do trabalho em 4 frentes: [equipe.md](equipe.md). Board: [projeto no Gi
 | 0.1 | Reunião para aprovar #3: Propostas 1 a 4 do v1.1 + Propostas 5 a 9 da pesquisa | grupo | 45 min |
 | 0.2 | Atualizar `gdd.md` (seções 4, 5, 6, 7, 8) e o histórico com o que foi aprovado | qualquer pessoa | 1 h |
 | 0.3 | Decidir #16 (barra MENTE no HUD) na mesma reunião | grupo | junto |
-| 0.4 | Cada pessoa escolhe uma das 4 frentes e se atribui nas issues | todos | 10 min |
+| 0.4 | Cada pessoa escolhe uma das 5 frentes e se atribui nas issues | todos | 10 min |
 
 ## Fase 1: base do vertical slice
 
@@ -35,7 +35,7 @@ Divisão do trabalho em 4 frentes: [equipe.md](equipe.md). Board: [projeto no Gi
 |---|---|---|---|---|---|
 | Loot dos armários (bateria +30, sedativo) | #29 | 1 | R | 2 h | nada |
 | Skill check de multímetro na ejeção de HD | #33 | 1 (+3 no visual) | D, R | 6 h | #3 |
-| `DifficultyProfile` por ala | #30 | 4 (1, 2, 3 leem) | D | 3 h | #3 |
+| `DifficultyProfile` por ala | #30 | 5 (as outras leem) | D | 3 h | #3 |
 | Batimento em 3 faixas de distância | #38 | 3 | D | 2 h | nada |
 
 Skill check, resumo (detalhes em [skill-check-hd.md](skill-check-hd.md)): ejeção de 12 s, 25%/s de chance após 2 s, máx. 3 checks, good 15/13/11% por HD, great 4% (+5%), falha -10% + pausa 1 s + ruído raio 12. Monstro perto: zona -40%. Sanidade < 35: ponteiro treme. Depois de 50% o servidor faz ruído baixo a cada 3 s.
@@ -46,8 +46,8 @@ Skill check, resumo (detalhes em [skill-check-hd.md](skill-check-hd.md)): ejeç�
 |---|---|---|---|---|---|
 | Diretor de tensão (pico e recuo de 30 a 45 s) | #35 | 2 | D, P | 5 h | #30 |
 | Monstro destrava comportamentos por ala (Médica) | #36 | 2 | D, P | 3 h | #30 |
-| Upgrade da Lux-90 ao ejetar HD (1 de 2) | #31 | 1 (+3 na tela) | R | 4 h | #3 |
-| Menu, Briefing, Vitória com rank S/A/B/C | #32 | 3 | R, P | 4 h | #3 |
+| Upgrade da Lux-90 ao ejetar HD (1 de 2) | #31 | 1 (+5 na tela) | R | 4 h | #3 |
+| Menu, Briefing, Vitória com rank S/A/B/C | #32 | 5 | R, P | 4 h | #3 |
 | Ala Médica completa: 1 min sem monstro, tileset, "Progresso salvo" | #41 | 4 | P, R | 1 dia | #29, #30 |
 
 Entrega da semana 8: Ala Médica jogável do Menu até a tela de rank, com skill check, upgrade e diretor de tensão. Build WebGL publicada.
@@ -63,7 +63,7 @@ Entrega da semana 8: Ala Médica jogável do Menu até a tela de rank, com skill
 | Ala de Energia | #42 | 4 | P, D |
 | Ala Executiva | #43 | 4 | P, D |
 | Fuga da Eclusa cronometrada | #44 | 4 | P, D |
-| Checkpoint JSON entre alas | #45 | 4 | P |
+| Checkpoint JSON entre alas | #45 | 5 | P |
 
 ## Extras (sem milestone, para quem terminar antes)
 
@@ -72,7 +72,7 @@ Entrega da semana 8: Ala Médica jogável do Menu até a tela de rank, com skill
 | Loot por tabela sorteada por ala | #46 | 1 | Left 4 Dead |
 | Ajuste dinâmico leve da chance de bateria | #47 | 1 | Hamlet |
 | Modo seguro opcional | #48 | 2 | SOMA |
-| Bônus no rank por HD sem falha | #49 | 3 | Darkwood / Proposta 3 |
+| Bônus no rank por HD sem falha | #49 | 5 | Darkwood / Proposta 3 |
 
 ## Por frente
 
@@ -80,8 +80,11 @@ Entrega da semana 8: Ala Médica jogável do Menu até a tela de rank, com skill
 |---|---|---|---|---|
 | 1 Jogador, interação e itens | #29, #33 | #31 | #34 | #46, #47 |
 | 2 Monstro e tensão | ler #30 | #35, #36 | #37 | #48 |
-| 3 Sanidade, HUD e narrativa | #38, #16 | #32 | #39, #40 | #49 |
-| 4 Níveis, partida e build | #30 | #41 | #42, #43, #44, #45 | |
+| 3 Sanidade, HUD e narrativa | #38, #16 | | #39, #40 | |
+| 4 Níveis | | #41 | #42, #43, #44 | |
+| 5 Partida, telas e build | #30 | #32 | #45 | #49 |
+
+A Frente 3 tem a Fase 2 livre de propósito: é quando escreve os roteiros dos logs (#39) e fecha o Ato 3 (#40) com o grupo.
 
 ## Como cada mudança entra
 
