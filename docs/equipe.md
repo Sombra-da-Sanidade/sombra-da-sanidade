@@ -1,6 +1,8 @@
 # Organização da equipe: frentes de trabalho
 
-O projeto é dividido em **5 frentes**, uma por pessoa. Ninguém é designado: cada integrante **escolhe uma frente livre** e se atribui nas issues dela no GitHub.
+Depois da mini demo o projeto é dividido em **4 frentes**, uma por pessoa. Ninguém é designado: cada integrante **escolhe uma frente livre** e se atribui nas issues dela no GitHub. O roteiro completo, com fases e dependências, está em [planejamento.md](planejamento.md).
+
+> A mini demo usou 5 frentes (ver [mini-demo.md](mini-demo.md)). A label `frente:5-integracao` ficou só no histórico.
 
 ## Como pegar uma frente
 
@@ -8,23 +10,27 @@ O projeto é dividido em **5 frentes**, uma por pessoa. Ninguém é designado: c
 2. Avise no grupo qual frente você pegou.
 3. No GitHub, abra cada issue da frente e clique em **Assignees > assign yourself**.
 4. Crie sua Sandbox: menu **Sombra da Sanidade > Criar Sandbox > Frente N**.
-5. Procure no código por `TODO(Frente N)`: é o que falta na sua frente.
+5. Comece pelas issues do milestone **Vertical slice**; as de **Versão final** vêm depois.
 
-Uma pessoa por frente. Se terminar antes, ajude outra frente via PR, com a revisão de quem é responsável por ela.
+Uma pessoa por frente. Se terminar antes, pegue uma issue **Extra** ou ajude outra frente via PR, com a revisão de quem é responsável por ela.
 
-## As 5 frentes
+## As 4 frentes
 
-Escopo atual: itens **Essenciais do MVP** (GDD seção 12.1) para a mini demo. Detalhes e prazos em [mini-demo.md](mini-demo.md).
+| Frente | Sistema | Vertical slice (semana 8) | Versão final (semana 12) | Extras | Label | Pastas / assets |
+|---|---|---|---|---|---|---|
+| 1 | Jogador, interação e itens | #33 skill check do HD, #29 armários, #31 upgrades da Lux-90 | #34 Adrena-Syn | #46, #47 | `frente:1-jogador` | `Scripts/Player/`, `Scripts/Flashlight/`, `Scripts/Interaction/` (exceto `Breaker`), `DriveServer` |
+| 2 | Monstro e tensão | #35 diretor de tensão, #36 comportamentos por ala (Médica) | #37 comportamentos Energia/Executiva | #48 | `frente:2-monstro` | `Scripts/Monster/`, prefab Monster, `Core/TensionDirector` |
+| 3 | Sanidade, HUD e narrativa | #38 batimento em camadas, #32 telas e rank, #16 barra MENTE | #39 logs de áudio, #40 Ato 3 | #49 | `frente:3-sanidade-hud` | `Scripts/Sanity/`, `Scripts/UI/`, Volume profile, cenas de Menu/Briefing |
+| 4 | Níveis, partida e build | #30 `DifficultyProfile`, #41 Ala Médica completa | #42 Energia, #43 Executiva, #44 Eclusa, #45 checkpoint | | `frente:4-niveis` | `Scenes/Wings/`, `Breaker`, `ExitDoor`, `Scripts/Core/` (exceto `TensionDirector`), configs, `ProjectSettings/`, `Packages/` |
 
-| Frente | Sistema | Essencial do MVP | Issues | Label | Pastas / assets |
-|---|---|---|---|---|---|
-| 1 | Lanterna e EMP | Lanterna de cone; Pulso EMP | #6 | `frente:1-lanterna` | `Scripts/Flashlight/`, `Scripts/Player/` |
-| 2 | Monstro | IA perseguidora imortal com NavMesh 2D | #4, #5 | `frente:2-monstro` | `Scripts/Monster/`, prefab Monster |
-| 3 | Sanidade e HUD | Dreno de sanidade | #8, #9 | `frente:3-sanidade` | `Scripts/Sanity/`, `Scripts/UI/`, Volume profile |
-| 4 | Disjuntor e mapa | Reparo de disjuntores (Zona Segura) | #10, #12 | `frente:4-disjuntor` | `Scripts/Interaction/Breaker.cs`, `Scenes/Main/Demo.unity` |
-| 5 | Partida, HDs e build | Extração das 3 gavetas de HD; vitória/derrota | #7, #11 | `frente:5-integracao` | `Scripts/Core/`, `DriveServer`, `ExitDoor`, configs, `ProjectSettings/`, `Packages/` |
+Comum a todos: **#3 (aprovar o GDD v1.1)** trava boa parte das issues, então a reunião vem primeiro. Qualquer sprite novo segue o [guia de estilo](arte/guia-de-estilo.md) e entra pelo `art-src/` (ver [CONTRIBUTING](../CONTRIBUTING.md#arte)).
 
-Comum a todos: **#2 (onboarding)** e o [guia de estilo](arte/guia-de-estilo.md): qualquer sprite novo, de qualquer frente, segue a paleta e entra pelo `art-src/` (ver [CONTRIBUTING](../CONTRIBUTING.md#arte)). Fora da mini demo: #3 (GDD v1.1) e #13 (direção de arte).
+### Onde as frentes se encostam
+
+- **#33 skill check:** a lógica é da Frente 1; o mostrador final usa o estilo do HUD da Frente 3.
+- **#31 upgrades:** efeitos na Frente 1; a tela de escolha (CRT verde) com a Frente 3.
+- **#30 `DifficultyProfile`:** a Frente 4 cria o asset e o perfil ativo; as Frentes 1, 2 e 3 só leem.
+- **#45 checkpoint:** a Frente 4 salva; a Frente 3 mostra "Continuar" no menu (#32).
 
 ## Responsabilidades de quem pega uma frente
 
@@ -40,17 +46,5 @@ Cada frente tem sua cena de teste: `Assets/_Project/Scenes/Sandbox/Frente<N>.uni
 ## Revisão de PR
 
 - PR de uma frente: revisão de quem é responsável por ela (ou de qualquer outra pessoa, se o autor for o responsável).
-- PR que toca `ProjectSettings/` ou `Packages/`: revisão da Frente 5.
+- PR que toca `ProjectSettings/` ou `Packages/`: revisão da Frente 4.
 - PR de GDD (`docs/gdd/`): qualquer pessoa, avisando no grupo.
-
-## Depois da mini demo
-
-As frentes continuam as mesmas e crescem com o vertical slice:
-
-| Frente | Próximos passos |
-|---|---|
-| 1 | Módulos neurais (Adrena-Syn), upgrades da Lux-90 (proposta v1.1) |
-| 2 | Estados completos da IA, balanceamento por ala |
-| 3 | Alucinações, Revelação pela Loucura, HUD diegético final |
-| 4 | Level design das 3 alas, arte e áudio do ambiente |
-| 5 | Checkpoint, telas de menu/briefing/rank, builds e publicação |
