@@ -48,8 +48,11 @@ namespace SombraDaSanidade.EditorTools
         [MenuItem("Sombra da Sanidade/Criar Sandbox/Frente 3 - Sanidade, HUD e narrativa", priority = 22)]
         public static void SandboxFrente3() => BuildSandbox("Frente3");
 
-        [MenuItem("Sombra da Sanidade/Criar Sandbox/Frente 4 - Níveis, partida e build", priority = 23)]
+        [MenuItem("Sombra da Sanidade/Criar Sandbox/Frente 4 - Níveis", priority = 23)]
         public static void SandboxFrente4() => BuildSandbox("Frente4");
+
+        [MenuItem("Sombra da Sanidade/Criar Sandbox/Frente 5 - Partida, telas e build", priority = 24)]
+        public static void SandboxFrente5() => BuildSandbox("Frente5");
 
         // Mantido para o batchmode do PR anterior.
         public static void Build() => BuildPrototype();
