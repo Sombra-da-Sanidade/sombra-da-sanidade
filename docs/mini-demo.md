@@ -1,5 +1,7 @@
 # Mini demo: quinta 29/10/2026
 
+> Entregue. Depois da mini demo: ver [planejamento.md](planejamento.md).
+
 Primeira entrega: demo jogável no navegador (WebGL) com os itens **Essenciais do MVP** (GDD seção 12.1):
 
 1. Movimentação 2D, lanterna de cone e dreno de sanidade
