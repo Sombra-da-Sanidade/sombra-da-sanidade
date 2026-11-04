@@ -28,6 +28,12 @@ MonoBehaviour:
   - 1.4
   - 2.6
   safeZoneMargin: 0.6
+  behaviours: 1
+  searchPoints: 3
+  searchRadius: 10
+  searchCandidates: 3
+  searchRevisitChance: 0.25
+  searchListenFactor: 0.5
   tension: {fileID: 11400000, guid: 7eeef026faee38245a82f21338d3e9b8, type: 2}
   mercySanityThreshold: 15
   mercySearchDelay: 0.05
