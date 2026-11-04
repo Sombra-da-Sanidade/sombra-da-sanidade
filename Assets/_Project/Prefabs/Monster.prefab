@@ -159,6 +159,8 @@ MonoBehaviour:
   frameSize: {x: 48, y: 64}
   pixelsPerUnit: 16
   pivot: {x: 0.5, y: 0.02}
+  killSheet: {fileID: 2800000, guid: 5ae1539aeda51cb76fad5b64eed7ba19, type: 3}
+  killGlowSheet: {fileID: 2800000, guid: 6102d026846810092949e275168d7a93, type: 3}
   body: {fileID: 396122938869606635}
   glow: {fileID: 3216162675574182368}
   led: {fileID: 3583594666648365821}
@@ -213,6 +215,26 @@ MonoBehaviour:
     frames: 8
     fps: 12
     loop: 1
+  - name: gallop_down
+    row: 10
+    frames: 12
+    fps: 20
+    loop: 1
+  - name: gallop_up
+    row: 11
+    frames: 12
+    fps: 20
+    loop: 1
+  - name: gallop_side
+    row: 12
+    frames: 12
+    fps: 20
+    loop: 1
+  - name: lunge
+    row: 13
+    frames: 8
+    fps: 16
+    loop: 0
   patrolColor: {r: 0.17, g: 0.41, b: 0.57, a: 1}
   alertColor: {r: 0.31, g: 0.72, b: 1, a: 1}
   chaseColor: {r: 0.67, g: 0.93, b: 1, a: 1}

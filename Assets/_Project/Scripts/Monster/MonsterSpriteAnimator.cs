@@ -37,6 +37,10 @@ namespace SombraDaSanidade.Monster
         [Tooltip("Pivô do quadro (0-1). Embaixo no centro: o transform fica nos pés.")]
         [SerializeField] private Vector2 pivot = new Vector2(0.5f, 0.02f);
 
+        [Header("Mortes (folha de 80x80, MonsterKillScene)")]
+        [SerializeField] private Texture2D killSheet;
+        [SerializeField] private Texture2D killGlowSheet;
+
         [Header("Renderers")]
         [SerializeField] private SpriteRenderer body;
         [SerializeField] private SpriteRenderer glow;
@@ -56,6 +60,10 @@ namespace SombraDaSanidade.Monster
             new Clip("run_up", 7, 8, 12f, true),
             new Clip("run_side", 8, 8, 12f, true),
             new Clip("stun", 9, 8, 12f, true),
+            new Clip("gallop_down", 10, 12, 20f, true),
+            new Clip("gallop_up", 11, 12, 20f, true),
+            new Clip("gallop_side", 12, 12, 20f, true),
+            new Clip("lunge", 13, 8, 16f, false),
         };
 
         [Header("LED por estado")]
@@ -72,6 +80,8 @@ namespace SombraDaSanidade.Monster
         private int currentClip = -1;
         private float clipTime;
         private Vector2 facing = Vector2.down;
+        private bool wasDetecting;
+        private float lungeTimer;
 
         private void Awake()
         {
@@ -84,12 +94,27 @@ namespace SombraDaSanidade.Monster
             }
             bodyFrames = Slice(sheet);
             if (glowSheet != null && glow != null) glowFrames = Slice(glowSheet);
+            if (killSheet != null)
+            {
+                var kill = GetComponent<MonsterKillScene>();
+                if (kill == null) kill = gameObject.AddComponent<MonsterKillScene>();
+                kill.Setup(killSheet, killGlowSheet, body, glow, pixelsPerUnit);
+            }
             Play(IndexOf("idle"));
             Apply();
         }
 
         private void Update()
         {
+            // Durante a morte quem desenha é o MonsterKillScene.
+            if (monster.IsKilling) return;
+
+            // Bote: logo depois do grito ele dispara para a frente antes de galopar.
+            bool detecting = monster.State == MonsterState.Chase && monster.IsDetecting;
+            if (wasDetecting && !detecting && monster.State == MonsterState.Chase) lungeTimer = ClipLength("lunge");
+            wasDetecting = detecting;
+            if (lungeTimer > 0f) lungeTimer -= Time.deltaTime;
+
             Vector2 v = monster.Velocity;
             bool moving = v.sqrMagnitude > 0.04f;
             if (moving) facing = v;
@@ -108,7 +133,11 @@ namespace SombraDaSanidade.Monster
                     return "stun";
                 case MonsterState.Chase:
                     if (monster.IsDetecting) return "scream";
-                    return moving ? "run_" + DirectionSuffix() : "listen";
+                    if (lungeTimer > 0f && IndexOf("lunge") >= 0) return "lunge";
+                    if (!moving) return "listen";
+                    // Galope de quatro. Prefab antigo sem as linhas novas: usa a corrida.
+                    string gallop = "gallop_" + DirectionSuffix();
+                    return IndexOf(gallop) >= 0 && HasRow(gallop) ? gallop : "run_" + DirectionSuffix();
                 case MonsterState.Investigate:
                     return moving ? "walk_" + DirectionSuffix() : "listen";
                 default:
@@ -194,6 +223,19 @@ namespace SombraDaSanidade.Monster
                     led.intensity = patrolIntensity * (0.8f + 0.2f * Mathf.Sin(Time.time * 2f));
                     break;
             }
+        }
+
+        private float ClipLength(string clipName)
+        {
+            int i = IndexOf(clipName);
+            if (i < 0 || !HasRow(clipName)) return 0f;
+            return clips[i].frames / Mathf.Max(1f, clips[i].fps);
+        }
+
+        private bool HasRow(string clipName)
+        {
+            int i = IndexOf(clipName);
+            return i >= 0 && bodyFrames != null && clips[i].row < bodyFrames.Length;
         }
 
         private int IndexOf(string clipName)

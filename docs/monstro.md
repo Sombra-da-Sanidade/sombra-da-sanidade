@@ -10,7 +10,7 @@ Resumo do Espécime Vazio como ele está no código hoje. Os números ficam em `
 |---|---|---|---|
 | **Patrulha Cega** | Início da partida, ou depois de investigar | Anda entre os pontos de patrulha, pausando 1 s em cada um | Ruído ouvido → Investigação. Luz → Perseguição |
 | **Investigação Auditiva** | Ouviu um ruído (`NoiseBus`) | Vai até o ponto do ruído e fica 3 s parado escutando | Termina de escutar → Patrulha. Luz → Perseguição |
-| **Perseguição Furiosa** | O cone da lanterna tocou nele | Grita parado por 0,8 s e depois corre atrás do jogador | Sem luz por mais de 1,5 s: vai até onde viu o jogador por último e escuta (Investigação) |
+| **Perseguição Furiosa** | O cone da lanterna tocou nele | Grita parado por 0,8 s, dá o bote e galopa atrás do jogador a 1,25× a velocidade (~4,4 m/s, mais rápido que os 4 m/s do jogador) | Sem luz por mais de 1,5 s: vai até onde viu o jogador por último e escuta (Investigação) |
 | **Atordoado** | Pulso EMP (`Stun`) | Fica parado 4 s e não mata ao toque | Se estava caçando, procura onde o jogador estava; senão volta à Patrulha |
 
 Ele é cego: só acha o jogador pela luz ou pelo som. **Andar no escuro não faz barulho**, então apagar a lanterna é a forma de escapar.
@@ -23,11 +23,11 @@ Ele é cego: só acha o jogador pela luz ou pelo som. **Andar no escuro não faz
 | Ruído | Ouve qualquer ruído dentro do raio do emissor ou a até 6 m (`hearingRadius`), e vai investigar. Durante a perseguição, ignora ruídos. | 4.3 |
 | 70% / 30% | Em cada ponto de patrulha: se houver um ruído recente (até 20 s) ainda não investigado, 70% de chance de ir até ele; senão, sorteia outro ponto. | 4.6 |
 | +10% por HD | `GameManager.DriveCollected` → `SetSpeedMultiplier`. 3,5 → 3,85 → 4,2 → 4,55 m/s (teto de 4,8). | regra 4 |
-| Toque mata | Trigger nos pés (raio 0,5) → `TriggerGameOver(DeathCause.Monster)`. Atordoado não mata. | 4.4 |
+| Toque mata | Trigger nos pés (raio 0,5) → evento `Caught` → `MonsterKillScene` toca uma das duas mortes (~3,5 s) → `TriggerGameOver(DeathCause.Monster)`. Atordoado não mata. | 4.4 |
 | Zona Segura | Nunca entra numa área com `MonsterRepellent` ligado. Se a luz acende em cima dele, sai pela borda. Na perseguição, espera na borda. | regra 6 |
 | Sanidade < 15 | Grito, escuta e pausas ficam 5% mais longos. | 5 |
 
-Não estão no GDD (ajustar no playtest): grito de 0,8 s (`detectionDelay`), memória de 1,5 s depois que a luz sai dele (`chaseMemory`), escuta de 3 s (`listenDuration`), pausa de 1 s por ponto (`waypointPause`), memória de ruído de 20 s (`noiseMemory`).
+Não estão no GDD (ajustar no playtest): grito de 0,8 s (`detectionDelay`), memória de 1,5 s depois que a luz sai dele (`chaseMemory`), escuta de 3 s (`listenDuration`), pausa de 1 s por ponto (`waypointPause`), memória de ruído de 20 s (`noiseMemory`), galope de 1,25× com teto de 5,6 m/s (`chaseSpeedMultiplier`, `chaseMaxSpeed`). Como ele galopa mais rápido que o jogador, fugir correndo não basta: é preciso apagar a luz, quebrar a linha de visão ou usar o EMP.
 
 ## Contratos para as outras frentes
 
@@ -46,9 +46,10 @@ Não estão no GDD (ajustar no playtest): grito de 0,8 s (`detectionDelay`), mem
 
 ## Arte e animação
 
-- Folhas em `Art/Monster/`: `EspecimeB_sheet.png` (48×64 por quadro, 16 px/unidade, 8 colunas, 10 animações) e `EspecimeB_sheet_glow.png` (LEDs, brasa e faíscas, na mesma grade). Design: Variante B do canvas de design do monstro, reduzida da versão 96×128 para a densidade de pixel dos tiles e para a paleta do projeto (rampa Espécime).
+- Folhas em `Art/Monster/`: `EspecimeB_sheet.png` (48×64 por quadro, 16 px/unidade, 12 colunas, uma linha por animação; as linhas de 8 quadros são completadas com quadros vazios `*_pad*`) e `EspecimeB_sheet_glow.png` (LEDs, brasa e faíscas, na mesma grade). Design: Variante B do canvas de design do monstro, reduzida da versão 96×128 para a densidade de pixel dos tiles e para a paleta do projeto (rampa Espécime).
 - A fonte é texto: `art-src/Monster/EspecimeB_sheet*.json`. Edite lá (ou no Estúdio) e rode `python3 tools/art/export_sprites.py`; não edite o PNG direto. Ver [guia de estilo](arte/guia-de-estilo.md).
-- `MonsterSpriteAnimator` escolhe a animação pelo estado e a direção pela velocidade: `idle`, `walk_*`, `listen`, `scream`, `run_*` e `stun`. O lado esquerdo usa flipX.
+- `MonsterSpriteAnimator` escolhe a animação pelo estado e a direção pela velocidade: `idle`, `walk_*`, `listen`, `scream`, `lunge` (o bote logo depois do grito), `gallop_*` (12 quadros, na perseguição) e `stun`. `run_*` ficou como reserva, para prefab antigo sem as linhas de galope. O lado esquerdo usa flipX.
+- Mortes: `EspecimeB_kills.png` e `_glow` (80×80, 16 colunas, quadros 0–31 = mordida, 32–63 = partir ao meio). São o monstro e o Thomas juntos: o `MonsterKillScene` esconde os dois sprites e desenha a cena no lugar, espelhada para o lado do jogador. A morte é sorteada. No modo seguro, não toca.
 - O corpo usa Sprite-Lit (some no escuro). A camada de brilho usa Sprite-Unlit, e há uma Light2D pequena nos eletrodos que muda de cor com o estado. É isso que deixa ver a "silhueta" de longe no escuro.
 - Para trocar a arte (por exemplo, voltar para a Variante A), gere o JSON em `art-src/Monster/`, exporte, e ajuste `frameSize` no componente e a tabela de animações.
 
@@ -119,6 +120,7 @@ Os números são iniciais para o playtest e podem mudar com o GDD v1.1 (#3).
 | `Scripts/Monster/MonsterController.cs` | IA: estados, sentidos, NavMeshAgent, contato |
 | `Scripts/Monster/MonsterRepellent.cs` | Área que o monstro não entra (Zona Segura) |
 | `Scripts/Monster/MonsterSpriteAnimator.cs` | Animação por folha de sprites e LED |
+| `Scripts/Monster/MonsterKillScene.cs` | Cena de morte antes do Game Over (criada pelo animador) |
 | `Scripts/Monster/NavMeshRuntimeBaker.cs` | Bake do NavMesh ao carregar a cena |
 | `Scripts/Editor/MonsterPrefabBuilder.cs` | Menu **Gerar prefab do Monstro** → `Prefabs/Monster.prefab` |
 | `Scripts/Core/TensionDirector.cs`, `TensionConfig.cs` | Diretor de tensão (#35) e seus números |
@@ -142,7 +144,8 @@ O menu **Sombra da Sanidade > Gerar cena de protótipo** (e as Sandboxes) já cr
 - os avisos de carga insuficiente e lanterna desligada, sem ruído ou gasto nas tentativas bloqueadas;
 - o +10% por HD;
 - a saída da Zona Segura;
-- o Game Over ao encostar.
+- o galope mais rápido que o jogador;
+- a cena de morte e o Game Over ao encostar.
 
 Em batch:
 

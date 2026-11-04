@@ -135,6 +135,9 @@ namespace SombraDaSanidade.EditorTools
                     if (t < 1.4f) return;
                     float dc = Vector2.Distance(monster.transform.position, player.transform.position);
                     Check($"Corre na direção do jogador ({distMark:0.0} -> {dc:0.0} m)", dc < distMark - 0.3f);
+                    float gallop = Mathf.Min(monster.Config.baseSpeed * monster.Config.chaseSpeedMultiplier, monster.Config.chaseMaxSpeed);
+                    Check($"Galopa mais rápido que o jogador ({agent.speed:0.00} m/s, esperado {gallop:0.00})",
+                        Mathf.Approximately(agent.speed, gallop) && gallop > 4f);
                     CheckEmp(flashlight, monster, player, agent);
                     // Jogador some no escuro, longe dali.
                     SetLight(flashlight, false);
@@ -171,16 +174,28 @@ namespace SombraDaSanidade.EditorTools
                     break;
 
                 case 9:
-                    if (gm.IsPlaying && Time.realtimeSinceStartup - stepStart < 1f) return;
+                    // A cena de morte (~3,5 s) toca antes do Game Over.
+                    if (monster.IsKilling && !killSeen)
+                    {
+                        killSeen = true;
+                        var scene = monster.GetComponent<MonsterKillScene>();
+                        Check($"Encostar toca a cena de morte ({(scene != null ? scene.LastKill.ToString() : "sem cena")})",
+                            scene != null && scene.IsPlaying && gm.IsPlaying);
+                    }
+                    if (gm.IsPlaying && Time.realtimeSinceStartup - stepStart < 6f) return;
+                    if (!killSeen) Check("Encostar toca a cena de morte", false);
                     Check("Encostar no monstro é Game Over", gm.State == GameState.GameOver && gm.LastDeathCause == DeathCause.Monster);
                     Finish();
                     break;
             }
         }
 
+        private static bool killSeen;
+
         private static void Next()
         {
             step++;
+            killSeen = false;
             stepStart = step == 9 ? Time.realtimeSinceStartup : Time.time;
         }
 

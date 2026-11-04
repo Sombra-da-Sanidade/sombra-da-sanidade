@@ -38,6 +38,18 @@ namespace SombraDaSanidade.Monster
         [Tooltip("Depois que a luz sai dele, continua sabendo onde o jogador está por este tempo. " +
                  "Evita fuga de graça apagando a lanterna no último instante. Não está no GDD.")]
         public float chaseMemory = 1.5f;
+        [Tooltip("Na Perseguição ele galopa: multiplica a velocidade normal. Com 1.25 fica em ~4.4 m/s, um pouco mais " +
+                 "rápido que o jogador (4 m/s). Fugir correndo não basta: é preciso apagar a luz, quebrar a linha ou usar o EMP. " +
+                 "Não está no GDD.")]
+        public float chaseSpeedMultiplier = 1.25f;
+        [Tooltip("Teto da velocidade no galope (com os HDs). Não está no GDD.")]
+        public float chaseMaxSpeed = 5.6f;
+
+        [Header("Morte (cena de 80x80 antes do Game Over)")]
+        [Tooltip("Quadros por segundo da cena de morte.")]
+        public float killFps = 12f;
+        [Tooltip("Tempo no último quadro antes da tela de Game Over.")]
+        public float killHold = 0.8f;
         [Tooltip("Alturas acima dos pés testadas contra o cone de luz (o sprite tem ~3 m).")]
         public float[] lightSampleHeights = { 0.2f, 1.4f, 2.6f };
 

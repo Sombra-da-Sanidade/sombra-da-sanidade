@@ -103,7 +103,8 @@ namespace SombraDaSanidade.EditorTools
                     break;
 
                 case 3:
-                    if (gm.IsPlaying && Time.realtimeSinceStartup - stepStart < 1f) return;
+                    // Com a cena de morte (~3,5 s) antes do Game Over.
+                    if (gm.IsPlaying && Time.realtimeSinceStartup - stepStart < 6f) return;
                     Check("Desligado, encostar volta a matar", gm.State == GameState.GameOver && gm.LastDeathCause == DeathCause.Monster);
                     Finish();
                     break;

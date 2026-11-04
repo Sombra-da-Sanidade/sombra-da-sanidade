@@ -23,6 +23,10 @@ MonoBehaviour:
   listenDuration: 3
   detectionDelay: 0.8
   chaseMemory: 1.5
+  chaseSpeedMultiplier: 1.25
+  chaseMaxSpeed: 5.6
+  killFps: 12
+  killHold: 0.8
   lightSampleHeights:
   - 0.2
   - 1.4
