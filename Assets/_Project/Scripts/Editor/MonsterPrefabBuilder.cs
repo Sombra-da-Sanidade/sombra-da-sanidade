@@ -15,6 +15,8 @@ namespace SombraDaSanidade.EditorTools
         public const string ArtDir = "Assets/_Project/Art/Monster";
         private const string SheetPath = ArtDir + "/EspecimeB_sheet.png";
         private const string GlowPath = ArtDir + "/EspecimeB_sheet_glow.png";
+        private const string KillPath = ArtDir + "/EspecimeB_kills.png";
+        private const string KillGlowPath = ArtDir + "/EspecimeB_kills_glow.png";
         private const string ConfigPath = "Assets/_Project/ScriptableObjects/Config/MonsterConfig.asset";
         private const string LitMaterialPath = "Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Lit-Default.mat";
         private const string UnlitMaterialPath = "Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Unlit-Default.mat";
@@ -40,6 +42,8 @@ namespace SombraDaSanidade.EditorTools
         {
             EnsureArtImport(SheetPath);
             EnsureArtImport(GlowPath);
+            EnsureArtImport(KillPath);
+            EnsureArtImport(KillGlowPath);
             var config = AssetDatabase.LoadAssetAtPath<MonsterConfig>(ConfigPath);
             var sheet = AssetDatabase.LoadAssetAtPath<Texture2D>(SheetPath);
             var glowSheet = AssetDatabase.LoadAssetAtPath<Texture2D>(GlowPath);
@@ -83,6 +87,8 @@ namespace SombraDaSanidade.EditorTools
                 var so = new SerializedObject(anim);
                 so.FindProperty("sheet").objectReferenceValue = sheet;
                 so.FindProperty("glowSheet").objectReferenceValue = glowSheet;
+                so.FindProperty("killSheet").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Texture2D>(KillPath);
+                so.FindProperty("killGlowSheet").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Texture2D>(KillGlowPath);
                 so.FindProperty("body").objectReferenceValue = body;
                 so.FindProperty("glow").objectReferenceValue = glow;
                 so.FindProperty("led").objectReferenceValue = led;

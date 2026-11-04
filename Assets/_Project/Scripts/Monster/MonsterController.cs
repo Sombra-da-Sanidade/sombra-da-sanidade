@@ -42,9 +42,25 @@ namespace SombraDaSanidade.Monster
         // Multiplicador acumulado pelos HDs coletados (GDD regra 4).
         public float SpeedMultiplier { get; private set; } = 1f;
 
-        public float CurrentSpeed => config != null
-            ? Mathf.Min(config.baseSpeed * SpeedMultiplier, config.maxSpeed) * (MonsterSafeMode.Enabled ? config.safeModeSpeedMultiplier : 1f)
-            : 0f;
+        // Na Perseguição ele galopa (config.chaseSpeedMultiplier). O modo seguro deixa tudo mais lento.
+        public float CurrentSpeed
+        {
+            get
+            {
+                if (config == null) return 0f;
+                float speed = Mathf.Min(config.baseSpeed * SpeedMultiplier, config.maxSpeed);
+                if (State == MonsterState.Chase)
+                    speed = Mathf.Min(speed * config.chaseSpeedMultiplier, Mathf.Max(config.chaseMaxSpeed, config.maxSpeed));
+                return speed * (MonsterSafeMode.Enabled ? config.safeModeSpeedMultiplier : 1f);
+            }
+        }
+
+        // Pegou o jogador e está tocando a cena de morte (MonsterKillScene). A IA fica parada até o Game Over.
+        public bool IsKilling { get; private set; }
+
+        // Encostou no jogador fora do modo seguro. O MonsterKillScene toca a morte e chama o Game Over no fim.
+        // Sem ninguém ouvindo, o Game Over é imediato.
+        public event Action<Transform> Caught;
 
         // Velocidade real no NavMesh, para animação e áudio.
         public Vector2 Velocity => agentReady ? (Vector2)agent.velocity : Vector2.zero;
@@ -154,6 +170,13 @@ namespace SombraDaSanidade.Monster
         {
             if (!agentReady) return;
 
+            if (IsKilling)
+            {
+                agent.isStopped = true;
+                agent.velocity = Vector3.zero;
+                return;
+            }
+
             if (GameManager.Instance != null && !GameManager.Instance.IsPlaying)
             {
                 agent.isStopped = true;
@@ -184,6 +207,7 @@ namespace SombraDaSanidade.Monster
         // Chamado pelo pulso EMP.
         public void Stun(float duration)
         {
+            if (IsKilling) return;
             if (State != MonsterState.Stunned) chasingBeforeStun = State == MonsterState.Chase;
             IsDetecting = false;
             stateTimer = duration;
@@ -244,6 +268,7 @@ namespace SombraDaSanidade.Monster
         {
             if (State == next) return;
             State = next;
+            ApplySpeed();
             StateChanged?.Invoke(next);
         }
 
@@ -644,13 +669,27 @@ namespace SombraDaSanidade.Monster
 
         private void TryKill(Collider2D other)
         {
-            if (IsStunned || !other.CompareTag("Player")) return;
+            if (IsStunned || IsKilling || !other.CompareTag("Player")) return;
+            if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) return;
             if (MonsterSafeMode.Enabled)
             {
                 SafeHit(other);
                 return;
             }
-            if (GameManager.Instance != null) GameManager.Instance.TriggerGameOver(DeathCause.Monster);
+            var target = other.attachedRigidbody != null ? other.attachedRigidbody.transform : other.transform;
+            if (Caught == null)
+            {
+                if (GameManager.Instance != null) GameManager.Instance.TriggerGameOver(DeathCause.Monster);
+                return;
+            }
+            IsKilling = true;
+            IsDetecting = false;
+            if (agentReady)
+            {
+                agent.isStopped = true;
+                agent.velocity = Vector3.zero;
+            }
+            Caught.Invoke(target);
         }
 
         // Modo seguro (#48): no lugar da morte, empurra o jogador para longe, tira sanidade e para um pouco.
