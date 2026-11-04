@@ -80,6 +80,8 @@ namespace SombraDaSanidade.EditorTools
                     if (failed) { Finish(); return; }
                     // Sem mouse no teste: a mira fica onde o teste mandar.
                     player.enabled = false;
+                    // O diretor de tensão (#35) tem teste próprio; aqui o recuo dele mudaria a patrulha.
+                    if (TensionDirector.Instance != null) TensionDirector.Instance.enabled = false;
                     SetLight(flashlight, false);
                     mark = monster.transform.position;
                     Next();
