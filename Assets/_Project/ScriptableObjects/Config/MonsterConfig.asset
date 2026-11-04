@@ -40,6 +40,11 @@ MonoBehaviour:
   noiseMemorySize: 4
   noiseMemorySeconds: 60
   noiseMemoryChance: 0.3
+  safeModeSpeedMultiplier: 0.8
+  safeModeSanityDamage: 15
+  safeModePushDistance: 2
+  safeModeHitPause: 1.5
+  safeModeHitCooldown: 2
   tension: {fileID: 11400000, guid: 7eeef026faee38245a82f21338d3e9b8, type: 2}
   mercySanityThreshold: 15
   mercySearchDelay: 0.05

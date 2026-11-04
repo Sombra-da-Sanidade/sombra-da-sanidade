@@ -83,6 +83,9 @@ namespace SombraDaSanidade.EditorTools
                     player.enabled = false;
                     // O diretor de tensão (#35) tem teste próprio; aqui o recuo dele mudaria a patrulha.
                     if (TensionDirector.Instance != null) TensionDirector.Instance.enabled = false;
+                    // O modo seguro (#48) tem teste próprio; aqui encostar precisa matar.
+                    SessionState.SetBool("SombraMonsterTest.SafeMode", MonsterSafeMode.Enabled);
+                    MonsterSafeMode.Enabled = false;
                     SetLight(flashlight, false);
                     mark = monster.transform.position;
                     Next();
@@ -284,6 +287,7 @@ namespace SombraDaSanidade.EditorTools
             if (failed) Debug.LogError(sb.ToString());
             else Debug.Log(sb.ToString());
 
+            MonsterSafeMode.Enabled = SessionState.GetBool("SombraMonsterTest.SafeMode", false);
             TestScenes.Finish(batch, failed);
         }
 

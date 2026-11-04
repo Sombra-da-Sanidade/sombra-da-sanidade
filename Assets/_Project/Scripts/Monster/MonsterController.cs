@@ -43,7 +43,7 @@ namespace SombraDaSanidade.Monster
         public float SpeedMultiplier { get; private set; } = 1f;
 
         public float CurrentSpeed => config != null
-            ? Mathf.Min(config.baseSpeed * SpeedMultiplier, config.maxSpeed)
+            ? Mathf.Min(config.baseSpeed * SpeedMultiplier, config.maxSpeed) * (MonsterSafeMode.Enabled ? config.safeModeSpeedMultiplier : 1f)
             : 0f;
 
         // Velocidade real no NavMesh, para animação e áudio.
@@ -105,11 +105,15 @@ namespace SombraDaSanidade.Monster
         private void OnEnable()
         {
             NoiseBus.NoiseEmitted += OnNoise;
+            MonsterSafeMode.Changed += OnSafeModeChanged;
         }
+
+        private void OnSafeModeChanged(bool on) => ApplySpeed();
 
         private void OnDisable()
         {
             NoiseBus.NoiseEmitted -= OnNoise;
+            MonsterSafeMode.Changed -= OnSafeModeChanged;
         }
 
         // Start, não OnEnable: garante que o Awake do GameManager e o bake do NavMesh já rodaram.
@@ -641,7 +645,41 @@ namespace SombraDaSanidade.Monster
         private void TryKill(Collider2D other)
         {
             if (IsStunned || !other.CompareTag("Player")) return;
+            if (MonsterSafeMode.Enabled)
+            {
+                SafeHit(other);
+                return;
+            }
             if (GameManager.Instance != null) GameManager.Instance.TriggerGameOver(DeathCause.Monster);
+        }
+
+        // Modo seguro (#48): no lugar da morte, empurra o jogador para longe, tira sanidade e para um pouco.
+        private float nextSafeHit;
+
+        private void SafeHit(Collider2D other)
+        {
+            if (Time.time < nextSafeHit) return;
+            nextSafeHit = Time.time + config.safeModeHitCooldown;
+
+            var target = other.attachedRigidbody != null ? other.attachedRigidbody.transform : other.transform;
+            var sanity = target.GetComponentInParent<SanityController>();
+            if (sanity != null) sanity.Add(-config.safeModeSanityDamage);
+
+            Vector2 from = transform.position;
+            Vector2 at = target.position;
+            Vector2 dir = at - from;
+            if (dir.sqrMagnitude < 0.0001f) dir = Vector2.down;
+            dir.Normalize();
+            // Não atravessa parede: para antes do que estiver no caminho.
+            float dist = config.safeModePushDistance;
+            var hit = Physics2D.CircleCast(at, 0.3f, dir, dist, LayerMask.GetMask("Walls"));
+            if (hit.collider != null) dist = Mathf.Max(0f, hit.distance - 0.05f);
+            Vector2 pushed = at + dir * dist;
+            var rb = target.GetComponent<Rigidbody2D>();
+            if (rb != null) rb.position = pushed;
+            target.position = pushed;
+
+            Stun(config.safeModeHitPause);
         }
 
         private void OnDrawGizmosSelected()
