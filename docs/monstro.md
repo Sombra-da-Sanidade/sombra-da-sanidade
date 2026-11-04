@@ -52,6 +52,28 @@ Não estão no GDD (ajustar no playtest): grito de 0,8 s (`detectionDelay`), mem
 - O corpo usa Sprite-Lit (some no escuro). A camada de brilho usa Sprite-Unlit, e há uma Light2D pequena nos eletrodos que muda de cor com o estado. É isso que deixa ver a "silhueta" de longe no escuro.
 - Para trocar a arte (por exemplo, voltar para a Variante A), gere o JSON em `art-src/Monster/`, exporte, e ajuste `frameSize` no componente e a tabela de animações.
 
+## Diretor de tensão (#35)
+
+`Core/TensionDirector` é a curva dente-de-serra do GDD 7 em código. Base: o menace gauge do Alien: Isolation e o ciclo do Left 4 Dead ([pesquisa](pesquisa/ritmo-e-tensao.md), Proposta 7).
+
+Ele mantém um medidor de 0 a 1:
+- **Sobe com:** o monstro perto (até 7 m, com peso menor se houver parede no meio), o cone da lanterna tocando nele, a perseguição ativa e a falha de skill check.
+- **Cai com:** o tempo, mas nunca enquanto ele persegue.
+
+| Fase | O que acontece |
+|---|---|
+| Build Up | O medidor sobe e cai conforme o jogo |
+| Sustain Peak | Ao chegar em 1, segura de 3 a 5 s |
+| Peak Fade | Espera a perseguição acabar sozinha (não tira o monstro do meio da caçada) |
+| Relax | 30 a 45 s com o monstro patrulhando os pontos mais longe do jogador; depois volta ao Build Up |
+
+- **O monstro continua cego:** o diretor só dá a direção (`MonsterController.SetRetreat`). No Relax, ruído novo e luz ainda atraem o monstro; ele só deixa de voltar atrás de ruídos antigos (a regra dos 70%).
+- **Nunca no HUD:** o medidor não aparece na tela (GDD 8). Quem quiser reagir a ele (batimento, música) lê `TensionDirector.Instance.Value` e `Phase`, ou o evento `PhaseChanged`.
+- **Sem configurar a cena:** cena com monstro e sem diretor ganha um sozinho ao carregar. Os números vêm de `Config/TensionConfig.asset`, ligado no `MonsterConfig.tension`. Sem o asset, valem os padrões.
+- **Frente 1 (#33):** chamar `TensionDirector.Instance?.ReportSkillCheckFailure()` quando o jogador errar o skill check.
+
+Os números são iniciais para o playtest e podem mudar com o GDD v1.1 (#3).
+
 ## Arquivos
 
 | Arquivo | Papel |
@@ -62,6 +84,8 @@ Não estão no GDD (ajustar no playtest): grito de 0,8 s (`detectionDelay`), mem
 | `Scripts/Monster/MonsterSpriteAnimator.cs` | Animação por folha de sprites e LED |
 | `Scripts/Monster/NavMeshRuntimeBaker.cs` | Bake do NavMesh ao carregar a cena |
 | `Scripts/Editor/MonsterPrefabBuilder.cs` | Menu **Gerar prefab do Monstro** → `Prefabs/Monster.prefab` |
+| `Scripts/Core/TensionDirector.cs`, `TensionConfig.cs` | Diretor de tensão (#35) e seus números |
+| `Scripts/Editor/TensionTest.cs` | Menu **Rodar teste da tensão** |
 | `Scripts/Editor/MonsterTest.cs` | Menu **Rodar teste do monstro** |
 
 O menu **Sombra da Sanidade > Gerar cena de protótipo** (e as Sandboxes) já cria o NavMesh, o monstro e 13 pontos de patrulha nos cruzamentos.
