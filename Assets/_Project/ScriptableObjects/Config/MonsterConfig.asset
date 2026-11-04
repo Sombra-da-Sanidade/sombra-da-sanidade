@@ -34,6 +34,12 @@ MonoBehaviour:
   searchCandidates: 3
   searchRevisitChance: 0.25
   searchListenFactor: 0.5
+  breakerCheckChance: 0.5
+  breakerCheckDistance: 2
+  breakerCheckCooldown: 20
+  noiseMemorySize: 4
+  noiseMemorySeconds: 60
+  noiseMemoryChance: 0.3
   tension: {fileID: 11400000, guid: 7eeef026faee38245a82f21338d3e9b8, type: 2}
   mercySanityThreshold: 15
   mercySearchDelay: 0.05
