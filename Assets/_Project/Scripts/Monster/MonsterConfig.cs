@@ -45,6 +45,10 @@ namespace SombraDaSanidade.Monster
         [Tooltip("Distância que ele mantém da borda de uma Zona Segura ativa.")]
         public float safeZoneMargin = 0.6f;
 
+        [Header("Diretor de tensão (#35)")]
+        [Tooltip("Ritmo de pico e recuo. Vazio: o diretor usa os valores padrão do TensionConfig.")]
+        public Core.TensionConfig tension;
+
         [Header("Ajuste de sanidade baixa (GDD 5)")]
         [Tooltip("Abaixo desta sanidade o monstro demora mais para procurar.")]
         public float mercySanityThreshold = 15f;
