@@ -52,18 +52,20 @@ Não estão no GDD (ajustar no playtest): grito de 0,8 s (`detectionDelay`), mem
 - O corpo usa Sprite-Lit (some no escuro). A camada de brilho usa Sprite-Unlit, e há uma Light2D pequena nos eletrodos que muda de cor com o estado. É isso que deixa ver a "silhueta" de longe no escuro.
 - Para trocar a arte (por exemplo, voltar para a Variante A), gere o JSON em `art-src/Monster/`, exporte, e ajuste `frameSize` no componente e a tabela de animações.
 
-## Comportamentos por ala (#36)
+## Comportamentos por ala (#36 e #37)
 
 O monstro ganha comportamentos por ala, como no Alien: Isolation. Eles destravam por progresso e **nunca** por número de mortes do jogador (Proposta 8).
 
 - **Lista:** `MonsterBehaviour`, em flags. O conjunto padrão fica em `MonsterConfig.behaviours`, e o padrão é o da Ala Médica.
 - **Troca em jogo:** `MonsterController.SetBehaviours(...)`. Quando o `DifficultyProfile` (#30) existir, ele chama isso ao entrar em cada ala. `Has(...)` diz se um comportamento está ligado.
 
-| Ala | Comportamentos |
-|---|---|
-| Médica | Patrulha e investigação de ruído (como antes) + **Busca** |
-| Energia (#37) | + checar de longe disjuntores ativos, atalhos |
-| Executiva (#37) | + voltar a pontos de ruído antigos (memória curta) |
+| Ala | Preset (`MonsterWingBehaviours`) | Comportamentos |
+|---|---|---|
+| Médica | `Medica` | Patrulha e investigação de ruído (como antes) + **Busca** |
+| Energia | `Energia` | + **Checar disjuntores** (`BreakerCheck`) + **Atalhos** (`Shortcuts`) |
+| Executiva | `Executiva` | + **Memória curta** (`NoiseMemory`) |
+
+Cada ala soma os comportamentos da anterior. O `DifficultyProfile` (#30) só precisa chamar `monster.SetBehaviours(MonsterWingBehaviours.Energia)` (etc.) ao entrar na ala.
 
 **Busca (`Search`):** depois de escutar no ponto do ruído, ou onde perdeu o jogador, ele checa até 3 pontos de patrulha a até 10 m dali antes de voltar à rota.
 - **Ordem subótima:** sorteia entre os 3 pontos mais próximos ainda não vistos, em vez de ir sempre ao mais perto.
@@ -72,6 +74,20 @@ O monstro ganha comportamentos por ala, como no Alien: Isolation. Eles destravam
 - **Recuo do diretor:** durante o Relax do diretor de tensão, ele não faz a busca. Escuta e vai embora.
 
 Números em `MonsterConfig` (`searchPoints`, `searchRadius`, `searchCandidates`, `searchRevisitChance`, `searchListenFactor`).
+
+**Checar disjuntores (`BreakerCheck`, Energia, #37):** em cada nó de decisão da patrulha, há 50% de chance de ele ir olhar uma Zona Segura acesa (a lâmpada de um disjuntor reparado).
+- **De longe:** para 2 m além da borda da luz, escuta e segue. Nunca entra.
+- **Sem trapaça:** ele não sabe se o jogador está lá. A luz é só um sinal de que alguém consertou algo.
+- **Sem insistir:** não volta à mesma zona antes de 20 s.
+
+**Atalhos (`Shortcuts`, Energia, #37):** `MonsterShortcut` é um `NavMeshLink` entre dois pontos de chão, por exemplo atravessando um duto na parede. Como o jogador não usa NavMesh, só o monstro passa. O link só fica ligado quando a ala dá esse comportamento.
+- **Frente 4:** para colocar no mapa da Ala de Energia, crie um objeto com `NavMeshLink` + `MonsterShortcut` e posicione Start Point e End Point no chão dos dois lados. Um tile de grade (`floor_grate`) nas pontas ajuda o jogador a entender por onde ele aparece.
+
+**Memória curta (`NoiseMemory`, Executiva, #37):** ele lembra os últimos 4 ruídos por 60 s. Em cada nó de decisão, há 30% de chance de voltar a um ruído antigo, e não só ao último (que já tem a regra dos 70%).
+
+Números em `MonsterConfig` (`breakerCheck*`, `noiseMemory*`).
+
+**Ainda depende do #30:** a velocidade e o raio auditivo por ala (tabela da Proposta 1 do v1.1). O `DifficultyProfile` vai ajustar esses números e chamar `SetBehaviours` na troca de ala.
 
 ## Diretor de tensão (#35)
 
@@ -107,6 +123,8 @@ Os números são iniciais para o playtest e podem mudar com o GDD v1.1 (#3).
 | `Scripts/Editor/MonsterPrefabBuilder.cs` | Menu **Gerar prefab do Monstro** → `Prefabs/Monster.prefab` |
 | `Scripts/Core/TensionDirector.cs`, `TensionConfig.cs` | Diretor de tensão (#35) e seus números |
 | `Scripts/Monster/MonsterBehaviour.cs` | Lista de comportamentos por ala (#36) |
+| `Scripts/Monster/MonsterShortcut.cs` | Atalho só do monstro (#37) |
+| `Scripts/Editor/MonsterWingTest.cs` | Menu **Rodar teste das alas do monstro** |
 | `Scripts/Editor/MonsterBehaviourTest.cs` | Menu **Rodar teste dos comportamentos do monstro** |
 | `Scripts/Editor/TensionTest.cs` | Menu **Rodar teste da tensão** |
 | `Scripts/Editor/MonsterTest.cs` | Menu **Rodar teste do monstro** |

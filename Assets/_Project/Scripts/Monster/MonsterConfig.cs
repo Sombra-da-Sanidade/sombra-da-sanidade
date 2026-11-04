@@ -59,6 +59,22 @@ namespace SombraDaSanidade.Monster
         [Tooltip("Busca: fração do tempo de escuta em cada ponto checado.")]
         [Range(0.1f, 1f)] public float searchListenFactor = 0.5f;
 
+        [Header("Ala de Energia: checar disjuntores (#37)")]
+        [Tooltip("Chance, em cada nó de decisão da patrulha, de ir olhar uma Zona Segura acesa. Não está no GDD.")]
+        [Range(0f, 1f)] public float breakerCheckChance = 0.5f;
+        [Tooltip("Para a esta distância além da borda da luz para olhar de longe.")]
+        public float breakerCheckDistance = 2f;
+        [Tooltip("Não volta à mesma Zona Segura antes deste tempo.")]
+        public float breakerCheckCooldown = 20f;
+
+        [Header("Ala Executiva: memória curta de ruídos (#37)")]
+        [Tooltip("Quantos ruídos antigos ele lembra.")]
+        public int noiseMemorySize = 4;
+        [Tooltip("Por quanto tempo um ruído antigo ainda vale.")]
+        public float noiseMemorySeconds = 60f;
+        [Tooltip("Chance, em cada nó de decisão da patrulha, de voltar a um ruído antigo (não o último).")]
+        [Range(0f, 1f)] public float noiseMemoryChance = 0.3f;
+
         [Header("Diretor de tensão (#35)")]
         [Tooltip("Ritmo de pico e recuo. Vazio: o diretor usa os valores padrão do TensionConfig.")]
         public Core.TensionConfig tension;

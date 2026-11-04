@@ -43,6 +43,7 @@ namespace SombraDaSanidade.EditorTools
         private static void Start(bool batch)
         {
             if (!batch && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            TestScenes.Remember();
             EditorSceneManager.OpenScene(PrototypeSceneBuilder.PrototypeScenePath);
 
             SessionState.SetBool(RunningKey, true);
@@ -283,8 +284,7 @@ namespace SombraDaSanidade.EditorTools
             if (failed) Debug.LogError(sb.ToString());
             else Debug.Log(sb.ToString());
 
-            EditorApplication.ExitPlaymode();
-            if (batch) EditorApplication.Exit(failed ? 1 : 0);
+            TestScenes.Finish(batch, failed);
         }
 
         private class TestSetupException : System.Exception

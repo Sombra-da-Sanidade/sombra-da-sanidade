@@ -73,6 +73,10 @@ namespace SombraDaSanidade.Monster
         private bool atSearchPoint;
         private readonly List<int> searchVisited = new List<int>();
 
+        // Energia e Executiva (#37)
+        private readonly Dictionary<MonsterRepellent, float> zoneChecked = new Dictionary<MonsterRepellent, float>();
+        private readonly List<(Vector2 pos, float time)> noiseHistory = new List<(Vector2, float)>();
+
         private Vector2 lastKnownPlayerPos;
         private float lastSeenTime = float.NegativeInfinity;
 
@@ -119,6 +123,7 @@ namespace SombraDaSanidade.Monster
 
             home = transform.position;
             Behaviours = config.behaviours;
+            BehavioursChanged?.Invoke(Behaviours);
             if (NavMesh.SamplePosition(transform.position, out var hit, 3f, NavMesh.AllAreas))
             {
                 agent.enabled = true;
@@ -213,10 +218,14 @@ namespace SombraDaSanidade.Monster
 
         public bool Has(MonsterBehaviour behaviour) => (Behaviours & behaviour) == behaviour;
 
+        // Avisado quando a ala troca o conjunto (o MonsterShortcut liga e desliga os atalhos com isso).
+        public event Action<MonsterBehaviour> BehavioursChanged;
+
         public void SetBehaviours(MonsterBehaviour behaviours)
         {
             Behaviours = behaviours;
             if (!Has(MonsterBehaviour.Search)) searchLeft = 0;
+            BehavioursChanged?.Invoke(behaviours);
         }
 
         public void SetSpeedMultiplier(float multiplier)
@@ -258,6 +267,8 @@ namespace SombraDaSanidade.Monster
                     EnterInvestigate(lastNoisePos);
                     return;
                 }
+                if (!IsRetreating && Has(MonsterBehaviour.BreakerCheck) && TryCheckLitZone()) return;
+                if (!IsRetreating && Has(MonsterBehaviour.NoiseMemory) && TryRecallOldNoise()) return;
                 GoToNextPatrolPoint();
                 return;
             }
@@ -269,13 +280,14 @@ namespace SombraDaSanidade.Monster
             }
         }
 
-        private void EnterInvestigate(Vector2 position)
+        private void EnterInvestigate(Vector2 position, bool search = true)
         {
             investigateTarget = position;
             waiting = false;
             SetState(MonsterState.Investigate);
             agent.isStopped = false;
             BeginSearch(position);
+            if (!search) searchLeft = 0;
             MoveTo(position);
         }
 
@@ -445,6 +457,45 @@ namespace SombraDaSanidade.Monster
             lastNoisePos = position;
             lastNoiseTime = Time.time;
             lastNoiseVisited = false;
+            noiseHistory.Add((position, Time.time));
+            int max = Mathf.Max(1, config.noiseMemorySize);
+            while (noiseHistory.Count > max) noiseHistory.RemoveAt(0);
+        }
+
+        // ---------- Energia e Executiva (#37) ----------
+
+        // Ala de Energia: vai olhar de longe uma Zona Segura acesa. Para fora da luz (MoveTo já respeita a
+        // borda) e escuta. Não sabe se o jogador está lá: a luz é só um sinal de que alguém consertou algo.
+        private bool TryCheckLitZone()
+        {
+            var zones = MonsterRepellent.Active;
+            if (zones.Count == 0 || Random.value >= config.breakerCheckChance) return false;
+            MonsterRepellent pick = null;
+            float best = float.MaxValue;
+            for (int i = 0; i < zones.Count; i++)
+            {
+                var z = zones[i];
+                if (zoneChecked.TryGetValue(z, out float when) && Time.time - when < config.breakerCheckCooldown) continue;
+                float d = (z.Center - (Vector2)transform.position).sqrMagnitude;
+                if (d < best) { best = d; pick = z; }
+            }
+            if (pick == null) return false;
+            zoneChecked[pick] = Time.time;
+            var edge = pick.ClosestOutside(transform.position, config.safeZoneMargin + config.breakerCheckDistance);
+            EnterInvestigate(edge, search: false);
+            return true;
+        }
+
+        // Ala Executiva: memória curta. Volta a um ruído antigo (não o último, que já tem a regra dos 70%).
+        private bool TryRecallOldNoise()
+        {
+            if (Random.value >= config.noiseMemoryChance) return false;
+            var options = new List<Vector2>();
+            for (int i = 0; i < noiseHistory.Count - 1; i++)
+                if (Time.time - noiseHistory[i].time <= config.noiseMemorySeconds) options.Add(noiseHistory[i].pos);
+            if (options.Count == 0) return false;
+            EnterInvestigate(options[Random.Range(0, options.Count)]);
+            return true;
         }
 
         private bool HasFreshNoise() =>

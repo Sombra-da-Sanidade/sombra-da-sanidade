@@ -58,6 +58,7 @@ namespace SombraDaSanidade.EditorTools
                 : PrototypeSceneBuilder.PrototypeScenePath);
 
             if (!batch && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            TestScenes.Remember();
             EditorSceneManager.OpenScene(scene);
 
             SessionState.SetBool(RunningKey, true);
@@ -254,8 +255,7 @@ namespace SombraDaSanidade.EditorTools
             InputSystem.settings.editorInputBehaviorInPlayMode = previousInputBehavior;
             if (mouse != null) InputSystem.RemoveDevice(mouse);
             if (keyboard != null) InputSystem.RemoveDevice(keyboard);
-            EditorApplication.ExitPlaymode();
-            if (batch) EditorApplication.Exit(failed ? 1 : 0);
+            TestScenes.Finish(batch, failed);
         }
     }
 }
