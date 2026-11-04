@@ -30,6 +30,8 @@ namespace SombraDaSanidade.Monster
         [SerializeField] private Transform player;
         [SerializeField] private SanityController sanity;
 
+        public MonsterConfig Config => config;
+
         public MonsterState State { get; private set; } = MonsterState.Patrol;
         public bool IsStunned => State == MonsterState.Stunned;
 
@@ -62,6 +64,7 @@ namespace SombraDaSanidade.Monster
         private bool waiting;           // parado no ponto de patrulha / escutando
         private float repathTimer;
         private int currentWaypoint = -1;
+        private Vector2? retreatFrom;
 
         private Vector2 lastKnownPlayerPos;
         private float lastSeenTime = float.NegativeInfinity;
@@ -185,6 +188,18 @@ namespace SombraDaSanidade.Monster
             EnterInvestigate(position);
         }
 
+        // Diretor de tensão (#35): no Relax ele patrulha os pontos mais longe deste lugar (o jogador).
+        // Não é um alvo: o monstro continua achando o jogador só pela luz e pelo ruído. null = patrulha normal.
+        public bool IsRetreating => retreatFrom.HasValue;
+
+        public void SetRetreat(Vector2? awayFrom, bool redirectNow = true)
+        {
+            retreatFrom = awayFrom;
+            if (!agentReady || !awayFrom.HasValue || !redirectNow) return;
+            // Larga a investigação e já sai andando para longe; perseguição o diretor espera acabar sozinha.
+            if (State == MonsterState.Patrol || State == MonsterState.Investigate) EnterPatrol();
+        }
+
         public void SetSpeedMultiplier(float multiplier)
         {
             SpeedMultiplier = multiplier;
@@ -216,7 +231,8 @@ namespace SombraDaSanidade.Monster
                 waiting = false;
 
                 // Nó de decisão (GDD 4.6): 70% vai ao último ruído, 30% segue a rota.
-                if (HasFreshNoise() && Random.value < config.followNoiseChance)
+                // No recuo do diretor ele não volta atrás de ruído antigo (ruído novo ainda o atrai).
+                if (!IsRetreating && HasFreshNoise() && Random.value < config.followNoiseChance)
                 {
                     lastNoiseVisited = true;
                     EnterInvestigate(lastNoisePos);
@@ -388,6 +404,11 @@ namespace SombraDaSanidade.Monster
         private void GoToNextPatrolPoint()
         {
             Vector2 target;
+            if (retreatFrom.HasValue)
+            {
+                MoveTo(FarthestPoint(retreatFrom.Value));
+                return;
+            }
             if (patrolPoints != null && patrolPoints.Length > 0)
             {
                 int next = currentWaypoint;
@@ -403,6 +424,40 @@ namespace SombraDaSanidade.Monster
                 if (NavMesh.SamplePosition(target, out var hit, 3f, NavMesh.AllAreas)) target = hit.position;
             }
             MoveTo(target);
+        }
+
+        // Ponto de patrulha mais longe de `from`. Se já está nele, vai para o segundo mais longe,
+        // para não ficar parado o recuo inteiro.
+        private Vector2 FarthestPoint(Vector2 from)
+        {
+            if (patrolPoints != null && patrolPoints.Length > 0)
+            {
+                int best = -1, second = -1;
+                float bestD = -1f, secondD = -1f;
+                for (int i = 0; i < patrolPoints.Length; i++)
+                {
+                    if (patrolPoints[i] == null) continue;
+                    float d = ((Vector2)patrolPoints[i].position - from).sqrMagnitude;
+                    if (d > bestD) { second = best; secondD = bestD; best = i; bestD = d; }
+                    else if (d > secondD) { second = i; secondD = d; }
+                }
+                int pick = best == currentWaypoint && second >= 0 ? second : best;
+                if (pick >= 0)
+                {
+                    currentWaypoint = pick;
+                    return patrolPoints[pick].position;
+                }
+            }
+            Vector2 far = home;
+            float farD = -1f;
+            for (int i = 0; i < 8; i++)
+            {
+                Vector2 c = home + Random.insideUnitCircle * randomPatrolRadius;
+                if (!NavMesh.SamplePosition(c, out var hit, 3f, NavMesh.AllAreas)) continue;
+                float d = ((Vector2)hit.position - from).sqrMagnitude;
+                if (d > farD) { farD = d; far = hit.position; }
+            }
+            return far;
         }
 
         // GDD regra 6: nunca entra numa lâmpada de teto acesa.
