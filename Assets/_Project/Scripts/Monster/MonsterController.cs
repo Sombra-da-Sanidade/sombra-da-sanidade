@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using SombraDaSanidade.Core;
 using SombraDaSanidade.Flashlight;
 using SombraDaSanidade.Sanity;
@@ -66,6 +67,12 @@ namespace SombraDaSanidade.Monster
         private int currentWaypoint = -1;
         private Vector2? retreatFrom;
 
+        // Busca da Ala Médica (#36)
+        private int searchLeft;
+        private Vector2 searchCenter;
+        private bool atSearchPoint;
+        private readonly List<int> searchVisited = new List<int>();
+
         private Vector2 lastKnownPlayerPos;
         private float lastSeenTime = float.NegativeInfinity;
 
@@ -111,6 +118,7 @@ namespace SombraDaSanidade.Monster
             if (sanity == null) sanity = FindAnyObjectByType<SanityController>();
 
             home = transform.position;
+            Behaviours = config.behaviours;
             if (NavMesh.SamplePosition(transform.position, out var hit, 3f, NavMesh.AllAreas))
             {
                 agent.enabled = true;
@@ -200,6 +208,17 @@ namespace SombraDaSanidade.Monster
             if (State == MonsterState.Patrol || State == MonsterState.Investigate) EnterPatrol();
         }
 
+        // Comportamentos ligados nesta ala (#36). Nunca dependem de mortes do jogador.
+        public MonsterBehaviour Behaviours { get; private set; } = MonsterBehaviour.Search;
+
+        public bool Has(MonsterBehaviour behaviour) => (Behaviours & behaviour) == behaviour;
+
+        public void SetBehaviours(MonsterBehaviour behaviours)
+        {
+            Behaviours = behaviours;
+            if (!Has(MonsterBehaviour.Search)) searchLeft = 0;
+        }
+
         public void SetSpeedMultiplier(float multiplier)
         {
             SpeedMultiplier = multiplier;
@@ -219,6 +238,7 @@ namespace SombraDaSanidade.Monster
         {
             SetState(MonsterState.Patrol);
             waiting = false;
+            searchLeft = 0;
             GoToNextPatrolPoint();
         }
 
@@ -255,6 +275,7 @@ namespace SombraDaSanidade.Monster
             waiting = false;
             SetState(MonsterState.Investigate);
             agent.isStopped = false;
+            BeginSearch(position);
             MoveTo(position);
         }
 
@@ -263,7 +284,18 @@ namespace SombraDaSanidade.Monster
             if (waiting)
             {
                 stateTimer -= Time.deltaTime;
-                if (stateTimer <= 0f) EnterPatrol();
+                if (stateTimer > 0f) return;
+                // Busca (#36): antes de voltar à rota, checa pontos por perto.
+                if (searchLeft > 0 && NextSearchPoint(out var next))
+                {
+                    searchLeft--;
+                    waiting = false;
+                    atSearchPoint = true;
+                    agent.isStopped = false;
+                    MoveTo(next);
+                    return;
+                }
+                EnterPatrol();
                 return;
             }
 
@@ -271,8 +303,59 @@ namespace SombraDaSanidade.Monster
             {
                 waiting = true;
                 agent.isStopped = true;
-                stateTimer = config.listenDuration * MercyFactor();
+                float listen = config.listenDuration * (atSearchPoint ? config.searchListenFactor : 1f);
+                stateTimer = listen * MercyFactor();
             }
+        }
+
+        // ---------- Busca (#36) ----------
+
+        private void BeginSearch(Vector2 center)
+        {
+            searchVisited.Clear();
+            atSearchPoint = false;
+            searchCenter = center;
+            // No recuo do diretor de tensão (#35) ele não fica rondando: escuta e vai embora.
+            searchLeft = Has(MonsterBehaviour.Search) && !IsRetreating ? config.searchPoints : 0;
+        }
+
+        // Ordem subótima, como no Alien: Isolation: sorteia entre os pontos mais próximos ainda não vistos,
+        // e às vezes volta a um que já checou. Parece procurar, não saber.
+        private bool NextSearchPoint(out Vector2 point)
+        {
+            point = searchCenter;
+            if (patrolPoints == null || patrolPoints.Length == 0)
+            {
+                Vector2 c = searchCenter + Random.insideUnitCircle * config.searchRadius * 0.5f;
+                if (!NavMesh.SamplePosition(c, out var hit, 3f, NavMesh.AllAreas)) return false;
+                point = hit.position;
+                return true;
+            }
+
+            if (searchVisited.Count > 1 && Random.value < config.searchRevisitChance)
+            {
+                // Volta a um já visitado, mas não ao último (senão ele só ficaria parado).
+                int back = searchVisited[Random.Range(0, searchVisited.Count - 1)];
+                point = patrolPoints[back].position;
+                searchVisited.Add(back);
+                return true;
+            }
+
+            var candidates = new List<int>();
+            for (int i = 0; i < patrolPoints.Length; i++)
+            {
+                if (patrolPoints[i] == null || searchVisited.Contains(i)) continue;
+                if (((Vector2)patrolPoints[i].position - searchCenter).sqrMagnitude <= config.searchRadius * config.searchRadius)
+                    candidates.Add(i);
+            }
+            if (candidates.Count == 0) return false;
+            candidates.Sort((a, b) =>
+                ((Vector2)patrolPoints[a].position - searchCenter).sqrMagnitude.CompareTo(
+                    ((Vector2)patrolPoints[b].position - searchCenter).sqrMagnitude));
+            int pick = candidates[Random.Range(0, Mathf.Min(Mathf.Max(1, config.searchCandidates), candidates.Count))];
+            searchVisited.Add(pick);
+            point = patrolPoints[pick].position;
+            return true;
         }
 
         private void OnLit()
@@ -322,6 +405,7 @@ namespace SombraDaSanidade.Monster
                 investigateTarget = lastKnownPlayerPos;
                 stateTimer = config.listenDuration * MercyFactor();
                 SetState(MonsterState.Investigate);
+                BeginSearch(lastKnownPlayerPos);
             }
         }
 

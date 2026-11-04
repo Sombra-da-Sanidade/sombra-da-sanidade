@@ -45,6 +45,20 @@ namespace SombraDaSanidade.Monster
         [Tooltip("Distância que ele mantém da borda de uma Zona Segura ativa.")]
         public float safeZoneMargin = 0.6f;
 
+        [Header("Comportamentos por ala (#36, Proposta 8)")]
+        [Tooltip("Comportamentos ligados. Padrão = Ala Médica. O DifficultyProfile de cada ala (#30) troca em jogo.")]
+        public MonsterBehaviour behaviours = MonsterBehaviour.Search;
+        [Tooltip("Busca: quantos pontos de patrulha ele checa perto do ruído antes de voltar à rota. Não está no GDD.")]
+        public int searchPoints = 3;
+        [Tooltip("Busca: só pontos a até esta distância do ruído contam.")]
+        public float searchRadius = 10f;
+        [Tooltip("Busca: sorteia entre os N pontos mais próximos ainda não vistos (ordem subótima).")]
+        public int searchCandidates = 3;
+        [Tooltip("Busca: chance de voltar a um ponto que já checou.")]
+        [Range(0f, 1f)] public float searchRevisitChance = 0.25f;
+        [Tooltip("Busca: fração do tempo de escuta em cada ponto checado.")]
+        [Range(0.1f, 1f)] public float searchListenFactor = 0.5f;
+
         [Header("Diretor de tensão (#35)")]
         [Tooltip("Ritmo de pico e recuo. Vazio: o diretor usa os valores padrão do TensionConfig.")]
         public Core.TensionConfig tension;

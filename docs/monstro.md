@@ -52,6 +52,27 @@ Não estão no GDD (ajustar no playtest): grito de 0,8 s (`detectionDelay`), mem
 - O corpo usa Sprite-Lit (some no escuro). A camada de brilho usa Sprite-Unlit, e há uma Light2D pequena nos eletrodos que muda de cor com o estado. É isso que deixa ver a "silhueta" de longe no escuro.
 - Para trocar a arte (por exemplo, voltar para a Variante A), gere o JSON em `art-src/Monster/`, exporte, e ajuste `frameSize` no componente e a tabela de animações.
 
+## Comportamentos por ala (#36)
+
+O monstro ganha comportamentos por ala, como no Alien: Isolation. Eles destravam por progresso e **nunca** por número de mortes do jogador (Proposta 8).
+
+- **Lista:** `MonsterBehaviour`, em flags. O conjunto padrão fica em `MonsterConfig.behaviours`, e o padrão é o da Ala Médica.
+- **Troca em jogo:** `MonsterController.SetBehaviours(...)`. Quando o `DifficultyProfile` (#30) existir, ele chama isso ao entrar em cada ala. `Has(...)` diz se um comportamento está ligado.
+
+| Ala | Comportamentos |
+|---|---|
+| Médica | Patrulha e investigação de ruído (como antes) + **Busca** |
+| Energia (#37) | + checar de longe disjuntores ativos, atalhos |
+| Executiva (#37) | + voltar a pontos de ruído antigos (memória curta) |
+
+**Busca (`Search`):** depois de escutar no ponto do ruído, ou onde perdeu o jogador, ele checa até 3 pontos de patrulha a até 10 m dali antes de voltar à rota.
+- **Ordem subótima:** sorteia entre os 3 pontos mais próximos ainda não vistos, em vez de ir sempre ao mais perto.
+- **Retorno:** às vezes (25%) volta a um ponto que já checou.
+- **Escuta mais curta:** em cada ponto, escuta pela metade do tempo normal.
+- **Recuo do diretor:** durante o Relax do diretor de tensão, ele não faz a busca. Escuta e vai embora.
+
+Números em `MonsterConfig` (`searchPoints`, `searchRadius`, `searchCandidates`, `searchRevisitChance`, `searchListenFactor`).
+
 ## Diretor de tensão (#35)
 
 `Core/TensionDirector` é a curva dente-de-serra do GDD 7 em código. Base: o menace gauge do Alien: Isolation e o ciclo do Left 4 Dead ([pesquisa](pesquisa/ritmo-e-tensao.md), Proposta 7).
@@ -85,6 +106,8 @@ Os números são iniciais para o playtest e podem mudar com o GDD v1.1 (#3).
 | `Scripts/Monster/NavMeshRuntimeBaker.cs` | Bake do NavMesh ao carregar a cena |
 | `Scripts/Editor/MonsterPrefabBuilder.cs` | Menu **Gerar prefab do Monstro** → `Prefabs/Monster.prefab` |
 | `Scripts/Core/TensionDirector.cs`, `TensionConfig.cs` | Diretor de tensão (#35) e seus números |
+| `Scripts/Monster/MonsterBehaviour.cs` | Lista de comportamentos por ala (#36) |
+| `Scripts/Editor/MonsterBehaviourTest.cs` | Menu **Rodar teste dos comportamentos do monstro** |
 | `Scripts/Editor/TensionTest.cs` | Menu **Rodar teste da tensão** |
 | `Scripts/Editor/MonsterTest.cs` | Menu **Rodar teste do monstro** |
 
