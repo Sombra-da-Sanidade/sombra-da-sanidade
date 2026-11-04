@@ -75,6 +75,18 @@ namespace SombraDaSanidade.Monster
         [Tooltip("Chance, em cada nó de decisão da patrulha, de voltar a um ruído antigo (não o último).")]
         [Range(0f, 1f)] public float noiseMemoryChance = 0.3f;
 
+        [Header("Modo seguro (#48, opcional)")]
+        [Tooltip("Velocidade no modo seguro, multiplicando a normal. Não está no GDD.")]
+        [Range(0.3f, 1f)] public float safeModeSpeedMultiplier = 0.8f;
+        [Tooltip("Sanidade perdida quando ele encosta no jogador, no lugar da morte.")]
+        public float safeModeSanityDamage = 15f;
+        [Tooltip("Distância que o jogador é empurrado para longe dele.")]
+        public float safeModePushDistance = 2f;
+        [Tooltip("Pausa do monstro depois do encontrão, para o jogador fugir.")]
+        public float safeModeHitPause = 1.5f;
+        [Tooltip("Tempo mínimo entre dois encontrões.")]
+        public float safeModeHitCooldown = 2f;
+
         [Header("Diretor de tensão (#35)")]
         [Tooltip("Ritmo de pico e recuo. Vazio: o diretor usa os valores padrão do TensionConfig.")]
         public Core.TensionConfig tension;
