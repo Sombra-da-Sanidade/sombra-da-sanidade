@@ -41,6 +41,7 @@ namespace SombraDaSanidade.EditorTools
         private static void Start(bool batch)
         {
             if (!batch && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            TestScenes.Remember();
             EditorSceneManager.OpenScene(PrototypeSceneBuilder.PrototypeScenePath);
             SessionState.SetBool(RunningKey, true);
             SessionState.SetBool(BatchKey, batch);
@@ -172,8 +173,7 @@ namespace SombraDaSanidade.EditorTools
             foreach (var r in results) sb.AppendLine(r);
             if (failed) Debug.LogError(sb.ToString());
             else Debug.Log(sb.ToString());
-            EditorApplication.ExitPlaymode();
-            if (batch) EditorApplication.Exit(failed ? 1 : 0);
+            TestScenes.Finish(batch, failed);
         }
     }
 }
