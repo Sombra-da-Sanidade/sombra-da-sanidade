@@ -421,6 +421,26 @@ namespace SombraDaSanidade.EditorTools
             var parent = new GameObject("Lockers").transform;
             CreateLocker(parent, square, "Locker_Oeste", new Vector2(-10f, -13.2f));
             CreateLocker(parent, square, "Locker_Leste", new Vector2(10f, -13.2f));
+            CreateAdrenaSyn(parent, square, "AdrenaSyn_Saguao", new Vector2(-3f, -12.5f));
+        }
+
+        // Frente 1. Módulo Adrena-Syn (GDD 6): ampola laranja com brilho, usada com E (issue #34).
+        internal static GameObject CreateAdrenaSyn(Transform parent, Sprite square, string name, Vector2 position)
+        {
+            var go = CreateBlock(parent, square, name, position, new Vector2(0.3f, 0.5f), new Color(1f, 0.55f, 0.2f));
+            var col = go.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            col.size = new Vector2(3f, 2f); // compensa a escala pequena do bloco
+
+            var glow = new GameObject("Glow").AddComponent<Light2D>();
+            glow.transform.SetParent(go.transform, false);
+            glow.lightType = Light2D.LightType.Point;
+            glow.color = new Color(1f, 0.55f, 0.2f);
+            glow.intensity = 0.5f;
+            glow.pointLightOuterRadius = 1.2f;
+
+            go.AddComponent<AdrenaSynModule>();
+            return go;
         }
 
         // Armário em bloco cinza encostado na parede, com o Locker (GDD 6: 60% de bateria ou sedativo).
