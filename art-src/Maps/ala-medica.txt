@@ -1,6 +1,6 @@
 # Ala Medica (issue #12): 1 caractere = 1 tile (16 px = 1 unidade). Linha de cima = norte.
 # Gerado por AlfaSceneBuilder.BuildAlaMedica a partir deste arquivo. Mesma legenda da alfa.txt, mais:
-#  A armario (marcador cinza; o loot de 60% vem depois)
+#  A armario (loot pela tabela da ala, ver docs/jogador.md)   a Modulo Adrena-Syn
 # Salas: Arquivo (HD-01, monstro) em cima, Enfermaria a oeste, Laboratorio a leste, Salao central, Antessala embaixo
 # (inicio e porta para o saguao). Dois loops: anel externo e o atalho pelo Salao central (GDD 4.1, sem becos).
 ########################################################################

@@ -444,7 +444,8 @@ namespace SombraDaSanidade.EditorTools
         }
 
         // Armário em bloco cinza encostado na parede, com o Locker (GDD 6: 60% de bateria ou sedativo).
-        internal static GameObject CreateLocker(Transform parent, Sprite square, string name, Vector2 position)
+        // Sem tabela, o armário usa as chances fixas do InteractionConfig.
+        internal static GameObject CreateLocker(Transform parent, Sprite square, string name, Vector2 position, LootTable table = null)
         {
             var go = CreateBlock(parent, square, name, position, new Vector2(0.9f, 0.6f), new Color(0.32f, 0.34f, 0.36f));
             go.GetComponent<SpriteRenderer>().sortingOrder = -4;
@@ -453,8 +454,13 @@ namespace SombraDaSanidade.EditorTools
             col.size = new Vector2(1.6f, 2.4f); // compensa a escala do bloco: ~1.4 x 1.4 no mundo
             var locker = go.AddComponent<Locker>();
             SetRef(locker, "config", GetOrCreateConfig<InteractionConfig>("InteractionConfig"));
+            if (table != null) SetRef(locker, "table", table);
             return go;
         }
+
+        // Tabela de loot da ala (extra #46): ScriptableObjects/Config/Loot/LootTable_<ala>.asset. Null se não existir.
+        internal static LootTable LoadLootTable(string wing) =>
+            AssetDatabase.LoadAssetAtPath<LootTable>($"{ConfigDir}/Loot/LootTable_{wing}.asset");
 
         // TextMesh usa material próprio (sem luz 2D): brilha no escuro como tinta de fósforo.
         internal static void CreateClue(Transform parent, string name, Vector2 position, string text, float characterSize)

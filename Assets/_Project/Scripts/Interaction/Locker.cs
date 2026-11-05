@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using SombraDaSanidade.Core;
 using SombraDaSanidade.Flashlight;
 using SombraDaSanidade.Player;
@@ -18,6 +19,8 @@ namespace SombraDaSanidade.Interaction
         [SerializeField] private SpriteRenderer body;
         [Tooltip("Fração da cor original depois de aberto (marca visual de armário já saqueado).")]
         [SerializeField, Range(0f, 1f)] private float openedTint = 0.45f;
+        [Tooltip("Tabela de loot da ala (extra #46). Vazio: usa as chances fixas do InteractionConfig (GDD 6).")]
+        [SerializeField] private LootTable table;
 
         public string Prompt => "Abrir armário";
         public bool CanInteract => !opened && config != null;
@@ -25,6 +28,7 @@ namespace SombraDaSanidade.Interaction
 
         public bool IsOpened => opened;
         public LootKind Loot { get; private set; }
+        public LootTable Table => table;
 
         // Disparado ao abrir, com o que saiu: gancho para som, HUD e o ajuste dinâmico de bateria.
         public event Action<Locker, LootKind> Opened;
@@ -38,6 +42,52 @@ namespace SombraDaSanidade.Interaction
         private GUIStyle feedbackStyle;
 
         private const float FeedbackDuration = 1.8f;
+
+        // Armários por tabela, para a garantia de uma bateria por ala.
+        private static readonly Dictionary<LootTable, HashSet<Locker>> byTable = new Dictionary<LootTable, HashSet<Locker>>();
+        private LootTable registeredTable;
+
+        private void OnEnable() => Register();
+
+        private void OnDisable() => Unregister();
+
+        private void Register()
+        {
+            if (table == null) return;
+            if (!byTable.TryGetValue(table, out var set)) byTable[table] = set = new HashSet<Locker>();
+            set.Add(this);
+            registeredTable = table;
+        }
+
+        private void Unregister()
+        {
+            if (registeredTable != null && byTable.TryGetValue(registeredTable, out var set))
+            {
+                set.Remove(this);
+                if (set.Count == 0) byTable.Remove(registeredTable);
+            }
+            registeredTable = null;
+        }
+
+        // Troca a tabela em tempo de execução (perfil de dificuldade, testes).
+        public void SetTable(LootTable value)
+        {
+            Unregister();
+            table = value;
+            if (isActiveAndEnabled) Register();
+        }
+
+        // Último armário fechado da ala sem nenhuma bateria ter saído: precisa dar bateria.
+        private bool MustGiveBattery()
+        {
+            if (table == null || !table.guaranteeBattery || !byTable.TryGetValue(table, out var set)) return false;
+            foreach (var other in set)
+            {
+                if (other == this) continue;
+                if (!other.opened || other.Loot == LootKind.Battery) return false;
+            }
+            return true;
+        }
 
         private void Awake()
         {
@@ -64,15 +114,22 @@ namespace SombraDaSanidade.Interaction
             Open(RollLoot());
         }
 
-        // Sorteio do GDD 6: lootChance de ter algo; dentro disso, batteryShare de ser bateria,
+        // Com tabela da ala (#46): sorteia pelos pesos dela e garante uma bateria por ala.
+        // Sem tabela, sorteio do GDD 6: lootChance de ter algo; dentro disso, batteryShare de ser bateria,
         // adrenaSynShare de ser Adrena-Syn e o resto sedativo. O ajuste dinâmico (#47) soma pontos
         // à chance de bateria, tirados da chance de vir vazio.
         public LootKind RollLoot()
         {
+            float bonus = pity != null ? pity.BonusChance : 0f;
+            if (table != null)
+            {
+                if (MustGiveBattery()) return LootKind.Battery;
+                return Pick(table.Chance(LootKind.Battery) + bonus, table.Chance(LootKind.Sedative), table.Chance(LootKind.AdrenaSyn));
+            }
+
             float battery = config.lockerLootChance * config.lockerBatteryShare;
             float adrena = config.lockerLootChance * Mathf.Min(config.lockerAdrenaSynShare, 1f - config.lockerBatteryShare);
             float sedative = config.lockerLootChance - battery - adrena;
-            float bonus = pity != null ? pity.BonusChance : 0f;
             return Pick(battery + bonus, sedative, adrena);
         }
 
