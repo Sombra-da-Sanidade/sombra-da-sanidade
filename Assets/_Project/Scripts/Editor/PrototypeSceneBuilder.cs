@@ -328,6 +328,9 @@ namespace SombraDaSanidade.EditorTools
             SetRef(sanity, "config", sanityConfig);
 
             player.AddComponent<PlayerInteractor>();
+            // Frente 1: skill check de multímetro na ejeção do HD e o mostrador provisório (#33).
+            player.AddComponent<SkillCheck>();
+            player.AddComponent<SkillCheckHud>();
 
             return player;
         }
