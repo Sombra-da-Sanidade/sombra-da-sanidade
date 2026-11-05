@@ -27,6 +27,8 @@ namespace SombraDaSanidade.Sanity
         public bool InSafeZone => safeZoneCount > 0;
         public bool InDarkness => flashlight != null && !flashlight.IsLit && !InSafeZone;
         public bool IsMonsterNear { get; private set; }
+        // Distância até o monstro (infinita sem monstro ativo). Usada pelo batimento em faixas (issue #38).
+        public float DistanceToMonster { get; private set; } = float.MaxValue;
 
         public event Action<float> ValueChanged;
         public event Action<SanityState> StateChanged;
@@ -57,9 +59,16 @@ namespace SombraDaSanidade.Sanity
         {
             if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) return;
 
-            IsMonsterNear = monster != null && monster.isActiveAndEnabled
-                && ((Vector2)(monster.transform.position - transform.position)).sqrMagnitude
-                   <= config.monsterProximityRadius * config.monsterProximityRadius;
+            if (monster != null && monster.isActiveAndEnabled)
+            {
+                DistanceToMonster = Vector2.Distance(transform.position, monster.transform.position);
+                IsMonsterNear = DistanceToMonster <= config.monsterProximityRadius;
+            }
+            else
+            {
+                DistanceToMonster = float.MaxValue;
+                IsMonsterNear = false;
+            }
 
             // Zona Segura protege a mente por completo: o monstro não entra nela (GDD 4.2).
             float rate;

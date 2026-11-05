@@ -9,10 +9,10 @@ namespace SombraDaSanidade.Sanity
         public float maxSanity = 100f;
 
         [Header("Ralos (por segundo)")]
-        [Tooltip("Escuridão total (GDD: -1.5%/s).")]
-        public float darknessDrain = 1.5f;
-        [Tooltip("Proximidade do monstro (GDD: -3%/s).")]
-        public float monsterProximityDrain = 3f;
+        [Tooltip("Escuridão total (GDD: -1.5%/s; playtest: 1,5x mais rápido).")]
+        public float darknessDrain = 2.25f;
+        [Tooltip("Proximidade do monstro (GDD: -3%/s; playtest: 1,5x mais rápido).")]
+        public float monsterProximityDrain = 4.5f;
         [Tooltip("Distância em que o monstro conta como próximo. Não está no GDD: ajustar no playtest.")]
         public float monsterProximityRadius = 5f;
         [Tooltip("Custo imediato do Módulo Adrena-Syn (GDD: -20).")]
@@ -42,5 +42,33 @@ namespace SombraDaSanidade.Sanity
         public float hallucinationMinInterval = 15f;
         [Tooltip("Intervalo máximo entre alucinações em segundos (GDD: 25).")]
         public float hallucinationMaxInterval = 25f;
+
+        [Header("Batimento em 3 faixas de distância do monstro (issue #38)")]
+        [Tooltip("Abaixo desta distância (m) o monstro está na faixa de alerta. Valor não está no GDD: ajustar no playtest.")]
+        public float heartbeatWarningRadius = 12f;
+        [Tooltip("Abaixo desta distância (m) o monstro está na faixa de perigo. Valor não está no GDD: ajustar no playtest.")]
+        public float heartbeatDangerRadius = 6f;
+        [Tooltip("Distância (m) em que a tensão por proximidade chega ao máximo.")]
+        public float heartbeatContactRadius = 1.5f;
+        [Tooltip("Tensão (0 a 1) ao cruzar a borda da faixa de perigo. Entre alerta e perigo ela sobe de 0 até este valor.")]
+        [Range(0f, 1f)] public float dangerTensionFloor = 0.6f;
+        [Tooltip("Batimentos por minuto com tensão baixa (primeira batida ao ficar Ansioso ou entrar na faixa de alerta).")]
+        public float calmBpm = 65f;
+        [Tooltip("Batimentos por minuto com tensão média (meio da escala).")]
+        public float warningBpm = 105f;
+        [Tooltip("Batimentos por minuto com tensão máxima (monstro colado ou sanidade perto de zero).")]
+        public float panicBpm = 160f;
+        [Tooltip("Volume da batida com tensão mínima e máxima.")]
+        [Range(0f, 1f)] public float heartbeatMinVolume = 0.35f;
+        [Range(0f, 1f)] public float heartbeatMaxVolume = 1f;
+        [Tooltip("Pitch da batida com tensão máxima (1 = normal).")]
+        public float heartbeatMaxPitch = 1.15f;
+
+        [Header("Respiração ofegante")]
+        [Tooltip("A respiração começa abaixo desta sanidade, ou sempre na faixa de perigo.")]
+        public float breathingBelow = 35f;
+        [Tooltip("Volume da respiração com tensão mínima e máxima.")]
+        [Range(0f, 1f)] public float breathingMinVolume = 0.15f;
+        [Range(0f, 1f)] public float breathingMaxVolume = 0.7f;
     }
 }
