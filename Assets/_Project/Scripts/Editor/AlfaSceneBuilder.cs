@@ -31,7 +31,7 @@ namespace SombraDaSanidade.EditorTools
         private const string AlaMedicaLayoutFile = "art-src/Maps/ala-medica.txt";
 
         // Caracteres que são chão (o resto é parede/teto).
-        private const string FloorChars = ".,hwpbL@MmiA";
+        private const string FloorChars = ".,hwpbL@MmiAa";
 
         [MenuItem("Sombra da Sanidade/Gerar cena Alfa (tiles)", priority = 2)]
         public static void BuildFromMenu()
@@ -107,6 +107,7 @@ namespace SombraDaSanidade.EditorTools
                         case 'M': monsterSpawn = center; break;
                         case 'm': patrol.Add(center); break;
                         case 'i': PrototypeSceneBuilder.CreateStabilizer(items, square, $"Stabilizer_{x}_{y}", center); break;
+                        case 'a': PrototypeSceneBuilder.CreateAdrenaSyn(items, square, $"AdrenaSyn_{x}_{y}", center); break;
                         case 'A':
                             if (lockers == null) lockers = new GameObject("Lockers").transform;
                             CreateLocker(lockers, square, $"Locker_{x}_{y}", center);

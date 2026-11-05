@@ -18,3 +18,4 @@ MonoBehaviour:
   lockerNoiseRadius: 6
   lockerLootChance: 0.6
   lockerBatteryShare: 0.5
+  lockerAdrenaSynShare: 0
