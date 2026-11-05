@@ -110,7 +110,7 @@ namespace SombraDaSanidade.EditorTools
                         case 'a': PrototypeSceneBuilder.CreateAdrenaSyn(items, square, $"AdrenaSyn_{x}_{y}", center); break;
                         case 'A':
                             if (lockers == null) lockers = new GameObject("Lockers").transform;
-                            CreateLocker(lockers, square, $"Locker_{x}_{y}", center);
+                            CreateLocker(lockers, square, $"Locker_{wing ?? Wing(x, map.Width)}_{x}_{y}", center, wing ?? Wing(x, map.Width));
                             break;
                     }
                 }
@@ -298,10 +298,11 @@ namespace SombraDaSanidade.EditorTools
             parent.Find(name).GetComponent<SpriteRenderer>().enabled = false;   // o desenho é o tile breaker_off
         }
 
-        // Armário encostado na parede, com o Locker (Frente 1, issue #29).
-        private static void CreateLocker(Transform parent, Sprite square, string name, Vector2 cell)
+        // Armário encostado na parede, com o Locker (Frente 1, issue #29) e a tabela de loot da ala (#46).
+        private static void CreateLocker(Transform parent, Sprite square, string name, Vector2 cell, string wing)
         {
-            PrototypeSceneBuilder.CreateLocker(parent, square, name, cell + Vector2.up * 0.2f);
+            PrototypeSceneBuilder.CreateLocker(parent, square, name, cell + Vector2.up * 0.2f,
+                PrototypeSceneBuilder.LoadLootTable(wing));
         }
 
         // Eclusa: as portas são tiles; o trigger fica no chão em frente e uma faixa de luz mostra o estado
