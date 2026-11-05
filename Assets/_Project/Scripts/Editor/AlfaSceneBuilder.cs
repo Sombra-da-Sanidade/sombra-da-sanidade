@@ -297,13 +297,10 @@ namespace SombraDaSanidade.EditorTools
             parent.Find(name).GetComponent<SpriteRenderer>().enabled = false;   // o desenho é o tile breaker_off
         }
 
-        // Armário em bloco cinza, encostado na parede. Só marca a posição: o loot (GDD 6: 60% de bateria
-        // ou sedativo por armário) entra depois.
+        // Armário encostado na parede, com o Locker (Frente 1, issue #29).
         private static void CreateLocker(Transform parent, Sprite square, string name, Vector2 cell)
         {
-            var go = PrototypeSceneBuilder.CreateBlock(parent, square, name, cell + Vector2.up * 0.2f,
-                new Vector2(0.9f, 0.6f), new Color(0.32f, 0.34f, 0.36f));
-            go.GetComponent<SpriteRenderer>().sortingOrder = -4;
+            PrototypeSceneBuilder.CreateLocker(parent, square, name, cell + Vector2.up * 0.2f);
         }
 
         // Eclusa: as portas são tiles; o trigger fica no chão em frente e uma faixa de luz mostra o estado

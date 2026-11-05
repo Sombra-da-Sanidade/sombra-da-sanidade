@@ -14,3 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Interaction.InteractionConfig
   ejectDuration: 2
   ejectNoiseRadius: 10
+  lockerOpenDuration: 1
+  lockerNoiseRadius: 6
+  lockerLootChance: 0.6
+  lockerBatteryShare: 0.5
