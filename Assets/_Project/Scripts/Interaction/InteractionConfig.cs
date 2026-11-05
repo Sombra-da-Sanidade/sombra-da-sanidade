@@ -21,5 +21,7 @@ namespace SombraDaSanidade.Interaction
         [Range(0f, 1f)] public float lockerLootChance = 0.6f;
         [Tooltip("Dos armários com loot, fração que tem bateria (o resto tem sedativo). GDD 6 não separa: ajustar no playtest.")]
         [Range(0f, 1f)] public float lockerBatteryShare = 0.5f;
+        [Tooltip("Dos armários com loot, fração que tem Módulo Adrena-Syn (o resto, depois da bateria, é sedativo). Não está no GDD: 0 até o playtest.")]
+        [Range(0f, 1f)] public float lockerAdrenaSynShare = 0f;
     }
 }

@@ -1,15 +1,16 @@
 using System;
 using SombraDaSanidade.Core;
 using SombraDaSanidade.Flashlight;
+using SombraDaSanidade.Player;
 using SombraDaSanidade.Sanity;
 using UnityEngine;
 
 namespace SombraDaSanidade.Interaction
 {
-    public enum LootKind { Nothing, Battery, Sedative }
+    public enum LootKind { Nothing, Battery, Sedative, AdrenaSyn }
 
     // Armário da base (GDD 6, Economia): segurar E abre, faz barulho e pode ter bateria sobressalente (+30)
-    // ou sedativo (mesmo efeito do Estabilizador de Lítio). Abre uma vez só. Frente 1. Issue #29.
+    // ou sedativo (mesmo efeito do Estabilizador de Lítio), e Adrena-Syn (#34). Abre uma vez só. Frente 1. Issue #29.
     public class Locker : MonoBehaviour, IInteractable
     {
         [SerializeField] private InteractionConfig config;
@@ -61,11 +62,15 @@ namespace SombraDaSanidade.Interaction
             Open(RollLoot());
         }
 
-        // Sorteio do GDD 6: lootChance de ter algo; dentro disso, batteryShare de ser bateria.
+        // Sorteio do GDD 6: lootChance de ter algo; dentro disso, batteryShare de ser bateria,
+        // adrenaSynShare de ser Adrena-Syn e o resto sedativo.
         public LootKind RollLoot()
         {
             if (UnityEngine.Random.value >= config.lockerLootChance) return LootKind.Nothing;
-            return UnityEngine.Random.value < config.lockerBatteryShare ? LootKind.Battery : LootKind.Sedative;
+            float r = UnityEngine.Random.value;
+            if (r < config.lockerBatteryShare) return LootKind.Battery;
+            if (r < config.lockerBatteryShare + config.lockerAdrenaSynShare) return LootKind.AdrenaSyn;
+            return LootKind.Sedative;
         }
 
         // Separado do sorteio para os testes escolherem o conteúdo.
@@ -90,6 +95,10 @@ namespace SombraDaSanidade.Interaction
                     // A corrotina da lentidão roda na sanidade do jogador, que continua ativa até o fim do efeito.
                     LithiumStabilizer.ApplyEffect(sanity, sanity);
                     ShowFeedback("Sedativo: +sanidade, passos lentos");
+                    break;
+                case LootKind.AdrenaSyn:
+                    AdrenaSynModule.Apply(sanity != null ? sanity.GetComponent<PlayerController>() : null);
+                    ShowFeedback("Adrena-Syn: corre, mas a mente paga");
                     break;
                 default:
                     ShowFeedback("Vazio");
