@@ -6,7 +6,8 @@ namespace SombraDaSanidade.Interaction
 {
     // Servidor com a Gaveta de HD (GDD 4.3). Issue #11; skill check (#33) da Frente 1.
     // Segurar E ejeta o HD (12 s com skill check de multímetro): soma no GameManager (que acelera o monstro)
-    // e faz barulho. Depois da metade, o servidor faz ruído baixo enquanto ejeta.
+    // e faz barulho. Depois da metade, o servidor faz ruído baixo enquanto ejeta. Ao ejetar, abre a escolha
+    // de upgrade da Lux-90 (#31).
     public class DriveServer : MonoBehaviour, IInteractable, ISkillCheckable
     {
         [SerializeField] private InteractionConfig config;
@@ -51,6 +52,7 @@ namespace SombraDaSanidade.Interaction
             if (interactor == null) return;
             if (interactor.GetComponent<SkillCheck>() == null) interactor.gameObject.AddComponent<SkillCheck>();
             if (interactor.GetComponent<UI.SkillCheckHud>() == null) interactor.gameObject.AddComponent<UI.SkillCheckHud>();
+            if (interactor.GetComponent<UI.UpgradeTerminal>() == null) interactor.gameObject.AddComponent<UI.UpgradeTerminal>();
         }
 
         public void BeginInteract()
@@ -86,6 +88,16 @@ namespace SombraDaSanidade.Interaction
             if (logClip != null) AudioSource.PlayClipAtPoint(logClip, transform.position);
             if (GameManager.Instance != null) GameManager.Instance.CollectDrive();
             Ejected?.Invoke(this);
+            OpenUpgradeTerminal();
+        }
+
+        // Recompensa concreta do HD (#31): escolha de 1 de 2 upgrades da Lux-90, com o jogo pausado.
+        private void OpenUpgradeTerminal()
+        {
+            if (config.upgradeTree == null) return;
+            var terminal = FindAnyObjectByType<UI.UpgradeTerminal>();
+            int drive = GameManager.Instance != null ? GameManager.Instance.DrivesCollected : 1;
+            if (terminal != null) terminal.Open(config.upgradeTree, drive);
         }
     }
 }
