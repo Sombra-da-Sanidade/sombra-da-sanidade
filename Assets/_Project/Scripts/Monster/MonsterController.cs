@@ -190,7 +190,8 @@ namespace SombraDaSanidade.Monster
                 return;
             }
 
-            if (IsLitByFlashlight()) OnLit();
+            // Modo econômico do Filtro Âmbar (#31) ilumina sem atrair.
+            if (IsLitByFlashlight() && flashlight.AttractsMonster) OnLit();
 
             switch (State)
             {
