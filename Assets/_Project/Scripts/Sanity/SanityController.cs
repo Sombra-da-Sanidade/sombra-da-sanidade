@@ -27,6 +27,10 @@ namespace SombraDaSanidade.Sanity
         public bool InSafeZone => safeZoneCount > 0;
         public bool InDarkness => flashlight != null && !flashlight.IsLit && !InSafeZone;
         public bool IsMonsterNear { get; private set; }
+        // Limiar das pistas em fósforo (GDD regra 5: 35). O upgrade Ressonador Neural (#31) sobe para 50.
+        public float RevealCluesBelow => revealOverride >= 0f ? revealOverride : config.revealCluesBelow;
+
+        private float revealOverride = -1f;
 
         public event Action<float> ValueChanged;
         public event Action<SanityState> StateChanged;
@@ -89,6 +93,12 @@ namespace SombraDaSanidade.Sanity
 
             if (Value <= 0f && GameManager.Instance != null)
                 GameManager.Instance.TriggerGameOver(DeathCause.Sanity);
+        }
+
+        // Troca o limiar das pistas em tempo de execução, sem mexer no asset (upgrade da Lux-90, #31).
+        public void SetRevealCluesBelow(float value)
+        {
+            revealOverride = value;
         }
 
         // Chamado pelo trigger da Zona Segura ao entrar/sair. Contador para suportar zonas sobrepostas.
