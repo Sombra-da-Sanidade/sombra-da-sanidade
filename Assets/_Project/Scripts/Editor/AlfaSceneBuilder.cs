@@ -31,7 +31,7 @@ namespace SombraDaSanidade.EditorTools
         private const string AlaMedicaLayoutFile = "art-src/Maps/ala-medica.txt";
 
         // Caracteres que são chão (o resto é parede/teto).
-        private const string FloorChars = ".,hwpbL@MmiA";
+        private const string FloorChars = ".,hwpbL@MmiAa";
 
         [MenuItem("Sombra da Sanidade/Gerar cena Alfa (tiles)", priority = 2)]
         public static void BuildFromMenu()
@@ -107,9 +107,10 @@ namespace SombraDaSanidade.EditorTools
                         case 'M': monsterSpawn = center; break;
                         case 'm': patrol.Add(center); break;
                         case 'i': PrototypeSceneBuilder.CreateStabilizer(items, square, $"Stabilizer_{x}_{y}", center); break;
+                        case 'a': PrototypeSceneBuilder.CreateAdrenaSyn(items, square, $"AdrenaSyn_{x}_{y}", center); break;
                         case 'A':
                             if (lockers == null) lockers = new GameObject("Lockers").transform;
-                            CreateLocker(lockers, square, $"Locker_{x}_{y}", center);
+                            CreateLocker(lockers, square, $"Locker_{wing ?? Wing(x, map.Width)}_{x}_{y}", center, wing ?? Wing(x, map.Width));
                             break;
                     }
                 }
@@ -297,13 +298,11 @@ namespace SombraDaSanidade.EditorTools
             parent.Find(name).GetComponent<SpriteRenderer>().enabled = false;   // o desenho é o tile breaker_off
         }
 
-        // Armário em bloco cinza, encostado na parede. Só marca a posição: o loot (GDD 6: 60% de bateria
-        // ou sedativo por armário) entra depois.
-        private static void CreateLocker(Transform parent, Sprite square, string name, Vector2 cell)
+        // Armário encostado na parede, com o Locker (Frente 1, issue #29) e a tabela de loot da ala (#46).
+        private static void CreateLocker(Transform parent, Sprite square, string name, Vector2 cell, string wing)
         {
-            var go = PrototypeSceneBuilder.CreateBlock(parent, square, name, cell + Vector2.up * 0.2f,
-                new Vector2(0.9f, 0.6f), new Color(0.32f, 0.34f, 0.36f));
-            go.GetComponent<SpriteRenderer>().sortingOrder = -4;
+            PrototypeSceneBuilder.CreateLocker(parent, square, name, cell + Vector2.up * 0.2f,
+                PrototypeSceneBuilder.LoadLootTable(wing));
         }
 
         // Eclusa: as portas são tiles; o trigger fica no chão em frente e uma faixa de luz mostra o estado

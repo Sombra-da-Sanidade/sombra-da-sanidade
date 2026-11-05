@@ -22,6 +22,12 @@ namespace SombraDaSanidade.Flashlight
         [Tooltip("Fração da intensidade quando a bateria está quase no fim.")]
         [Range(0f, 1f)] public float lowBatteryIntensityRatio = 0.2f;
 
+        [Header("Modo econômico (upgrade Filtro Âmbar, #31)")]
+        [Tooltip("Fração da intensidade no modo econômico (Proposta 2 do GDD v1.1: 50%).")]
+        [Range(0f, 1f)] public float ecoIntensityRatio = 0.5f;
+        [Tooltip("Multiplicador do dreno de bateria no modo econômico. Não está na proposta: ajustar no playtest.")]
+        [Range(0f, 1f)] public float ecoDrainMultiplier = 0.5f;
+
         [Header("Pulso EMP")]
         [Tooltip("Custo de carga por disparo (GDD: 40%).")]
         public float empCost = 40f;

@@ -49,7 +49,7 @@ namespace SombraDaSanidade.Sanity
 
         private void Update()
         {
-            float target = sanity.Value < sanity.Config.revealCluesBelow ? 1f : 0f;
+            float target = sanity.Value < sanity.RevealCluesBelow ? 1f : 0f;
             alpha = Mathf.MoveTowards(alpha, target, fadeSpeed * Time.deltaTime);
             Apply();
         }

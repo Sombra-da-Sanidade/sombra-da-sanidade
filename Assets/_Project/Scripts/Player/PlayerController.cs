@@ -17,6 +17,7 @@ namespace SombraDaSanidade.Player
         [SerializeField] private bool rotateVisual = true;
         [SerializeField] private float visualRotationOffset = -90f;
 
+        public PlayerConfig Config => config;
         public Vector2 Facing { get; private set; } = Vector2.down;
         public Vector2 MoveInput { get; private set; }
         public bool IsMoving => MoveInput.sqrMagnitude > 0.01f;

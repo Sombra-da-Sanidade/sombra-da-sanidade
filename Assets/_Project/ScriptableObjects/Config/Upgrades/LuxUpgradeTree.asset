@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b48097bd884049c39b918de4d23d5c32, type: 3}
+  m_Name: LuxUpgradeTree
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Flashlight.LuxUpgradeTree
+  choices:
+  - optionA: {fileID: 11400000, guid: a3a2de0cabcb4d1da20431e82398b1d2, type: 2}
+    optionB: {fileID: 11400000, guid: 33765a2210344b2f88cf9beb8d9b2e43, type: 2}
+  - optionA: {fileID: 11400000, guid: 0db654937ff7434aad22f48de135b556, type: 2}
+    optionB: {fileID: 11400000, guid: 4b3a60a7518c4ec1b3a32f2accda0d66, type: 2}
+  - optionA: {fileID: 11400000, guid: 75aea0b779a04e26a2f5f31044c2711f, type: 2}
+    optionB: {fileID: 11400000, guid: 1f895e25d9d14cad89d24ae7969c11ba, type: 2}

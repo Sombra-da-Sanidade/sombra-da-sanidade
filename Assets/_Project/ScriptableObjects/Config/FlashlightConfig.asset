@@ -19,5 +19,7 @@ MonoBehaviour:
   range: 8
   intensity: 1.2
   lowBatteryIntensityRatio: 0.2
+  ecoIntensityRatio: 0.5
+  ecoDrainMultiplier: 0.5
   empCost: 40
   empStunDuration: 4

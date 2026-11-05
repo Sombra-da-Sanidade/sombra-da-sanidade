@@ -12,5 +12,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfef521963314ddcbd342120dd951645, type: 3}
   m_Name: InteractionConfig
   m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Interaction.InteractionConfig
-  ejectDuration: 2
+  ejectDuration: 12
   ejectNoiseRadius: 10
+  upgradeTree: {fileID: 11400000, guid: c3e97e1488af404e940dc686aefad599, type: 2}
+  ejectLateNoiseFrom: 0.5
+  ejectLateNoiseRadius: 6
+  ejectLateNoiseInterval: 3
+  skillCheckStartDelay: 2
+  skillCheckChancePerSecond: 0.25
+  skillCheckMaxPerDrive: 3
+  skillCheckWarning: 0.6
+  skillCheckSweep: 1.1
+  skillCheckZoneMin: 0.35
+  skillCheckGoodSize: 0.15
+  skillCheckShrinkPerDrive: 0.02
+  skillCheckGreatSize: 0.04
+  skillCheckGreatBonus: 0.05
+  skillCheckFailPenalty: 0.1
+  skillCheckFailPause: 1
+  skillCheckFailNoiseRadius: 12
+  skillCheckFailShakeDuration: 0.25
+  skillCheckFailShakeMagnitude: 0.2
+  skillCheckMonsterNearShrink: 0.4
+  skillCheckJitterBelowSanity: 35
+  skillCheckJitterAmount: 0.04
+  lockerOpenDuration: 1
+  lockerNoiseRadius: 6
+  lockerLootChance: 0.6
+  lockerBatteryShare: 0.5
+  lockerAdrenaSynShare: 0
+  pityBatteryBelow: 20
+  pityDelay: 30
+  pityBonus: 0.15
+  pityLog: 1
