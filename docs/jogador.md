@@ -22,6 +22,12 @@ Abrir faz barulho de propósito: saquear com o monstro por perto é um risco (Pi
 
 Na cena, os armários são o caractere `A` das plantas em `art-src/Maps/` (`AlfaSceneBuilder`). No protótipo há dois no saguão.
 
+### Ajuste dinâmico de bateria (extra #47)
+
+Inspirado no sistema Hamlet de ajuste dinâmico de dificuldade (`docs/pesquisa/ritmo-e-tensao.md`). Se a bateria ficar abaixo de **20** por mais de **30 s**, o próximo armário tem **+15 pontos** de chance de bateria (de 30% para 45%), tirados da chance de vir vazio. Desliga quando sai uma bateria. O jogador não é avisado; o Console mostra `[Ajuste de bateria]` quando liga e desliga (`pityLog`).
+
+O `BatteryPity` fica no Player. O primeiro `Locker` da cena cria o componente se ele não existir, então não precisa regenerar cena. Números em `InteractionConfig` (`pity*`).
+
 ## Módulo Adrena-Syn (#34, GDD 6 e Pilar 2)
 
 Ampola laranja usada com **E** na hora (sem inventário). Também pode sair de um armário.
@@ -53,3 +59,4 @@ Ampola laranja usada com **E** na hora (sem inventário). Também pode sair de u
 |---|---|---|
 | Armários | Rodar teste dos armários | `SombraDaSanidade.EditorTools.LockerTest.RunBatch` |
 | Adrena-Syn | Rodar teste do Adrena-Syn | `SombraDaSanidade.EditorTools.AdrenaSynTest.RunBatch` |
+| Ajuste de bateria | Rodar teste do ajuste de bateria | `SombraDaSanidade.EditorTools.BatteryPityTest.RunBatch` |
