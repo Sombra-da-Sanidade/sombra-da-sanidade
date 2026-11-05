@@ -23,5 +23,15 @@ namespace SombraDaSanidade.Interaction
         [Range(0f, 1f)] public float lockerBatteryShare = 0.5f;
         [Tooltip("Dos armários com loot, fração que tem Módulo Adrena-Syn (o resto, depois da bateria, é sedativo). Não está no GDD: 0 até o playtest.")]
         [Range(0f, 1f)] public float lockerAdrenaSynShare = 0f;
+
+        [Header("Ajuste dinâmico de bateria (extra #47)")]
+        [Tooltip("Bateria abaixo deste valor conta como \"faltando\". Não está no GDD (pesquisa: Hamlet): ajustar no playtest.")]
+        [Min(0f)] public float pityBatteryBelow = 20f;
+        [Tooltip("Segundos seguidos com a bateria baixa até o ajuste ligar. Não está no GDD: ajustar no playtest.")]
+        [Min(0f)] public float pityDelay = 30f;
+        [Tooltip("Pontos somados à chance de bateria do próximo armário (0.15 = +15 pontos). Volta ao normal quando sai uma bateria.")]
+        [Range(0f, 1f)] public float pityBonus = 0.15f;
+        [Tooltip("Mostra no Console quando o ajuste liga e desliga (playtest). Sem aviso ao jogador.")]
+        public bool pityLog = true;
     }
 }
