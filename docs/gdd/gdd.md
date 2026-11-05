@@ -29,6 +29,9 @@ Explorar com o cone de luz → apagar a luz e se esconder ao ouvir o monstro →
 | Espécime Vazio | vel. 3.5 a 4.8, raio auditivo, stun 0-4s | Patrulha Cega, Investigação Auditiva, Perseguição Furiosa, Atordoado |
 | Lanterna Lux-90 | carga 0-100, cone 60°, alcance 8 | Apagada, Iluminando, Disparo EMP (-40), Esgotada |
 | Disjuntor | tensão, fusível, timer de luz 0-60s | Queimado, Em Reparo (4s), Ativo (Zona Segura) |
+| Servidor de HD | ejeção 12 s, até 3 skill checks de multímetro | Carregado, Ejetando, Vazio |
+
+**Skill check do HD** (calibragem no multímetro, seção 4.4 do PDF; detalhes em [skill-check-hd.md](../skill-check-hd.md)): durante a ejeção, depois de 2 s, 25%/s de chance de um check (máx. 3). Bipe, o ponteiro varre o mostrador em 1,1 s e Espaço precisa cair na faixa: good 15/13/11% conforme os HDs já coletados, great 4% (+5% de progresso). Errar ou não apertar: -10% de progresso, 1 s parado, ruído de raio 12. Monstro perto encolhe a faixa em 40%; sanidade < 35 faz o ponteiro tremer. Depois de 50% o servidor faz ruído baixo (raio 6) a cada 3 s. Números iniciais, pendentes da aprovação do v1.1 (#3).
 
 ## 5. Regras
 
@@ -74,7 +77,7 @@ Curva dente-de-serra: cada HD é um pico de perigo, cada Zona Segura um alívio.
 
 ## 8. Controles e interface
 
-WASD move, mouse mira, F/clique esquerdo liga a lanterna, clique direito dispara EMP. HUD diegético: medidor de bateria e contador de HDs no canto superior esquerdo; sanidade comunicada por vinheta, batimentos e aberração cromática. Posição do monstro e timers nunca aparecem em número.
+WASD move, mouse mira, F/clique esquerdo liga a lanterna, clique direito dispara EMP, E segura para interagir, Espaço calibra o multímetro no skill check. HUD diegético: medidor de bateria e contador de HDs no canto superior esquerdo; sanidade comunicada por vinheta, batimentos e aberração cromática. Posição do monstro e timers nunca aparecem em número.
 
 Fluxo: Menu → Briefing → Jogo (Médica → Energia → Executiva → Eclusa) → Vitória (estatísticas) / Game Over (causa e reinício do checkpoint da ala).
 
@@ -105,3 +108,4 @@ Marcos: Protótipo (semana 4), Vertical slice com Ala Médica (semana 8), Versã
 |---|---|---|
 | 1.0 | 12/10/2026 | GDD entregue |
 | 1.0.1 | 27/10/2026 | Unity atualizada para 6000.5.10f1 (antes 2022.3/2023.x) |
+| 1.0.2 | 05/11/2026 | Skill check de multímetro na ejeção de HD (12 s), números iniciais pendentes do v1.1 (#33) |
