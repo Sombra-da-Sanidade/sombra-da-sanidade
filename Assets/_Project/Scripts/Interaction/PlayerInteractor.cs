@@ -14,10 +14,15 @@ namespace SombraDaSanidade.Interaction
         public IInteractable Current { get; private set; }
         public bool IsChanneling { get; private set; }
         public float Progress { get; private set; }
+        public bool IsProgressPaused => Time.time < pausedUntil;
+
+        // Segura E por código (testes em batchmode, que não têm input). Não usar no jogo.
+        public bool HoldOverride { get; set; }
 
         private readonly Collider2D[] hits = new Collider2D[16];
         private Vector2 channelStartPos;
         private GUIStyle promptStyle;
+        private float pausedUntil;
 
         private void Update()
         {
@@ -28,7 +33,7 @@ namespace SombraDaSanidade.Interaction
             }
 
             var kb = Keyboard.current;
-            bool held = kb != null && kb.eKey.isPressed;
+            bool held = HoldOverride || (kb != null && kb.eKey.isPressed);
 
             if (!IsChanneling) Current = FindNearest();
             if (Current == null || !Current.CanInteract)
@@ -58,7 +63,8 @@ namespace SombraDaSanidade.Interaction
             }
 
             float duration = Current.HoldDuration;
-            Progress = duration <= 0f ? 1f : Mathf.Clamp01(Progress + Time.deltaTime / duration);
+            if (!IsProgressPaused)
+                Progress = duration <= 0f ? 1f : Mathf.Clamp01(Progress + Time.deltaTime / duration);
             Current.TickInteract(Progress);
 
             if (Progress >= 1f)
@@ -68,6 +74,19 @@ namespace SombraDaSanidade.Interaction
                 Progress = 0f;
                 done.CompleteInteract();
             }
+        }
+
+        // Soma ou tira progresso da canalização atual (skill check, #33). Sem canalização, não faz nada.
+        public void AddProgress(float delta)
+        {
+            if (!IsChanneling) return;
+            Progress = Mathf.Clamp01(Progress + delta);
+        }
+
+        // Congela o progresso por alguns segundos (falha no skill check). Segurar E continua valendo.
+        public void PauseProgress(float seconds)
+        {
+            pausedUntil = Mathf.Max(pausedUntil, Time.time + seconds);
         }
 
         private void Cancel()
