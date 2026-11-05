@@ -331,6 +331,8 @@ namespace SombraDaSanidade.EditorTools
             // Frente 1: skill check de multímetro na ejeção do HD e o mostrador provisório (#33).
             player.AddComponent<SkillCheck>();
             player.AddComponent<SkillCheckHud>();
+            // Frente 1: tela de upgrade da Lux-90 ao ejetar HD (#31).
+            player.AddComponent<UpgradeTerminal>();
 
             return player;
         }
