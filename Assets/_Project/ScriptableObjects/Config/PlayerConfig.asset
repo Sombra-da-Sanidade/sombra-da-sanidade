@@ -13,3 +13,5 @@ MonoBehaviour:
   m_Name: PlayerConfig
   m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Player.PlayerConfig
   moveSpeed: 4
+  adrenaSynSpeedBonus: 0.35
+  adrenaSynDuration: 15
