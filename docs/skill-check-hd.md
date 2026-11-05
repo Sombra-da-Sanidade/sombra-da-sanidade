@@ -1,6 +1,6 @@
 # Skill check na ejeção de HD
 
-**Status:** plano, aguardando aprovação no GDD v1.1 (#3). Números e justificativa: [pesquisa/propostas.md](pesquisa/propostas.md) (Propostas 5 e 6).
+**Status:** implementado (#33) com os números abaixo, que ainda dependem da aprovação do GDD v1.1 (#3). Números e justificativa: [pesquisa/propostas.md](pesquisa/propostas.md) (Propostas 5 e 6).
 
 ## Por quê
 Extrair HD vira o "gerador" do Dead by Daylight / a "cifra" do Identity V: tarefa longa, parado e exposto, com checks que exigem atenção. O GDD v1.0 (seção 4.4, "Modos / minijogos") já previa uma "calibragem de circuitos no multímetro" que nunca foi implementada.
@@ -41,6 +41,13 @@ Reaproveitar: `NoiseBus.Emit`, `CameraFollow.Shake`, `GameManager.Instance` (HDs
 3. Commits atômicos: config, interface + `AddProgress`, `SkillCheck`, HUD, builder, teste, docs.
 4. Compilação em batchmode numa cópia no scratchpad e `SkillCheckTest`.
 5. PR com `Closes #<n>`, revisão da Frente 5.
+
+## Como testar e ajustar
+
+- Menu **Sombra da Sanidade > Rodar teste do skill check** (`SkillCheckTest`). Batchmode: `-executeMethod SombraDaSanidade.EditorTools.SkillCheckTest.RunBatch`.
+- Números: `InteractionConfig`, seção "Skill check" (e `ejectLate*` para o ruído depois de 50%).
+- Cenas geradas antes do #33: o `DriveServer` adiciona `SkillCheck` e `SkillCheckHud` no jogador ao iniciar, então não precisa regenerar.
+- Para o rank (#49): `DriveServer.SkillCheckFailures` e o evento `SkillCheckResolved`.
 
 ## Verificação
 - Batchmode compila e o `SkillCheckTest` passa (acerto, great, erro, ruído emitido, faixa menor depois do HD).
