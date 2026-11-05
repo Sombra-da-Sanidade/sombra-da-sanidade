@@ -108,6 +108,7 @@ namespace SombraDaSanidade.EditorTools
             CreateSanityEffects(player.GetComponent<SanityController>(), square, wallLayer);
             CreateObjectives(square);
             CreateSanityItems(square);
+            CreateLockers(square);
             CreateMonster(new Vector2(16f, 10f));
 
             Directory.CreateDirectory(Path.GetDirectoryName(path));
@@ -416,6 +417,53 @@ namespace SombraDaSanidade.EditorTools
 
             go.AddComponent<LithiumStabilizer>();
         }
+
+        // Frente 1. Dois armários no saguão, perto do spawn, para testar o loot (issue #29).
+        private static void CreateLockers(Sprite square)
+        {
+            var parent = new GameObject("Lockers").transform;
+            CreateLocker(parent, square, "Locker_Oeste", new Vector2(-10f, -13.2f));
+            CreateLocker(parent, square, "Locker_Leste", new Vector2(10f, -13.2f));
+            CreateAdrenaSyn(parent, square, "AdrenaSyn_Saguao", new Vector2(-3f, -12.5f));
+        }
+
+        // Frente 1. Módulo Adrena-Syn (GDD 6): ampola laranja com brilho, usada com E (issue #34).
+        internal static GameObject CreateAdrenaSyn(Transform parent, Sprite square, string name, Vector2 position)
+        {
+            var go = CreateBlock(parent, square, name, position, new Vector2(0.3f, 0.5f), new Color(1f, 0.55f, 0.2f));
+            var col = go.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            col.size = new Vector2(3f, 2f); // compensa a escala pequena do bloco
+
+            var glow = new GameObject("Glow").AddComponent<Light2D>();
+            glow.transform.SetParent(go.transform, false);
+            glow.lightType = Light2D.LightType.Point;
+            glow.color = new Color(1f, 0.55f, 0.2f);
+            glow.intensity = 0.5f;
+            glow.pointLightOuterRadius = 1.2f;
+
+            go.AddComponent<AdrenaSynModule>();
+            return go;
+        }
+
+        // Armário em bloco cinza encostado na parede, com o Locker (GDD 6: 60% de bateria ou sedativo).
+        // Sem tabela, o armário usa as chances fixas do InteractionConfig.
+        internal static GameObject CreateLocker(Transform parent, Sprite square, string name, Vector2 position, LootTable table = null)
+        {
+            var go = CreateBlock(parent, square, name, position, new Vector2(0.9f, 0.6f), new Color(0.32f, 0.34f, 0.36f));
+            go.GetComponent<SpriteRenderer>().sortingOrder = -4;
+            var col = go.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            col.size = new Vector2(1.6f, 2.4f); // compensa a escala do bloco: ~1.4 x 1.4 no mundo
+            var locker = go.AddComponent<Locker>();
+            SetRef(locker, "config", GetOrCreateConfig<InteractionConfig>("InteractionConfig"));
+            if (table != null) SetRef(locker, "table", table);
+            return go;
+        }
+
+        // Tabela de loot da ala (extra #46): ScriptableObjects/Config/Loot/LootTable_<ala>.asset. Null se não existir.
+        internal static LootTable LoadLootTable(string wing) =>
+            AssetDatabase.LoadAssetAtPath<LootTable>($"{ConfigDir}/Loot/LootTable_{wing}.asset");
 
         // TextMesh usa material próprio (sem luz 2D): brilha no escuro como tinta de fósforo.
         internal static void CreateClue(Transform parent, string name, Vector2 position, string text, float characterSize)

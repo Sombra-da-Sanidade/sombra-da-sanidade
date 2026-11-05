@@ -21,6 +21,7 @@ namespace SombraDaSanidade.Flashlight
         [Tooltip("Camadas que bloqueiam o feixe (paredes).")]
         [SerializeField] private LayerMask obstacles;
 
+        public FlashlightConfig Config => config;
         public float Battery { get; private set; }
         public float BatteryRatio => config.maxBattery > 0f ? Battery / config.maxBattery : 0f;
         public bool IsSwitchedOn { get; private set; } = true;
