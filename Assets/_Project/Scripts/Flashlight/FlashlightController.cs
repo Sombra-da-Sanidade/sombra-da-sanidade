@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using SombraDaSanidade.Core;
 using SombraDaSanidade.Monster;
 using SombraDaSanidade.Player;
@@ -22,12 +23,31 @@ namespace SombraDaSanidade.Flashlight
         [SerializeField] private LayerMask obstacles;
 
         public float Battery { get; private set; }
-        public float BatteryRatio => config.maxBattery > 0f ? Battery / config.maxBattery : 0f;
+        public float BatteryRatio => MaxBattery > 0f ? Battery / MaxBattery : 0f;
         public bool IsSwitchedOn { get; private set; } = true;
         public bool IsLit => IsSwitchedOn && Battery > 0f;
 
+        // Valores efetivos com os upgrades da Lux-90 (#31). Os assets de config nunca são alterados.
+        public float Range => config.range * rangeMultiplier;
+        public float MaxBattery => maxBatteryOverride > 0f ? maxBatteryOverride : config.maxBattery;
+        public float EmpCost => empCostOverride >= 0f ? empCostOverride : config.empCost;
+        public float EmpStunDuration => stunOverride >= 0f ? stunOverride : config.empStunDuration;
+        public bool HasAmberFilter { get; private set; }
+        // Modo econômico (Filtro Âmbar, tecla Q): luz a 50% que não atrai o monstro.
+        public bool IsEcoMode { get; private set; }
+        // O monstro só é atraído pela luz fora do modo econômico. O EMP continua acertando.
+        public bool AttractsMonster => IsLit && !IsEcoMode;
+        public IReadOnlyList<LuxUpgrade> Installed => installed;
+
         public event Action<float> BatteryChanged;
         public event Action<bool> LitChanged;
+        public event Action<LuxUpgrade> UpgradeInstalled;
+
+        private float rangeMultiplier = 1f;
+        private float maxBatteryOverride = -1f;
+        private float empCostOverride = -1f;
+        private float stunOverride = -1f;
+        private readonly List<LuxUpgrade> installed = new List<LuxUpgrade>();
 
         private Light2D light2D;
         private PlayerSpriteAnimator spriteAnimator;
@@ -78,7 +98,7 @@ namespace SombraDaSanidade.Flashlight
 
             Vector2 origin = pivot.position;
             Vector2 toPoint = point - origin;
-            if (toPoint.magnitude > config.range) return false;
+            if (toPoint.magnitude > Range) return false;
             if (Vector2.Angle(player.Facing, toPoint) > config.coneAngle * 0.5f) return false;
 
             return !Physics2D.Linecast(origin, point, obstacles);
@@ -97,6 +117,42 @@ namespace SombraDaSanidade.Flashlight
             SetBattery(Battery + amount);
         }
 
+        // Instala um upgrade da Lux-90 (#31). Efeitos de sanidade ficam no LuxUpgrades.
+        public void ApplyUpgrade(LuxUpgrade upgrade)
+        {
+            if (upgrade == null) return;
+            switch (upgrade.effect)
+            {
+                case LuxUpgradeEffect.RangeMultiplier:
+                    rangeMultiplier *= Mathf.Max(0.1f, upgrade.value);
+                    ApplyConeShape();
+                    break;
+                case LuxUpgradeEffect.MaxBattery:
+                    // A célula nova chega carregada: soma a diferença na carga atual.
+                    float gain = Mathf.Max(0f, upgrade.value - MaxBattery);
+                    maxBatteryOverride = Mathf.Max(MaxBattery, upgrade.value);
+                    SetBattery(Battery + gain);
+                    break;
+                case LuxUpgradeEffect.EmpCost:
+                    empCostOverride = Mathf.Max(0f, upgrade.value);
+                    break;
+                case LuxUpgradeEffect.StunDuration:
+                    stunOverride = Mathf.Max(0f, upgrade.value);
+                    break;
+                case LuxUpgradeEffect.AmberFilter:
+                    HasAmberFilter = true;
+                    break;
+            }
+            installed.Add(upgrade);
+            UpgradeInstalled?.Invoke(upgrade);
+        }
+
+        // Liga ou desliga o modo econômico. Só com o Filtro Âmbar.
+        public void SetEcoMode(bool on)
+        {
+            IsEcoMode = on && HasAmberFilter;
+        }
+
         private void ReadToggle()
         {
             var kb = Keyboard.current;
@@ -104,6 +160,7 @@ namespace SombraDaSanidade.Flashlight
             bool pressed = (kb != null && kb.fKey.wasPressedThisFrame)
                 || (mouse != null && mouse.leftButton.wasPressedThisFrame);
             if (pressed) IsSwitchedOn = !IsSwitchedOn;
+            if (HasAmberFilter && kb != null && kb.qKey.wasPressedThisFrame) SetEcoMode(!IsEcoMode);
         }
 
         private void ReadEmp()
@@ -127,14 +184,14 @@ namespace SombraDaSanidade.Flashlight
             // Consultar antes do gasto: o último disparo pode zerar a bateria e apagar o cone.
             bool hitsMonster = monster != null && monster.isActiveAndEnabled
                 && monster.IsLitByFlashlight();
-            if (!TrySpend(config.empCost))
+            if (!TrySpend(EmpCost))
             {
                 ShowEmpFeedback("Carga insuficiente para EMP");
                 return;
             }
 
             empFeedbackUntil = 0f;
-            if (hitsMonster) monster.Stun(config.empStunDuration);
+            if (hitsMonster) monster.Stun(EmpStunDuration);
             // Atordoar primeiro evita que o alvo reaja ao ruído do próprio EMP (GDD 4.3 e 6.3).
             NoiseBus.Emit(transform.position, config.empNoiseRadius);
             ShakeEmp();
@@ -190,7 +247,7 @@ namespace SombraDaSanidade.Flashlight
         private void Drain()
         {
             if (IsSwitchedOn && Battery > 0f)
-                SetBattery(Battery - config.drainPerSecond * Time.deltaTime);
+                SetBattery(Battery - config.drainPerSecond * (IsEcoMode ? config.ecoDrainMultiplier : 1f) * Time.deltaTime);
         }
 
         private void UpdateLight()
@@ -205,19 +262,22 @@ namespace SombraDaSanidade.Flashlight
             if (light2D == null) return;
             light2D.enabled = lit;
             if (lit)
-                light2D.intensity = Mathf.Lerp(config.intensity * config.lowBatteryIntensityRatio, config.intensity, BatteryRatio);
+            {
+                float full = config.intensity * (IsEcoMode ? config.ecoIntensityRatio : 1f);
+                light2D.intensity = Mathf.Lerp(full * config.lowBatteryIntensityRatio, full, BatteryRatio);
+            }
         }
 
         private void SetBattery(float value)
         {
-            Battery = Mathf.Clamp(value, 0f, config.maxBattery);
+            Battery = Mathf.Clamp(value, 0f, MaxBattery);
             BatteryChanged?.Invoke(Battery);
         }
 
         private void ApplyConeShape()
         {
             if (light2D == null) return;
-            light2D.pointLightOuterRadius = config.range;
+            light2D.pointLightOuterRadius = Range;
             light2D.pointLightOuterAngle = config.coneAngle;
             light2D.pointLightInnerAngle = config.coneAngle * 0.6f;
         }
