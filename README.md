@@ -40,6 +40,9 @@ Para publicar uma versão nova: gere o build pelo menu **Sombra da Sanidade > Bu
 | [docs/equipe.md](docs/equipe.md) | As 5 frentes de trabalho e como escolher uma |
 | [docs/mini-demo.md](docs/mini-demo.md) | Plano da mini demo (29/10) |
 | [docs/monstro.md](docs/monstro.md) | Espécime Vazio: estados, regras e contratos da IA |
+| [docs/sanidade.md](docs/sanidade.md) | Sanidade: dreno, efeitos, batimento em 3 faixas |
+| [docs/hud.md](docs/hud.md) | HUD diegético: pilha, HDs, relógio no Tab, legendas |
+| [docs/narrativa/logs.md](docs/narrativa/logs.md) | Roteiros dos logs da Dra. Vance (rascunho para o grupo) |
 | [docs/arte/guia-de-estilo.md](docs/arte/guia-de-estilo.md) | Direção de arte: paleta, escala, regras de desenho, fichas de personagem |
 | [docs/decisoes/](docs/decisoes/) | Decisões técnicas registradas |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Fluxo de trabalho, branches, commits e cenas |

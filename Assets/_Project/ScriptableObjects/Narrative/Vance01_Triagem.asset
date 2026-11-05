@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 761c7ed67cc655f41a4dfe40f25782dd, type: 3}
+  m_Name: Vance01_Triagem
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Narrative.AudioLog
+  id: VANCE-01
+  speaker: VANCE
+  title: "Registro 04: triagem do Voluntário 07"
+  voice: {fileID: 0}
+  lines:
+  - "Registro 04. Projeto Hipnos, Sub-Nível 4. Voluntário 07 estável."
+  - "A sobrecarga de luz queimou as córneas dele. Ele não reage a nada que vê."
+  - "Mas quando um técnico respira do outro lado do vidro, ele vira a cabeça."
+  - "Ele não precisa enxergar. Ele escuta."

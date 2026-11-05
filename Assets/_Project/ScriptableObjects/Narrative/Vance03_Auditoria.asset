@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 761c7ed67cc655f41a4dfe40f25782dd, type: 3}
+  m_Name: Vance03_Auditoria
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Narrative.AudioLog
+  id: VANCE-03
+  speaker: VANCE
+  title: "Registro 19: o auditor"
+  voice: {fileID: 0}
+  lines:
+  - "Registro 19. A diretoria negou a evacuação."
+  - "Pediram um auditor externo para recuperar os HDs do projeto. Um só."
+  - "O perfil dele chegou antes dele: pressão, batimento, histórico de pânico."
+  - "Eles não querem os dados de volta. Querem medir quanto ele aguenta aqui."

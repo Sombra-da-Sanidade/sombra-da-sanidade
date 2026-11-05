@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 761c7ed67cc655f41a4dfe40f25782dd, type: 3}
+  m_Name: Vance02_Contencao
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Narrative.AudioLog
+  id: VANCE-02
+  speaker: VANCE
+  title: "Registro 12: falha de contenção"
+  voice: {fileID: 0}
+  lines:
+  - "Registro 12. A contenção elétrica caiu na subestação três."
+  - "O 07 atravessou a eclusa interna. Perdemos o turno da noite inteiro."
+  - "A lanterna atrai, mas a luz das lâmpadas de teto ele não atravessa."
+  - "Se alguém ouvir isto: religue os disjuntores e fique embaixo da luz."

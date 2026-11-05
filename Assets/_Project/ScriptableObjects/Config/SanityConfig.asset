@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: SanityConfig
   m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Sanity.SanityConfig
   maxSanity: 100
-  darknessDrain: 1.5
-  monsterProximityDrain: 3
+  darknessDrain: 2.25
+  monsterProximityDrain: 4.5
   monsterProximityRadius: 5
   adrenaSynCost: 20
   safeZoneRegen: 2
