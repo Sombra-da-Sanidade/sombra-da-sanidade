@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c66e6a72f9447a8a0b3a0fa05fbe2cb7, type: 3}
+  m_Name: NarrativeConfig
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Narrative.NarrativeConfig
+  holdDuration: 0.6
+  hearingRadius: 7
+  interruptRadius: 4.5
+  charactersPerSecond: 26
+  commaPause: 0.15
+  sentencePause: 0.35
+  minHoldSeconds: 1.2
+  holdPerCharacter: 0.02
+  pauseBetweenLines: 0.35
+  babbleVolume: 0.35
+  babbleMinInterval: 0.055
+  tapeHissVolume: 0.06
