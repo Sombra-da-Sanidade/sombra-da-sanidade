@@ -6,6 +6,7 @@ using SombraDaSanidade.Interaction;
 using SombraDaSanidade.Monster;
 using SombraDaSanidade.Player;
 using SombraDaSanidade.Sanity;
+using SombraDaSanidade.UI;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -174,9 +175,17 @@ namespace SombraDaSanidade.EditorTools
                     if (gm.DrivesCollected < 1 && Time.time - stepStart < ejectTimeout) { waitFrames = 5; return; }
                     Release();
                     CheckInput($"Segurar E coleta um HD ({gm.DrivesCollected}/{gm.DrivesRequired})", gm.DrivesCollected == 1);
+                    // Cada HD abre a tela de upgrade (#31) e pausa o jogo: escolhe a opção A para seguir.
+                    var terminal = player.GetComponent<UpgradeTerminal>();
+                    if (terminal != null) terminal.Choose(0);
                     foreach (var s in Object.FindObjectsByType<DriveServer>())
-                        if (s.CanInteract) s.CompleteInteract();
+                    {
+                        if (!s.CanInteract) continue;
+                        s.CompleteInteract();
+                        if (terminal != null) terminal.Choose(0);
+                    }
                     Check($"Todos os HDs coletados ({gm.DrivesCollected}/{gm.DrivesRequired})", gm.HasAllDrives);
+                    Check("Jogo retoma depois das escolhas de upgrade", !UpgradeTerminal.IsOpen && Time.timeScale > 0f);
                     var door = Object.FindAnyObjectByType<ExitDoor>();
                     Teleport(player, door.transform.position + Vector3.up * 0.3f);
                     stepStart = Time.realtimeSinceStartup;

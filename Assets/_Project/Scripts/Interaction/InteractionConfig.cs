@@ -1,3 +1,4 @@
+using SombraDaSanidade.Flashlight;
 using UnityEngine;
 
 namespace SombraDaSanidade.Interaction
@@ -11,6 +12,8 @@ namespace SombraDaSanidade.Interaction
         public float ejectDuration = 12f;
         [Tooltip("Raio do barulho ao ejetar o HD (GDD 4.3: ejetar faz barulho). Valor não está no GDD.")]
         public float ejectNoiseRadius = 10f;
+        [Tooltip("Upgrades da Lux-90 oferecidos ao ejetar cada HD (Proposta 2 do GDD v1.1). Vazio: sem tela de upgrade.")]
+        public LuxUpgradeTree upgradeTree;
         [Tooltip("A partir desta fração do progresso, o servidor faz ruído baixo enquanto ejeta. Não está no GDD: ajustar no playtest.")]
         [Range(0f, 1f)] public float ejectLateNoiseFrom = 0.5f;
         [Tooltip("Raio do ruído baixo depois da metade. Não está no GDD: ajustar no playtest.")]
