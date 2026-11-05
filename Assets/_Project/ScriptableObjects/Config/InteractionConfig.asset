@@ -36,3 +36,12 @@ MonoBehaviour:
   skillCheckMonsterNearShrink: 0.4
   skillCheckJitterBelowSanity: 35
   skillCheckJitterAmount: 0.04
+  lockerOpenDuration: 1
+  lockerNoiseRadius: 6
+  lockerLootChance: 0.6
+  lockerBatteryShare: 0.5
+  lockerAdrenaSynShare: 0
+  pityBatteryBelow: 20
+  pityDelay: 30
+  pityBonus: 0.15
+  pityLog: 1

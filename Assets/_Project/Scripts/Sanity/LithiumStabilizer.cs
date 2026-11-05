@@ -36,13 +36,21 @@ namespace SombraDaSanidade.Sanity
         {
             if (!CanInteract) return;
             used = true;
+            Hide();
+            ApplyEffect(sanity, this);
+        }
 
+        // Efeito do Estabilizador, também usado pelo sedativo dos armários (Locker, GDD 6).
+        // host roda a corrotina da lentidão: precisa continuar ativo até o fim do efeito.
+        public static void ApplyEffect(SanityController sanity, MonoBehaviour host)
+        {
+            if (sanity == null || sanity.Config == null) return;
             var config = sanity.Config;
             sanity.Add(config.stabilizerAmount);
-            Hide();
 
             var player = sanity.GetComponent<PlayerController>();
-            if (player != null) StartCoroutine(SlowDown(player, config.stabilizerSlowMultiplier, config.stabilizerSlowDuration));
+            if (player != null && host != null)
+                host.StartCoroutine(SlowDown(player, config.stabilizerSlowMultiplier, config.stabilizerSlowDuration));
         }
 
         // Multiplica e divide em vez de voltar para 1, para não apagar outro efeito (ex.: Adrena-Syn).
