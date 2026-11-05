@@ -4,9 +4,10 @@ using UnityEngine;
 
 namespace SombraDaSanidade.Interaction
 {
-    // Servidor com a Gaveta de HD (GDD 4.3). Frente 5 (Partida, HDs e build). Issue #11.
-    // Segurar E ejeta o HD: soma no GameManager (que acelera o monstro) e faz barulho.
-    public class DriveServer : MonoBehaviour, IInteractable
+    // Servidor com a Gaveta de HD (GDD 4.3). Issue #11; skill check (#33) da Frente 1.
+    // Segurar E ejeta o HD (12 s com skill check de multímetro): soma no GameManager (que acelera o monstro)
+    // e faz barulho. Depois da metade, o servidor faz ruído baixo enquanto ejeta.
+    public class DriveServer : MonoBehaviour, IInteractable, ISkillCheckable
     {
         [SerializeField] private InteractionConfig config;
         [Tooltip("Log de áudio tocado ao ejetar o HD (GDD 9: logs da Dra. Vance). Vazio na mini demo.")]
@@ -22,7 +23,15 @@ namespace SombraDaSanidade.Interaction
         // Disparado ao ejetar: gancho para logs, legendas e efeitos que vierem depois.
         public event Action<DriveServer> Ejected;
 
+        // Skill check (#33). Falhas ficam para o bônus do rank (#49).
+        public InteractionConfig SkillCheckConfig => config;
+        public bool CanSkillCheck => !ejected && config != null && SkillChecksDone < config.skillCheckMaxPerDrive;
+        public int SkillChecksDone { get; private set; }
+        public int SkillCheckFailures { get; private set; }
+        public event Action<DriveServer, SkillCheckResult> SkillCheckResolved;
+
         private bool ejected;
+        private float nextLateNoise;
 
         private void Awake()
         {
@@ -32,11 +41,40 @@ namespace SombraDaSanidade.Interaction
         private void Start()
         {
             if (indicator != null) indicator.color = loadedColor;
+            EnsurePlayerComponents();
         }
 
-        public void BeginInteract() { }
+        // Cenas geradas antes do #33 não têm o SkillCheck no jogador: cria aqui.
+        private static void EnsurePlayerComponents()
+        {
+            var interactor = FindAnyObjectByType<PlayerInteractor>();
+            if (interactor == null) return;
+            if (interactor.GetComponent<SkillCheck>() == null) interactor.gameObject.AddComponent<SkillCheck>();
+            if (interactor.GetComponent<UI.SkillCheckHud>() == null) interactor.gameObject.AddComponent<UI.SkillCheckHud>();
+        }
 
-        public void TickInteract(float progress) { }
+        public void BeginInteract()
+        {
+            nextLateNoise = 0f;
+        }
+
+        public void TickInteract(float progress)
+        {
+            if (progress < config.ejectLateNoiseFrom || Time.time < nextLateNoise) return;
+            nextLateNoise = Time.time + config.ejectLateNoiseInterval;
+            NoiseBus.Emit(transform.position, config.ejectLateNoiseRadius);
+        }
+
+        public void OnSkillCheckStarted()
+        {
+            SkillChecksDone++;
+        }
+
+        public void OnSkillCheckResolved(SkillCheckResult result)
+        {
+            if (result == SkillCheckResult.Fail) SkillCheckFailures++;
+            SkillCheckResolved?.Invoke(this, result);
+        }
 
         public void CancelInteract() { }
 
