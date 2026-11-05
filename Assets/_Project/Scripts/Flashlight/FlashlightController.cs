@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SombraDaSanidade.Core;
 using SombraDaSanidade.Monster;
 using SombraDaSanidade.Player;
+using SombraDaSanidade.UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
@@ -84,6 +85,8 @@ namespace SombraDaSanidade.Flashlight
 
         private void Update()
         {
+            // Tela de upgrade aberta: o clique é da tela, não da lanterna.
+            if (UpgradeTerminal.IsOpen) return;
             ReadToggle();
             Aim();
             ReadEmp();
