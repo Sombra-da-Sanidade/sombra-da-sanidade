@@ -5,6 +5,7 @@ using SombraDaSanidade.Core;
 using SombraDaSanidade.Flashlight;
 using SombraDaSanidade.Interaction;
 using SombraDaSanidade.Monster;
+using SombraDaSanidade.Narrative;
 using SombraDaSanidade.Player;
 using SombraDaSanidade.Sanity;
 using SombraDaSanidade.UI;
@@ -23,6 +24,7 @@ namespace SombraDaSanidade.EditorTools
     {
         private const string Root = "Assets/_Project";
         private const string ConfigDir = Root + "/ScriptableObjects/Config";
+        private const string NarrativeDir = Root + "/ScriptableObjects/Narrative";
         private const string PlaceholderSpritePath = Root + "/Art/Placeholder/square.png";
         private const string ThomasSheetPath = Root + "/Art/Sprites/thomas.png";
         public const string PrototypeScenePath = Root + "/Scenes/Sandbox/Prototipo.unity";
@@ -85,6 +87,8 @@ namespace SombraDaSanidade.EditorTools
             GetOrCreateConfig<SanityConfig>("SanityConfig");
             GetOrCreateConfig<MonsterConfig>("MonsterConfig");
             GetOrCreateConfig<InteractionConfig>("InteractionConfig");
+            GetOrCreateConfig<HudConfig>("HudConfig");
+            GetOrCreateConfig<NarrativeConfig>("NarrativeConfig");
             GetOrCreatePlaceholderSprite();
             DriveServerPrefabBuilder.GetOrBuild();
             int wallLayer = EnsureLayer(WallLayerName);
@@ -356,6 +360,8 @@ namespace SombraDaSanidade.EditorTools
             SetRef(hud, "flashlight", flashlight);
 
             SetRef(hud, "sanity", flashlight.GetComponent<SanityController>());
+            SetRef(hud, "config", GetOrCreateConfig<HudConfig>("HudConfig"));
+            SetRef(hud, "flashlightConfig", GetOrCreateConfig<FlashlightConfig>("FlashlightConfig"));
         }
 
         // ---------- Sanidade ----------
@@ -382,6 +388,19 @@ namespace SombraDaSanidade.EditorTools
             var so = new SerializedObject(hallucination);
             so.FindProperty("obstacles").intValue = 1 << wallLayer;
             so.ApplyModifiedPropertiesWithoutUndo();
+
+            var audioHallucination = new GameObject("SanityAudioHallucination").AddComponent<SanityAudioHallucination>();
+            SetRef(audioHallucination, "sanity", sanity);
+
+            // Logs da Dra. Vance: cada HD coletado toca o próximo (issue #39).
+            var logPlayer = new GameObject("AudioLogPlayer").AddComponent<AudioLogPlayer>();
+            SetRef(logPlayer, "config", GetOrCreateConfig<NarrativeConfig>("NarrativeConfig"));
+            var logs = new SerializedObject(logPlayer);
+            var driveLogs = logs.FindProperty("driveLogs");
+            string[] names = { "Vance01_Triagem", "Vance02_Contencao", "Vance03_Auditoria" };
+            driveLogs.arraySize = names.Length;
+            for (int i = 0; i < names.Length; i++) driveLogs.GetArrayElementAtIndex(i).objectReferenceValue = LoadAudioLog(names[i]);
+            logs.ApplyModifiedPropertiesWithoutUndo();
         }
 
         // Estabilizadores e pistas em fósforo. Textos provisórios até a Frente 4 ter os puzzles.
@@ -395,6 +414,41 @@ namespace SombraDaSanidade.EditorTools
             CreateClue(parent, "Clue_FusivelOeste", new Vector2(-7.5f, 2.2f), "FUSÍVEL 3-7-1", 0.06f);
             CreateClue(parent, "Clue_FusivelLeste", new Vector2(7.5f, 2.2f), "FUSÍVEL 9-0-2", 0.06f);
             CreateClue(parent, "Clue_Aviso", new Vector2(0f, -5.5f), "ELE SEGUE A LUZ", 0.1f);
+
+        }
+
+        internal static AudioLog LoadAudioLog(string name)
+        {
+            var log = AssetDatabase.LoadAssetAtPath<AudioLog>($"{NarrativeDir}/{name}.asset");
+            if (log == null) Debug.LogWarning($"Log {NarrativeDir}/{name}.asset não encontrado: o terminal fica sem gravação.");
+            return log;
+        }
+
+        // Terminal com um log extra (os principais tocam ao coletar os HDs). Tela verde piscando e luz fraca de fósforo.
+        // Frente 4: chamar nos mapas das alas, se o grupo quiser logs além dos 3 dos HDs.
+        internal static AudioLogTerminal CreateAudioLog(Transform parent, Sprite square, string name, Vector2 position, AudioLog log)
+        {
+            var go = CreateBlock(parent, square, name, position, new Vector2(0.7f, 0.5f), new Color(0.2f, 0.22f, 0.27f));
+            var col = go.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            col.size = new Vector2(2.5f, 3f); // compensa a escala pequena do bloco
+
+            var screen = CreateBlock(go.transform, square, "Screen", position + new Vector2(0f, 0.04f), new Vector2(0.75f, 0.6f), new Color(0.33f, 0.72f, 0.44f));
+            screen.transform.localScale = new Vector3(0.75f, 0.6f, 1f);
+            screen.GetComponent<SpriteRenderer>().sortingOrder = 6;
+
+            var glow = new GameObject("Glow").AddComponent<Light2D>();
+            glow.transform.SetParent(go.transform, false);
+            glow.lightType = Light2D.LightType.Point;
+            glow.color = new Color(0.33f, 0.72f, 0.44f);
+            glow.intensity = 0.35f;
+            glow.pointLightOuterRadius = 1.4f;
+
+            var terminal = go.AddComponent<AudioLogTerminal>();
+            SetRef(terminal, "log", log);
+            SetRef(terminal, "config", GetOrCreateConfig<NarrativeConfig>("NarrativeConfig"));
+            SetRef(terminal, "screen", screen.GetComponent<SpriteRenderer>());
+            return terminal;
         }
 
         internal static void CreateStabilizer(Transform parent, Sprite square, string name, Vector2 position)
