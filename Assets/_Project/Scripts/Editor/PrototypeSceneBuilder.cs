@@ -108,6 +108,7 @@ namespace SombraDaSanidade.EditorTools
             CreateSanityEffects(player.GetComponent<SanityController>(), square, wallLayer);
             CreateObjectives(square);
             CreateSanityItems(square);
+            CreateLockers(square);
             CreateMonster(new Vector2(16f, 10f));
 
             Directory.CreateDirectory(Path.GetDirectoryName(path));
@@ -412,6 +413,27 @@ namespace SombraDaSanidade.EditorTools
             glow.pointLightOuterRadius = 1.2f;
 
             go.AddComponent<LithiumStabilizer>();
+        }
+
+        // Frente 1. Dois armários no saguão, perto do spawn, para testar o loot (issue #29).
+        private static void CreateLockers(Sprite square)
+        {
+            var parent = new GameObject("Lockers").transform;
+            CreateLocker(parent, square, "Locker_Oeste", new Vector2(-10f, -13.2f));
+            CreateLocker(parent, square, "Locker_Leste", new Vector2(10f, -13.2f));
+        }
+
+        // Armário em bloco cinza encostado na parede, com o Locker (GDD 6: 60% de bateria ou sedativo).
+        internal static GameObject CreateLocker(Transform parent, Sprite square, string name, Vector2 position)
+        {
+            var go = CreateBlock(parent, square, name, position, new Vector2(0.9f, 0.6f), new Color(0.32f, 0.34f, 0.36f));
+            go.GetComponent<SpriteRenderer>().sortingOrder = -4;
+            var col = go.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            col.size = new Vector2(1.6f, 2.4f); // compensa a escala do bloco: ~1.4 x 1.4 no mundo
+            var locker = go.AddComponent<Locker>();
+            SetRef(locker, "config", GetOrCreateConfig<InteractionConfig>("InteractionConfig"));
+            return go;
         }
 
         // TextMesh usa material próprio (sem luz 2D): brilha no escuro como tinta de fósforo.
