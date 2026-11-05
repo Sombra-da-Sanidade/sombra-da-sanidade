@@ -32,6 +32,7 @@ namespace SombraDaSanidade.Interaction
         private bool opened;
         private FlashlightController flashlight;
         private SanityController sanity;
+        private BatteryPity pity;
         private float feedbackUntil;
         private string feedbackText;
         private GUIStyle feedbackStyle;
@@ -48,6 +49,7 @@ namespace SombraDaSanidade.Interaction
         {
             flashlight = FindAnyObjectByType<FlashlightController>();
             sanity = FindAnyObjectByType<SanityController>();
+            pity = BatteryPity.On(flashlight, config);
         }
 
         public void BeginInteract() { }
@@ -63,14 +65,33 @@ namespace SombraDaSanidade.Interaction
         }
 
         // Sorteio do GDD 6: lootChance de ter algo; dentro disso, batteryShare de ser bateria,
-        // adrenaSynShare de ser Adrena-Syn e o resto sedativo.
+        // adrenaSynShare de ser Adrena-Syn e o resto sedativo. O ajuste dinâmico (#47) soma pontos
+        // à chance de bateria, tirados da chance de vir vazio.
         public LootKind RollLoot()
         {
-            if (UnityEngine.Random.value >= config.lockerLootChance) return LootKind.Nothing;
+            float battery = config.lockerLootChance * config.lockerBatteryShare;
+            float adrena = config.lockerLootChance * Mathf.Min(config.lockerAdrenaSynShare, 1f - config.lockerBatteryShare);
+            float sedative = config.lockerLootChance - battery - adrena;
+            float bonus = pity != null ? pity.BonusChance : 0f;
+            return Pick(battery + bonus, sedative, adrena);
+        }
+
+        // Escolhe pelas chances absolutas. Se passarem de 1, os itens que não são bateria encolhem.
+        private static LootKind Pick(float battery, float sedative, float adrena)
+        {
+            battery = Mathf.Clamp01(battery);
+            float others = sedative + adrena;
+            if (battery + others > 1f && others > 0f)
+            {
+                float scale = (1f - battery) / others;
+                sedative *= scale;
+                adrena *= scale;
+            }
             float r = UnityEngine.Random.value;
-            if (r < config.lockerBatteryShare) return LootKind.Battery;
-            if (r < config.lockerBatteryShare + config.lockerAdrenaSynShare) return LootKind.AdrenaSyn;
-            return LootKind.Sedative;
+            if (r < battery) return LootKind.Battery;
+            if (r < battery + sedative) return LootKind.Sedative;
+            if (r < battery + sedative + adrena) return LootKind.AdrenaSyn;
+            return LootKind.Nothing;
         }
 
         // Separado do sorteio para os testes escolherem o conteúdo.
@@ -89,6 +110,7 @@ namespace SombraDaSanidade.Interaction
                 case LootKind.Battery:
                     float amount = flashlight != null && flashlight.Config != null ? flashlight.Config.batteryPickupAmount : 0f;
                     if (flashlight != null) flashlight.Recharge(amount);
+                    if (pity != null) pity.NotifyBatteryFound();
                     ShowFeedback($"Bateria +{amount:0}");
                     break;
                 case LootKind.Sedative:
