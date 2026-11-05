@@ -27,6 +27,7 @@ namespace SombraDaSanidade.EditorTools
         private static int waitFrames;
         private static float stepStart;
         private static float batteryAtStart;
+        private static float ejectTimeout = 4f;
         private static float sanityAtDark;
         private static Mouse mouse;
         private static Keyboard keyboard;
@@ -162,13 +163,15 @@ namespace SombraDaSanidade.EditorTools
                     // Leva o jogador ao primeiro servidor e segura E de verdade.
                     var server = Object.FindAnyObjectByType<DriveServer>();
                     Teleport(player, server.transform.position + Vector3.down * 1.1f);
+                    ejectTimeout = server.HoldDuration * 1.5f + 4f;
                     Press(Key.E);
                     stepStart = Time.time;
                     Next(5);
                     break;
 
                 case 8:
-                    if (gm.DrivesCollected < 1 && Time.time - stepStart < 4f) { waitFrames = 5; return; }
+                    // 12 s de ejeção mais as pausas de falha do skill check (sem apertar Espaço, os checks falham).
+                    if (gm.DrivesCollected < 1 && Time.time - stepStart < ejectTimeout) { waitFrames = 5; return; }
                     Release();
                     CheckInput($"Segurar E coleta um HD ({gm.DrivesCollected}/{gm.DrivesRequired})", gm.DrivesCollected == 1);
                     foreach (var s in Object.FindObjectsByType<DriveServer>())
