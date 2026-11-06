@@ -245,7 +245,10 @@ namespace SombraDaSanidade.EditorTools
                 noises++;
                 stunnedAtNoise = monster.IsStunned;
             };
+            EmpFailReason? failed = null;
+            System.Action<EmpFailReason> onFail = reason => failed = reason;
             NoiseBus.NoiseEmitted += onNoise;
+            flashlight.EmpFailed += onFail;
             try
             {
                 FireEmp(flashlight);
@@ -255,16 +258,17 @@ namespace SombraDaSanidade.EditorTools
 
                 FireEmp(flashlight);
                 Check("Sem carga mostra aviso e não emite outro ruído",
-                    EmpFeedback(flashlight) == "Carga insuficiente para EMP" && noises == 1);
+                    failed == EmpFailReason.NoCharge && noises == 1);
                 SetLight(flashlight, false);
                 FireEmp(flashlight);
                 Check("Lanterna desligada mostra aviso sem ruído ou gasto",
-                    EmpFeedback(flashlight) == "Lanterna desligada" && noises == 1
+                    failed == EmpFailReason.LightOff && noises == 1
                     && Mathf.Approximately(flashlight.Battery, 0f));
             }
             finally
             {
                 NoiseBus.NoiseEmitted -= onNoise;
+                flashlight.EmpFailed -= onFail;
             }
         }
 
@@ -272,10 +276,6 @@ namespace SombraDaSanidade.EditorTools
         private static void FireEmp(FlashlightController flashlight) =>
             typeof(FlashlightController).GetMethod("TryFireEmp", BindingFlags.Instance | BindingFlags.NonPublic)
                 .Invoke(flashlight, null);
-
-        private static string EmpFeedback(FlashlightController flashlight) =>
-            (string)typeof(FlashlightController).GetField("empFeedbackMessage", BindingFlags.Instance | BindingFlags.NonPublic)
-                .GetValue(flashlight);
 
         // Propriedades com private set: o teste ajusta por reflexão para não abrir a API do jogador e da lanterna.
         private static void SetFacing(PlayerController player, Vector2 dir) =>
