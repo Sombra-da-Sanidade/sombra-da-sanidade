@@ -24,6 +24,8 @@ namespace SombraDaSanidade.Interaction
         public float GreatSize { get; private set; }
         public SkillCheckResult LastResult { get; private set; }
         public bool IsPaused => Time.time < pauseUntil;
+        // Ponteiro tremendo pela sanidade baixa: o mostrador puxa para o roxo de Hipnos (SkillCheckHud).
+        public bool IsShaky { get; private set; }
 
         public event Action Warned;
         public event Action<SkillCheckResult> Resolved;
@@ -164,7 +166,8 @@ namespace SombraDaSanidade.Interaction
         // Sanidade baixa: o ponteiro treme (GDD 4.2, a mente atrapalha as mãos).
         private float Jitter(InteractionConfig config)
         {
-            if (sanity == null || sanity.Value >= config.skillCheckJitterBelowSanity) return 0f;
+            IsShaky = sanity != null && sanity.Value < config.skillCheckJitterBelowSanity;
+            if (!IsShaky) return 0f;
             return (Mathf.PerlinNoise(jitterSeed, Time.time * 12f) - 0.5f) * 2f * config.skillCheckJitterAmount;
         }
 

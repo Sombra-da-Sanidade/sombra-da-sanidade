@@ -4,70 +4,78 @@ using UnityEngine;
 
 namespace SombraDaSanidade.UI
 {
-    // Mostrador provisório do skill check (multímetro), em OnGUI no padrão do prompt do PlayerInteractor.
-    // A arte final segue o estilo do HUD da Frente 3. Frente 1. Issue #33.
+    // Multímetro do skill check (art-src/UI/skillcheck.json), ao lado do Thomas durante a ejeção do HD.
+    // O sprite é a caixa e o mostrador; a faixa good/great e o ponteiro são pintados por cima a partir do
+    // arco guardado no HudArt. Aviso: LED e borda piscando. Resultado: mostrador aceso (great) ou faísca (falha).
+    // Sem arte (HudArt ausente) não desenha nada. Frente 1, estilo da Frente 3. Issues #33 e #64.
     [RequireComponent(typeof(SkillCheck))]
     public class SkillCheckHud : MonoBehaviour
     {
-        [SerializeField] private Vector2 size = new Vector2(260f, 22f);
-        [SerializeField] private float heightAbovePlayer = 1.6f;
+        [Tooltip("Posição do canto superior esquerdo do multímetro em relação ao Thomas, em unidades do mundo.")]
+        [SerializeField] private Vector2 worldOffset = new Vector2(-3.4f, 1.6f);
 
         private SkillCheck check;
-        private GUIStyle labelStyle;
-
-        private static readonly Color Back = new Color(0.05f, 0.08f, 0.05f, 0.9f);
-        private static readonly Color Good = new Color(0.3f, 0.8f, 0.35f);
-        private static readonly Color Great = new Color(0.75f, 1f, 0.6f);
-        private static readonly Color Needle = new Color(1f, 0.92f, 0.75f);
-        private static readonly Color Fail = new Color(0.9f, 0.25f, 0.2f);
+        private float resultStart;
+        private SkillCheckState lastState;
 
         private void Awake()
         {
             check = GetComponent<SkillCheck>();
         }
 
-        private void OnGUI()
+        private void Update()
         {
-            if (check == null || check.State == SkillCheckState.Idle) return;
-            if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) return;
-            var cam = Camera.main;
-            if (cam == null) return;
-
-            labelStyle ??= new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 16, fontStyle = FontStyle.Bold };
-
-            Vector3 screen = cam.WorldToScreenPoint(transform.position + Vector3.up * heightAbovePlayer);
-            var rect = new Rect(screen.x - size.x * 0.5f, Screen.height - screen.y - size.y, size.x, size.y);
-
-            if (check.State == SkillCheckState.Warning)
-            {
-                labelStyle.normal.textColor = Needle;
-                GUI.Label(new Rect(rect.x, rect.y - 4f, rect.width, rect.height), "! CALIBRAR [ESPAÇO]", labelStyle);
-                return;
-            }
-
-            Fill(rect, Back);
-            Fill(Part(rect, check.ZoneStart, check.ZoneSize), Good);
-            Fill(Part(rect, check.ZoneStart, check.GreatSize), Great);
-            Fill(new Rect(rect.x + rect.width * check.NeedlePosition - 1.5f, rect.y - 4f, 3f, rect.height + 8f), Needle);
-
-            if (check.State == SkillCheckState.Result)
-            {
-                labelStyle.normal.textColor = check.LastResult == SkillCheckResult.Fail ? Fail : Great;
-                string text = check.LastResult == SkillCheckResult.Great ? "PERFEITO"
-                    : check.LastResult == SkillCheckResult.Good ? "OK" : "CURTO-CIRCUITO";
-                GUI.Label(new Rect(rect.x, rect.y - rect.height - 4f, rect.width, rect.height), text, labelStyle);
-            }
+            if (check == null) return;
+            if (check.State == SkillCheckState.Result && lastState != SkillCheckState.Result) resultStart = Time.time;
+            lastState = check.State;
         }
 
-        private static Rect Part(Rect r, float start, float length) =>
-            new Rect(r.x + r.width * start, r.y, r.width * length, r.height);
-
-        private static void Fill(Rect r, Color c)
+        private void OnGUI()
         {
-            var old = GUI.color;
-            GUI.color = c;
-            GUI.DrawTexture(r, Texture2D.whiteTexture);
-            GUI.color = old;
+            if (Event.current.type != EventType.Repaint) return;
+            if (check == null || check.State == SkillCheckState.Idle) return;
+            if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) return;
+            var art = HudArt.Instance;
+            var cam = Camera.main;
+            if (art == null || cam == null) return;
+
+            PixelHud.Begin();
+            var origin = PixelHud.WorldToGame(cam, transform.position + (Vector3)worldOffset);
+            int x = origin.x, y = origin.y;
+            bool blink = Mathf.Repeat(Time.time * 8f, 1f) < 0.5f;
+            bool insane = check.IsShaky;
+
+            string frame = insane ? "dial_hipnos" : "dial_body";
+            if (check.State == SkillCheckState.Warning) frame = blink ? "dial_warn_0" : "dial_warn_1";
+            else if (check.State == SkillCheckState.Result)
+            {
+                if (check.LastResult == SkillCheckResult.Fail)
+                    frame = "dial_fail_" + Mathf.Min(2, Mathf.FloorToInt((Time.time - resultStart) * 6f));
+                else if (check.LastResult == SkillCheckResult.Great)
+                    frame = blink ? "dial_great_0" : "dial_great_1";
+            }
+            if (!PixelHud.Sprite("skillcheck", frame, x, y)) return;
+
+            bool showZone = check.State == SkillCheckState.Active
+                || (check.State == SkillCheckState.Result && check.LastResult == SkillCheckResult.Good);
+            if (showZone)
+            {
+                float start = check.ZoneStart, good = start + check.ZoneSize, great = start + check.GreatSize;
+                foreach (var p in art.dialArc)
+                {
+                    if (p.z < start || p.z > good) continue;
+                    PixelHud.Box(x + (int)p.x, y + (int)p.y, 1, 1, p.z <= great ? PixelHud.Fosforo5 : PixelHud.Fosforo4);
+                }
+            }
+
+            if (check.State == SkillCheckState.Active || check.State == SkillCheckState.Result)
+            {
+                // NeedlePosition já traz o tremor da sanidade baixa (SkillCheck).
+                float a = Mathf.Lerp(art.dialAngles.x, art.dialAngles.y, Mathf.Clamp01(check.NeedlePosition)) * Mathf.Deg2Rad;
+                int x1 = Mathf.RoundToInt(art.dialPivot.x + art.dialNeedleRadius * Mathf.Cos(a));
+                int y1 = Mathf.RoundToInt(art.dialPivot.y - art.dialNeedleRadius * Mathf.Sin(a));
+                PixelHud.Line(x + art.dialPivot.x, y + art.dialPivot.y, x + x1, y + y1, PixelHud.Concreto8);
+            }
         }
     }
 }
