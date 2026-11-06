@@ -6,6 +6,7 @@ using SombraDaSanidade.Player;
 using SombraDaSanidade.Sanity;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static SombraDaSanidade.UI.PixelHud;
 
 namespace SombraDaSanidade.UI
 {
@@ -20,26 +21,6 @@ namespace SombraDaSanidade.UI
     // Tudo é desenhado em "pixels de jogo" (base 320x180, escala inteira) para casar com a Pixel Perfect Camera.
     public class DemoHud : MonoBehaviour
     {
-        // Paleta do jogo (art-src/palette.json).
-        private static readonly Color Vazio = Hex(0x0b0c10);
-        private static readonly Color Concreto1 = Hex(0x161920);
-        private static readonly Color Concreto2 = Hex(0x222630);
-        private static readonly Color Concreto3 = Hex(0x313744);
-        private static readonly Color Concreto4 = Hex(0x444b59);
-        private static readonly Color Concreto5 = Hex(0x5d6573);
-        private static readonly Color Concreto7 = Hex(0xa1a8b2);
-        private static readonly Color Concreto8 = Hex(0xd3d6da);
-        private static readonly Color Fosforo1 = Hex(0x0e2a22);
-        private static readonly Color Fosforo2 = Hex(0x1a4d3a);
-        private static readonly Color Fosforo4 = Hex(0x55b870);
-        private static readonly Color Fosforo5 = Hex(0xa9f294);
-        private static readonly Color Eletrico4 = Hex(0x5bb2ff);
-        private static readonly Color Emergencia3 = Hex(0xa1222c);
-        private static readonly Color Emergencia4 = Hex(0xdf4139);
-        private static readonly Color Ambar1 = Hex(0xc8922c);
-        private static readonly Color Ambar2 = Hex(0xf6d878);
-        private static readonly Color Hipnos2 = Hex(0x7e4a8a);
-
         private const int BatterySegments = 4;
         private const int EcgWidth = 44;
         private const int EcgHeight = 20;
@@ -84,7 +65,6 @@ namespace SombraDaSanidade.UI
         private float hintUntil;
 
         private GUIStyle textStyle;
-        private int px; // tamanho de um pixel de jogo na tela
 
         private void Start()
         {
@@ -289,7 +269,7 @@ namespace SombraDaSanidade.UI
             if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) return;
             if (Event.current.type != EventType.Repaint) return;
 
-            px = Mathf.Max(2, Mathf.FloorToInt(Screen.height / 180f));
+            Begin();
             textStyle ??= new GUIStyle(GUI.skin.label) { alignment = TextAnchor.UpperLeft, wordWrap = false, richText = false };
 
             DrawBatteryNearPlayer();
@@ -312,7 +292,7 @@ namespace SombraDaSanidade.UI
             if (alpha <= 0f) return;
 
             Vector3 screen = cam.WorldToScreenPoint(flashlight.transform.position + new Vector3(0.9f, 1.9f, 0f));
-            int x = Mathf.RoundToInt(screen.x / px), y = Mathf.RoundToInt((Screen.height - screen.y) / px);
+            int x = Mathf.RoundToInt(screen.x / Px), y = Mathf.RoundToInt((Screen.height - screen.y) / Px);
             DrawBattery(x, y, alpha);
         }
 
@@ -364,8 +344,8 @@ namespace SombraDaSanidade.UI
         {
             int w = 62, h = 46;
             float ease = 1f - (1f - watchRaise) * (1f - watchRaise);
-            int x = Screen.width / px - w - 8;
-            int y = Mathf.RoundToInt(Mathf.Lerp(Screen.height / (float)px + 4, Screen.height / (float)px - h - 8, ease));
+            int x = Screen.width / Px - w - 8;
+            int y = Mathf.RoundToInt(Mathf.Lerp(Screen.height / (float)Px + 4, Screen.height / (float)Px - h - 8, ease));
 
             // Pulseira, caixa e bisel
             Box(x + 14, y - 6, 34, 6, Concreto2, 1f);
@@ -381,7 +361,7 @@ namespace SombraDaSanidade.UI
             if (ecg != null)
             {
                 GUI.color = Color.white;
-                GUI.DrawTexture(new Rect(sx * px, sy * px, EcgWidth * px, EcgHeight * px), ecg);
+                GUI.DrawTexture(new Rect(sx * Px, sy * Px, EcgWidth * Px, EcgHeight * Px), ecg);
             }
             DrawDrives(sx, sy + EcgHeight + 3, watch: true);
             if (flashlight != null) DrawBattery(sx + EcgWidth - 15, sy + EcgHeight + 4, 1f);
@@ -397,14 +377,14 @@ namespace SombraDaSanidade.UI
             var player = AudioLogPlayer.Instance;
             if (player == null || !player.IsPlaying) return;
 
-            textStyle.fontSize = px * 5;
-            float bottom = Screen.height - px * 26;
+            textStyle.fontSize = Px * 5;
+            float bottom = Screen.height - Px * 26;
 
             if (player.SignalLost)
             {
                 const string lost = "— sinal perdido —";
                 var lostSize = textStyle.CalcSize(new GUIContent(lost));
-                float jitter = Random.Range(-1, 2) * px;
+                float jitter = Random.Range(-1, 2) * Px;
                 Label(new UnityEngine.Rect((Screen.width - lostSize.x) / 2f + jitter, bottom, lostSize.x, lostSize.y), lost, Emergencia4, 0.9f);
                 return;
             }
@@ -427,64 +407,42 @@ namespace SombraDaSanidade.UI
         {
             if (hintKey == null || cam == null || flashlight == null) return;
             float alpha = Mathf.Clamp01((hintUntil - Time.time) / 0.5f);
-            textStyle.fontSize = px * 4;
+            textStyle.fontSize = Px * 4;
 
             Vector3 screen = cam.WorldToScreenPoint(flashlight.transform.position + new Vector3(0f, 2.6f, 0f));
             var keySize = textStyle.CalcSize(new GUIContent(hintKey));
             var labelSize = textStyle.CalcSize(new GUIContent(hintLabel));
-            float total = keySize.x + px * 4 + px * 3 + labelSize.x;
+            float total = keySize.x + Px * 4 + Px * 3 + labelSize.x;
             float left = screen.x - total / 2f, top = Screen.height - screen.y;
 
-            var key = new UnityEngine.Rect(left, top, keySize.x + px * 4, keySize.y + px);
+            var key = new UnityEngine.Rect(left, top, keySize.x + Px * 4, keySize.y + Px);
             Fill(key, Concreto5, alpha);
-            Fill(new UnityEngine.Rect(key.x + px, key.y + px, key.width - 2 * px, key.height - 3 * px), Concreto1, alpha);
-            Label(new UnityEngine.Rect(key.x + px * 2, key.y, keySize.x, keySize.y), hintKey, Concreto8, alpha);
-            Label(new UnityEngine.Rect(key.xMax + px * 3, top, labelSize.x, labelSize.y), hintLabel, Concreto7, alpha);
+            Fill(new UnityEngine.Rect(key.x + Px, key.y + Px, key.width - 2 * Px, key.height - 3 * Px), Concreto1, alpha);
+            Label(new UnityEngine.Rect(key.x + Px * 2, key.y, keySize.x, keySize.y), hintKey, Concreto8, alpha);
+            Label(new UnityEngine.Rect(key.xMax + Px * 3, top, labelSize.x, labelSize.y), hintLabel, Concreto7, alpha);
         }
 
         // Barra MENTE antiga, só para depuração (F3 ou HudConfig.showSanityDebugBar). Issue #16.
         private void DrawDebugBar()
         {
             if (sanity == null || !sanity.enabled) return;
-            int x = Screen.width / px - 58, y = 6;
+            int x = Screen.width / Px - 58, y = 6;
             Box(x, y, 52, 4, Concreto2, 0.9f);
             Box(x, y, Mathf.RoundToInt(52 * sanity.Ratio), 4, Color.Lerp(Emergencia4, Fosforo4, sanity.Ratio), 0.9f);
-            textStyle.fontSize = px * 3;
+            textStyle.fontSize = Px * 3;
             string text = $"MENTE {sanity.Value:0}  {sanity.State}" + (heartbeat != null ? $"  {heartbeat.Tier} {heartbeat.Bpm:0}bpm" : "");
-            Label(new UnityEngine.Rect((x - 2) * px - 200, (y + 5) * px, 200 + 54 * px, px * 5), text, Concreto7, 0.9f);
-        }
-
-        // ---------- Primitivas ----------
-
-        // Retângulo em pixels de jogo.
-        private void Box(int x, int y, int w, int h, Color color, float alpha) =>
-            Fill(new UnityEngine.Rect(x * px, y * px, w * px, h * px), color, alpha);
-
-        private static void Fill(UnityEngine.Rect rect, Color color, float alpha)
-        {
-            GUI.color = new Color(color.r, color.g, color.b, alpha);
-            GUI.DrawTexture(rect, Texture2D.whiteTexture);
+            Label(new UnityEngine.Rect((x - 2) * Px - 200, (y + 5) * Px, 200 + 54 * Px, Px * 5), text, Concreto7, 0.9f);
         }
 
         private void Label(UnityEngine.Rect rect, string text, Color color, float alpha)
         {
             var shadow = rect;
-            shadow.position += new Vector2(px * 0.5f, px * 0.5f);
+            shadow.position += new Vector2(Px * 0.5f, Px * 0.5f);
             textStyle.normal.textColor = new Color(0f, 0f, 0f, alpha * 0.85f);
             GUI.color = Color.white;
             GUI.Label(shadow, text, textStyle);
             textStyle.normal.textColor = new Color(color.r, color.g, color.b, alpha);
             GUI.Label(rect, text, textStyle);
         }
-
-        // 1 até "until", depois cai até 0 em "fadeSeconds". 0 se nunca foi mostrado.
-        private static float Fade(float until, float fadeSeconds)
-        {
-            if (until <= 0f) return 0f;
-            if (Time.time < until) return 1f;
-            return Mathf.Clamp01(1f - (Time.time - until) / fadeSeconds);
-        }
-
-        private static Color Hex(int rgb) => new Color(((rgb >> 16) & 0xff) / 255f, ((rgb >> 8) & 0xff) / 255f, (rgb & 0xff) / 255f);
     }
 }
