@@ -86,8 +86,8 @@ namespace SombraDaSanidade.Flashlight
 
         private void Update()
         {
-            // Tela de upgrade aberta: o clique é da tela, não da lanterna.
-            if (UpgradeTerminal.IsOpen) return;
+            // Tela de upgrade ou painel aberto: o clique é da tela, não da lanterna.
+            if (UpgradeTerminal.IsOpen || ModalScreen.IsOpen) return;
             ReadToggle();
             Aim();
             ReadEmp();
