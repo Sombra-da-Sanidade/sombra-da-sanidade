@@ -21,7 +21,6 @@ namespace SombraDaSanidade.Interaction
 
         private readonly Collider2D[] hits = new Collider2D[16];
         private Vector2 channelStartPos;
-        private GUIStyle promptStyle;
         private float pausedUntil;
 
         private void Update()
@@ -116,22 +115,32 @@ namespace SombraDaSanidade.Interaction
         }
 
         // Prompt provisório para a mini demo. A UI final fica com o sistema de UI.
+        // Prompt sem número (GDD 8): tecla E e o nome da ação; segurando, a barra enche (hud_bars.json).
+        // Fica sob os pés do Thomas para não brigar com a pilha e o multímetro. Issue #64.
         private void OnGUI()
         {
+            if (Event.current.type != EventType.Repaint) return;
             if (Current == null || !Current.CanInteract) return;
             if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) return;
+            if (UI.UpgradeTerminal.IsOpen || UI.ModalScreen.IsOpen) return;
             var cam = Camera.main;
-            if (cam == null) return;
+            if (cam == null || !UI.PixelHud.HasArt) return;
 
-            promptStyle ??= new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 16 };
-            promptStyle.normal.textColor = new Color(0.75f, 0.95f, 0.75f);
-
-            Vector3 screen = cam.WorldToScreenPoint(transform.position + Vector3.up * 0.9f);
-            var rect = new Rect(screen.x - 150, Screen.height - screen.y - 30, 300, 24);
-            string text = IsChanneling
-                ? $"{Current.Prompt}... {Mathf.RoundToInt(Progress * 100)}%"
-                : $"[E] {Current.Prompt}";
-            GUI.Label(rect, text, promptStyle);
+            UI.PixelHud.Begin();
+            var p = UI.PixelHud.WorldToGame(cam, transform.position + Vector3.down * 0.35f);
+            if (IsChanneling)
+            {
+                string bar = IsProgressPaused ? "hold_paused" : "hold_" + Mathf.Clamp(Mathf.RoundToInt(Progress * 8f), 0, 8);
+                UI.PixelHud.Sprite("hud_icons", "key_e", p.x - 13, p.y);
+                UI.PixelHud.Sprite("hud_bars", bar, p.x - 3, p.y);
+                return;
+            }
+            string label = Current.Prompt;
+            int width = 8 + 3 + UI.PixelHud.TextWidth(label);
+            int left = p.x - width / 2;
+            UI.PixelHud.Sprite("hud_icons", "key_e", left, p.y);
+            UI.PixelHud.Box(left + 11, p.y + 1, width - 11 + 2, 7, UI.PixelHud.Vazio, 0.55f);
+            UI.PixelHud.Text(label, left + 12, p.y + 2, UI.PixelHud.Concreto7);
         }
     }
 }
