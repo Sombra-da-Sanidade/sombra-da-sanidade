@@ -11,14 +11,14 @@ using UnityEngine;
 namespace SombraDaSanidade.EditorTools
 {
     // Aplica as regras de importação de pixel art (docs/arte/guia-de-estilo.md) a tudo em
-    // Art/Tiles, Art/Sprites, Art/Monster, Art/Portraits e Art/Palette, e fatia as folhas usando o JSON de art-src/
+    // Art/Tiles, Art/Sprites, Art/Monster, Art/Portraits, Art/Props e Art/Palette, e fatia as folhas usando o JSON de art-src/
     // (mesmo arquivo que tools/art/export_sprites.py usa para gerar o PNG).
     public class PixelArtImporter : AssetPostprocessor
     {
         // Tile de 16px = 1 unidade do mundo (guia de estilo, "Escala").
         public const int PixelsPerUnit = 16;
         private const string ArtRoot = "Assets/_Project/Art/";
-        private static readonly string[] Categories = { "Tiles", "Sprites", "Monster", "Portraits", "Palette" };
+        private static readonly string[] Categories = { "Tiles", "Sprites", "Monster", "Portraits", "Props", "Palette" };
 
         [Serializable]
         private class Sheet

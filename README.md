@@ -6,7 +6,9 @@ Survival horror psicológico em 2D top-down feito em Unity para a disciplina de 
 
 ## Jogar no navegador
 
-Mini demo (WebGL): https://sombra-da-sanidade.github.io/sombra-da-sanidade/
+Versão beta (WebGL): https://sombra-da-sanidade.github.io/sombra-da-sanidade/
+
+A cena publicada é a [Beta](docs/beta.md): mapa gerado com tudo o que já foi implementado e painel de teste no F1.
 
 Para publicar uma versão nova: gere o build pelo menu **Sombra da Sanidade > Build WebGL** e rode `tools/publish-webgl.sh`. O script envia `Builds/WebGL` para o branch `gh-pages`.
 
@@ -29,6 +31,13 @@ Para publicar uma versão nova: gere o build pelo menu **Sombra da Sanidade > Bu
 | Mirar lanterna | Mouse |
 | Ligar / desligar lanterna | F ou clique esquerdo |
 | Pulso EMP | Clique direito |
+| Interagir (armário, disjuntor, HD, terminal) | Segurar E |
+| Skill check do multímetro | Espaço |
+| Escolher upgrade da Lux-90 | 1 / 2 |
+| Modo econômico (Filtro Âmbar) | Q |
+| Relógio | Tab |
+| Reiniciar no fim | R |
+| Painel de teste (só na Beta) | F1 (F2 força skill check) |
 
 ## Documentação
 
@@ -39,6 +48,10 @@ Para publicar uma versão nova: gere o build pelo menu **Sombra da Sanidade > Bu
 | [docs/gdd/gdd-v1.1-propostas.md](docs/gdd/gdd-v1.1-propostas.md) | Propostas para responder ao feedback do professor |
 | [docs/equipe.md](docs/equipe.md) | As 5 frentes de trabalho e como escolher uma |
 | [docs/mini-demo.md](docs/mini-demo.md) | Plano da mini demo (29/10) |
+| [docs/beta.md](docs/beta.md) | Cena Beta: mapa gerado por seed para testar tudo |
+| [docs/jogador.md](docs/jogador.md) | Armários, loot, Adrena-Syn e ajuste de bateria |
+| [docs/upgrades-lux90.md](docs/upgrades-lux90.md) | Upgrades da Lux-90 ao ejetar HD |
+| [docs/skill-check-hd.md](docs/skill-check-hd.md) | Skill check de multímetro na ejeção de HD |
 | [docs/monstro.md](docs/monstro.md) | Espécime Vazio: estados, regras e contratos da IA |
 | [docs/sanidade.md](docs/sanidade.md) | Sanidade: dreno, efeitos, batimento em 3 faixas |
 | [docs/hud.md](docs/hud.md) | HUD diegético: pilha, HDs, relógio no Tab, legendas |

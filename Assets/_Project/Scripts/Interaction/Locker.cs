@@ -19,6 +19,8 @@ namespace SombraDaSanidade.Interaction
         [SerializeField] private SpriteRenderer body;
         [Tooltip("Fração da cor original depois de aberto (marca visual de armário já saqueado).")]
         [SerializeField, Range(0f, 1f)] private float openedTint = 0.45f;
+        [Tooltip("Sprite do armário aberto (Art/Props). Vazio: só escurece o sprite atual.")]
+        [SerializeField] private Sprite openedSprite;
         [Tooltip("Tabela de loot da ala (extra #46). Vazio: usa as chances fixas do InteractionConfig (GDD 6).")]
         [SerializeField] private LootTable table;
 
@@ -158,7 +160,8 @@ namespace SombraDaSanidade.Interaction
             opened = true;
             Loot = loot;
 
-            if (body != null) body.color = new Color(body.color.r * openedTint, body.color.g * openedTint, body.color.b * openedTint, body.color.a);
+            if (body != null && openedSprite != null) body.sprite = openedSprite;
+            else if (body != null) body.color = new Color(body.color.r * openedTint, body.color.g * openedTint, body.color.b * openedTint, body.color.a);
             // Porta de metal: o monstro pode ouvir (GDD 4.3, interações fazem barulho).
             NoiseBus.Emit(transform.position, config.lockerNoiseRadius);
 

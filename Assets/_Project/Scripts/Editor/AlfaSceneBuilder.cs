@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -59,6 +60,25 @@ namespace SombraDaSanidade.EditorTools
         {
             var map = LoadLayout(layoutFile);
             if (map == null) return;
+            BuildFromLayout(map, scenePath, drivesRequired, (x, y) => wing ?? Wing(x, map.Width));
+        }
+
+        // O que a cena montada oferece a quem quer acrescentar coisas antes de salvar (ex.: a Beta).
+        internal class BuildContext
+        {
+            public Layout Map;
+            public Transform Objectives;
+            public Transform Items;
+            public GameObject Player;
+            public Sprite Square;
+            public int WallLayer;
+        }
+
+        // Monta a cena a partir de uma planta já carregada ou gerada. wingAt dá o nome da ala de cada célula
+        // (tabela de loot dos armários e nome dos objetivos). extras roda antes de salvar.
+        internal static void BuildFromLayout(Layout map, string scenePath, int drivesRequired,
+            Func<int, int, string> wingAt, Action<BuildContext> extras = null)
+        {
 
             // Assets antes de trocar de cena (mesmo motivo do PrototypeSceneBuilder).
             ArtTestSceneBuilder.LoadOrCreateTiles();
@@ -100,8 +120,8 @@ namespace SombraDaSanidade.EditorTools
                     var inFront = center + Vector2.down;   // célula de chão logo abaixo da face da parede
                     switch (c)
                     {
-                        case 'S': CreateServer(objectives, square, $"DriveServer_{wing ?? Wing(x, map.Width)}", inFront, center); break;
-                        case 'K': CreateBreaker(objectives, square, $"Breaker_{wing ?? Wing(x, map.Width)}_{++breakers}", inFront); break;
+                        case 'S': CreateServer(objectives, square, $"DriveServer_{wingAt(x, y)}", inFront, center); break;
+                        case 'K': CreateBreaker(objectives, square, $"Breaker_{wingAt(x, y)}_{++breakers}", inFront); break;
                         case 'E': exitCells.Add(new Vector2Int(x, y)); break;
                         case '@': playerSpawn = center; break;
                         case 'M': monsterSpawn = center; break;
@@ -110,7 +130,7 @@ namespace SombraDaSanidade.EditorTools
                         case 'a': PrototypeSceneBuilder.CreateAdrenaSyn(items, square, $"AdrenaSyn_{x}_{y}", center); break;
                         case 'A':
                             if (lockers == null) lockers = new GameObject("Lockers").transform;
-                            CreateLocker(lockers, square, $"Locker_{wing ?? Wing(x, map.Width)}_{x}_{y}", center, wing ?? Wing(x, map.Width));
+                            CreateLocker(lockers, square, $"Locker_{wingAt(x, y)}_{x}_{y}", center, wingAt(x, y));
                             break;
                     }
                 }
@@ -124,6 +144,11 @@ namespace SombraDaSanidade.EditorTools
             PrototypeSceneBuilder.CreateSanityEffects(player.GetComponent<SanityController>(), square, wallLayer);
             PrototypeSceneBuilder.CreateMonster(monsterSpawn, patrol);
 
+            extras?.Invoke(new BuildContext
+            {
+                Map = map, Objectives = objectives, Items = items, Player = player, Square = square, WallLayer = wallLayer
+            });
+
             Directory.CreateDirectory(Path.GetDirectoryName(scenePath));
             EditorSceneManager.SaveScene(scene, scenePath);
             PrototypeSceneBuilder.AddSceneToBuild(scenePath);
@@ -132,7 +157,7 @@ namespace SombraDaSanidade.EditorTools
 
         // ---------- Planta ----------
 
-        private class Layout
+        internal class Layout
         {
             public int Width, Height;
             public char[,] Cells;   // [x, y], y = 0 embaixo
