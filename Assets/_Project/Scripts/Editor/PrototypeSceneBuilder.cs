@@ -27,6 +27,7 @@ namespace SombraDaSanidade.EditorTools
         private const string NarrativeDir = Root + "/ScriptableObjects/Narrative";
         private const string PlaceholderSpritePath = Root + "/Art/Placeholder/square.png";
         private const string ThomasSheetPath = Root + "/Art/Sprites/thomas.png";
+        private const string PropsSheetPath = Root + "/Art/Props/props.png";
         public const string PrototypeScenePath = Root + "/Scenes/Sandbox/Prototipo.unity";
         public const string DemoScenePath = Root + "/Scenes/Main/Demo.unity";
         internal const string WallLayerName = "Walls";
@@ -442,6 +443,13 @@ namespace SombraDaSanidade.EditorTools
             var screen = CreateBlock(go.transform, square, "Screen", position + new Vector2(0f, 0.04f), new Vector2(0.75f, 0.6f), new Color(0.33f, 0.72f, 0.44f));
             screen.transform.localScale = new Vector3(0.75f, 0.6f, 1f);
             screen.GetComponent<SpriteRenderer>().sortingOrder = 6;
+            var screenRenderer = screen.GetComponent<SpriteRenderer>();
+            // Sprite do terminal (Art/Props): a tela acesa é uma camada por cima, que pisca enquanto a fita toca.
+            if (UseProp(go, "log_terminal_off", new Vector2(1.6f, 1.6f), 5) != null)
+            {
+                Object.DestroyImmediate(screen);
+                screenRenderer = AddPropLayer(go, "log_terminal_on", 6);
+            }
 
             var glow = new GameObject("Glow").AddComponent<Light2D>();
             glow.transform.SetParent(go.transform, false);
@@ -453,7 +461,7 @@ namespace SombraDaSanidade.EditorTools
             var terminal = go.AddComponent<AudioLogTerminal>();
             SetRef(terminal, "log", log);
             SetRef(terminal, "config", GetOrCreateConfig<NarrativeConfig>("NarrativeConfig"));
-            SetRef(terminal, "screen", screen.GetComponent<SpriteRenderer>());
+            SetRef(terminal, "screen", screenRenderer);
             return terminal;
         }
 
@@ -463,6 +471,7 @@ namespace SombraDaSanidade.EditorTools
             var col = go.AddComponent<BoxCollider2D>();
             col.isTrigger = true;
             col.size = new Vector2(2.5f, 2f); // compensa a escala pequena do bloco
+            UseProp(go, "stabilizer", new Vector2(1.2f, 1.2f), 5);
 
             var glow = new GameObject("Glow").AddComponent<Light2D>();
             glow.transform.SetParent(go.transform, false);
@@ -490,6 +499,7 @@ namespace SombraDaSanidade.EditorTools
             var col = go.AddComponent<BoxCollider2D>();
             col.isTrigger = true;
             col.size = new Vector2(3f, 2f); // compensa a escala pequena do bloco
+            UseProp(go, "adrena_syn", new Vector2(1.2f, 1.2f), 5);
 
             var glow = new GameObject("Glow").AddComponent<Light2D>();
             glow.transform.SetParent(go.transform, false);
@@ -511,8 +521,14 @@ namespace SombraDaSanidade.EditorTools
             var col = go.AddComponent<BoxCollider2D>();
             col.isTrigger = true;
             col.size = new Vector2(1.6f, 2.4f); // compensa a escala do bloco: ~1.4 x 1.4 no mundo
+            var art = UseProp(go, "locker_closed", new Vector2(1.4f, 1.4f), -4);
             var locker = go.AddComponent<Locker>();
             SetRef(locker, "config", GetOrCreateConfig<InteractionConfig>("InteractionConfig"));
+            if (art != null)
+            {
+                SetRef(locker, "body", art);
+                SetRef(locker, "openedSprite", LoadPropSprite("locker_open"));
+            }
             if (table != null) SetRef(locker, "table", table);
             return go;
         }
@@ -546,6 +562,34 @@ namespace SombraDaSanidade.EditorTools
         }
 
         // ---------- Helpers ----------
+
+        // Sprite da folha Art/Props (art-src/Props/props.json). Null se a folha ainda não foi importada.
+        internal static Sprite LoadPropSprite(string spriteName) =>
+            AssetDatabase.LoadAllAssetsAtPath(PropsSheetPath).OfType<Sprite>().FirstOrDefault(s => s.name == spriteName);
+
+        // Troca o bloco placeholder pelo sprite de Art/Props: o desenho vai num filho "Art" com o pivô nos pés,
+        // perto da base da célula, e o bloco raiz volta para escala 1 com o renderer desligado.
+        // Sem a folha, não muda nada e retorna null (o bloco colorido continua valendo).
+        internal static SpriteRenderer UseProp(GameObject go, string spriteName, Vector2 triggerSize, int sortingOrder)
+        {
+            if (LoadPropSprite(spriteName) == null) return null;
+            go.transform.localScale = Vector3.one;
+            go.GetComponent<SpriteRenderer>().enabled = false;
+            var col = go.GetComponent<BoxCollider2D>();
+            if (col != null) col.size = triggerSize;
+            return AddPropLayer(go, spriteName, sortingOrder);
+        }
+
+        internal static SpriteRenderer AddPropLayer(GameObject go, string spriteName, int sortingOrder)
+        {
+            var art = new GameObject(spriteName);
+            art.transform.SetParent(go.transform, false);
+            art.transform.localPosition = new Vector3(0f, -0.45f, 0f);
+            var sr = art.AddComponent<SpriteRenderer>();
+            sr.sprite = LoadPropSprite(spriteName);
+            sr.sortingOrder = sortingOrder;
+            return sr;
+        }
 
         internal static GameObject CreateBlock(Transform parent, Sprite square, string name, Vector2 position, Vector2 size, Color color)
         {
