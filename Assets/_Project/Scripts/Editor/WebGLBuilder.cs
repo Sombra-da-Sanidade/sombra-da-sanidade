@@ -15,9 +15,10 @@ namespace SombraDaSanidade.EditorTools
         [MenuItem("Sombra da Sanidade/Build WebGL", priority = 40)]
         public static void Build()
         {
-            // A Alfa (mapa com tiles) é a cena da mini demo; Demo e Protótipo ficam de reserva.
+            // A Beta (mapa gerado com tudo o que existe, docs/beta.md) é a cena publicada; Alfa, Demo e Protótipo ficam de reserva.
             string scene = new[]
             {
+                BetaSceneBuilder.ScenePath,
                 AlfaSceneBuilder.ScenePath,
                 PrototypeSceneBuilder.DemoScenePath,
                 PrototypeSceneBuilder.PrototypeScenePath
