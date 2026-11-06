@@ -79,7 +79,7 @@ Curva dente-de-serra: cada HD é um pico de perigo, cada Zona Segura um alívio.
 
 ## 8. Controles e interface
 
-WASD move, mouse mira, F/clique esquerdo liga a lanterna, clique direito dispara EMP, E segura para interagir, Espaço calibra o multímetro no skill check, Q liga o modo econômico (com o Filtro Âmbar), 1/2 escolhem o upgrade no terminal. HUD diegético: medidor de bateria e contador de HDs no canto superior esquerdo; sanidade comunicada por vinheta, batimentos e aberração cromática. Posição do monstro e timers nunca aparecem em número.
+WASD move, mouse mira, F/clique esquerdo liga a lanterna, clique direito dispara EMP, E segura para interagir, Espaço calibra o multímetro no skill check, Q liga o modo econômico (com o Filtro Âmbar), 1/2 escolhem o upgrade no terminal. Esc pausa (configurações de volume, brilho e tela cheia). HUD diegético: medidor de bateria e contador de HDs no canto superior esquerdo; sanidade comunicada por vinheta, batimentos e aberração cromática. Posição do monstro e timers nunca aparecem em número.
 
 Fluxo: Menu → Briefing → Jogo (Médica → Energia → Executiva → Eclusa) → Vitória (estatísticas) / Game Over (causa e reinício do checkpoint da ala).
 
@@ -112,3 +112,4 @@ Marcos: Protótipo (semana 4), Vertical slice com Ala Médica (semana 8), Versã
 | 1.0.1 | 27/10/2026 | Unity atualizada para 6000.5.10f1 (antes 2022.3/2023.x) |
 | 1.0.2 | 05/11/2026 | Skill check de multímetro na ejeção de HD (12 s), números iniciais pendentes do v1.1 (#33) |
 | 1.0.3 | 05/11/2026 | Upgrade da Lux-90 (1 de 2) ao ejetar cada HD, Proposta 2 pendente do v1.1 (#31) |
+| 1.0.4 | 06/11/2026 | HUD e telas em pixel art (multímetro, prompt sem número, pausa com Esc), #63 e #64 |

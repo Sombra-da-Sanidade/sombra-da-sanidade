@@ -9,7 +9,7 @@ namespace SombraDaSanidade.UI
 {
     // Tela de terminal (CRT verde) aberta ao ejetar um HD: o jogador escolhe 1 de 2 upgrades da Lux-90
     // com o jogo pausado (Proposta 2 do GDD v1.1, a recompensa concreta pedida no feedback do professor).
-    // Provisória em OnGUI; a arte final segue o estilo das telas da Frente 5. Fica no Player, criada
+    // Desenhada com o kit CRT de art-src/UI (issue #64). Fica no Player, criada
     // sob demanda pelo DriveServer. Frente 1. Issue #31.
     public class UpgradeTerminal : MonoBehaviour
     {
@@ -80,11 +80,62 @@ namespace SombraDaSanidade.UI
             else if (kb.digit2Key.wasPressedThisFrame || kb.numpad2Key.wasPressedThisFrame) Choose(1);
         }
 
+        // Tela de terminal Aethelgard com o kit CRT (screens.json): moldura, dois cartões com ícone, nome e efeito.
+        // Clique ou 1/2 escolhem. Sem arte, cai na versão de texto. Issue #64.
         private void OnGUI()
         {
             if (Current == null) return;
-            EnsureStyles();
+            if (!PixelHud.HasArt)
+            {
+                DrawFallback();
+                return;
+            }
 
+            PixelHud.Begin();
+            const int pw = 304, ph = 164;
+            int px = (PixelHud.Width - pw) / 2, py = (PixelHud.Height - ph) / 2;
+            int cw = 134, ch = 92, cy = py + 52;
+            int[] cx = { px + 14, px + 14 + cw + 8 };
+            int hover = -1;
+            for (int i = 0; i < 2; i++) if (PixelHud.MouseOver(cx[i], cy, cw, ch)) hover = i;
+
+            var e = Event.current;
+            if (e.type == EventType.MouseDown && e.button == 0 && hover >= 0)
+            {
+                e.Use();
+                Choose(hover);
+                return;
+            }
+            if (e.type != EventType.Repaint) return;
+
+            PixelHud.Dim(PixelHud.Vazio, 0.92f);
+            PixelHud.Panel(px, py, pw, ph);
+            PixelHud.Text("AETHELGARD // TERMINAL DE SERVIÇO", px + 14, py + 14, PixelHud.Fosforo4);
+            PixelHud.Text($"HD-0{DriveNumber} EXTRAÍDO. LUX-90 DETECTADA.", px + 14, py + 26, PixelHud.Fosforo3);
+            PixelHud.Text("SELECIONE UMA MODIFICAÇÃO:", px + 14, py + 36, PixelHud.Fosforo3);
+
+            bool blink = Mathf.Repeat(Time.unscaledTime * 2f, 1f) < 0.5f;
+            for (int i = 0; i < 2; i++)
+            {
+                var upgrade = i == 0 ? Current.optionA : Current.optionB;
+                bool selected = i == hover;
+                PixelHud.Box(cx[i], cy, cw, ch, selected ? PixelHud.Fosforo4 : PixelHud.Fosforo2);
+                PixelHud.Box(cx[i] + 1, cy + 1, cw - 2, ch - 2, selected ? PixelHud.Fosforo1 : PixelHud.Vazio);
+                PixelHud.Sprite("hud_icons", i == 0 ? "key_1" : "key_2", cx[i] + 6, cy + 6);
+                if (upgrade == null) continue;
+                PixelHud.Sprite("hud_icons", DemoHud.UpgradeIcon(upgrade.effect), cx[i] + cw - 22, cy + 6, 1f, 2);
+                PixelHud.Text(upgrade.displayName, cx[i] + 6, cy + 28, selected ? PixelHud.Fosforo5 : PixelHud.Fosforo4);
+                var lines = PixelHud.Wrap(upgrade.description, cw - 12);
+                for (int l = 0; l < lines.Count && l < 5; l++)
+                    PixelHud.Text(lines[l], cx[i] + 6, cy + 42 + l * 9, PixelHud.Fosforo3);
+                if (selected && blink) PixelHud.Sprite("screens", "cursor_0", cx[i] - 13, cy + 22);
+            }
+        }
+
+        // Versão de texto, para cenas sem o HudArt.
+        private void DrawFallback()
+        {
+            EnsureStyles();
             GUI.color = new Color(0f, 0.04f, 0f, 0.92f);
             GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
             GUI.color = Color.white;

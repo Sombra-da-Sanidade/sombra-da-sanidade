@@ -58,6 +58,7 @@ namespace SombraDaSanidade.Sanity
         {
             if (multiplier <= 0f) yield break;
             player.SpeedMultiplier *= multiplier;
+            player.SlowedUntil = Mathf.Max(player.SlowedUntil, Time.time + duration);
             yield return new WaitForSeconds(duration);
             if (player != null) player.SpeedMultiplier /= multiplier;
         }

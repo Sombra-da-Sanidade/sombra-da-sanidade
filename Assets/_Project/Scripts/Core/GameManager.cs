@@ -10,7 +10,7 @@ namespace SombraDaSanidade.Core
     public enum DeathCause { Monster, Sanity }
 
     // Estado da partida, HDs coletados e condições de vitória/derrota (GDD 4.4).
-    // Um por cena. As telas de fim são OnGUI provisórias para a mini demo.
+    // Um por cena. As telas de fim ficam em UI.ResultScreen (issue #64).
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance { get; private set; }
@@ -94,6 +94,8 @@ namespace SombraDaSanidade.Core
         private void OnGUI()
         {
             if (IsPlaying) return;
+            // Tela com o kit CRT (UI.ResultScreen); sem a arte, a versão de texto abaixo.
+            if (UI.ResultScreen.Draw(this)) return;
             EnsureStyles();
 
             GUI.color = new Color(0f, 0f, 0f, 0.8f);

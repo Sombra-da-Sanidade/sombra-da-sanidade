@@ -20,6 +20,13 @@ namespace SombraDaSanidade.UI
         [Tooltip("Abaixo desta fração a bateria fica sempre visível, piscando em vermelho.")]
         [Range(0f, 1f)] public float batteryLowRatio = 0.25f;
 
+        [Tooltip("Segundos que o raio cortado pisca ao lado da pilha depois de um clique direito sem EMP.")]
+        public float empFailShowSeconds = 1.5f;
+
+        [Header("Efeitos no relógio")]
+        [Tooltip("Nos últimos segundos do Adrena-Syn o ícone pisca no relógio.")]
+        public float effectEndingSeconds = 3f;
+
         [Header("HDs")]
         [Tooltip("Segundos visível depois de coletar um HD.")]
         public float driveShowSeconds = 4f;

@@ -10,6 +10,8 @@ using UnityEngine.Rendering.Universal;
 
 namespace SombraDaSanidade.Flashlight
 {
+    public enum EmpFailReason { LightOff, NoCharge }
+
     // Lanterna Mod. Lux-90: cone de luz que revela o cenário e drena bateria (GDD 4.2 e 6.3).
     // Baseado na lógica de óleo/cone do PlayerController do projeto Escura.
     public class FlashlightController : MonoBehaviour
@@ -44,6 +46,8 @@ namespace SombraDaSanidade.Flashlight
         public event Action<float> BatteryChanged;
         public event Action<bool> LitChanged;
         public event Action<LuxUpgrade> UpgradeInstalled;
+        // Clique direito sem EMP: o HUD pisca a marca do EMP ao lado da pilha (DemoHud).
+        public event Action<EmpFailReason> EmpFailed;
 
         private float rangeMultiplier = 1f;
         private float maxBatteryOverride = -1f;
@@ -56,11 +60,7 @@ namespace SombraDaSanidade.Flashlight
         private bool wasLit;
         private MonsterController monster;
         private CameraFollow cameraFollow;
-        private float empFeedbackUntil;
-        private string empFeedbackMessage;
-        private GUIStyle empFeedbackStyle;
 
-        private const float EmpFeedbackDuration = 1.5f;
 
         private void Awake()
         {
@@ -180,7 +180,7 @@ namespace SombraDaSanidade.Flashlight
             // Com a luz apagada, a tentativa avisa o motivo e mantém o tremor combinado.
             if (!IsSwitchedOn)
             {
-                ShowEmpFeedback("Lanterna desligada");
+                EmpFailed?.Invoke(EmpFailReason.LightOff);
                 ShakeEmp();
                 return;
             }
@@ -190,11 +190,10 @@ namespace SombraDaSanidade.Flashlight
                 && monster.IsLitByFlashlight();
             if (!TrySpend(EmpCost))
             {
-                ShowEmpFeedback("Carga insuficiente para EMP");
+                EmpFailed?.Invoke(EmpFailReason.NoCharge);
                 return;
             }
 
-            empFeedbackUntil = 0f;
             if (hitsMonster) monster.Stun(EmpStunDuration);
             // Atordoar primeiro evita que o alvo reaja ao ruído do próprio EMP (GDD 4.3 e 6.3).
             NoiseBus.Emit(transform.position, config.empNoiseRadius);
@@ -205,31 +204,6 @@ namespace SombraDaSanidade.Flashlight
         {
             if (cameraFollow != null)
                 cameraFollow.Shake(config.empShakeDuration, config.empShakeMagnitude);
-        }
-
-        private void ShowEmpFeedback(string message)
-        {
-            empFeedbackMessage = message;
-            empFeedbackUntil = Time.unscaledTime + EmpFeedbackDuration;
-        }
-
-        private void OnGUI()
-        {
-            if (Time.unscaledTime >= empFeedbackUntil) return;
-            if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) return;
-
-            if (empFeedbackStyle == null)
-            {
-                empFeedbackStyle = new GUIStyle(GUI.skin.label)
-                {
-                    alignment = TextAnchor.MiddleCenter,
-                    fontSize = 18
-                };
-                empFeedbackStyle.normal.textColor = new Color(1f, 0.6f, 0.4f);
-            }
-
-            GUI.Label(new Rect(16f, Screen.height - 72f, Screen.width - 32f, 32f),
-                empFeedbackMessage, empFeedbackStyle);
         }
 
         private void Aim()

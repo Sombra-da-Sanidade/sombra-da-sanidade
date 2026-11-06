@@ -23,7 +23,7 @@ Decisões:
 Novos (cada `.cs` com `.meta` e GUID aleatório no formato MonoImporter):
 - `Scripts/Interaction/ISkillCheckable.cs`: interface opcional. `IInteractable` não muda, então `Breaker`, `LithiumStabilizer` e `SanityClue` continuam iguais.
 - `Scripts/Interaction/SkillCheck.cs`: componente no Player. Estados Idle, Aviso, Ativo, Resultado. Só roda com `PlayerInteractor.Current is ISkillCheckable` e `IsChanneling`. Expõe `NeedlePosition`, `ZoneStart`, `ZoneSize`, `State` e `event Action<SkillCheckResult> Resolved`.
-- `Scripts/UI/SkillCheckHud.cs`: mostrador provisório em `OnGUI`, no padrão do prompt do `PlayerInteractor`.
+- `Scripts/UI/SkillCheckHud.cs`: multímetro em pixel art ao lado do Thomas (`art-src/UI/skillcheck.json`, #64; ver [hud.md](hud.md#arte-em-pixel-art-srcui)).
 - `Scripts/Editor/SkillCheckTest.cs`: `MenuItem` de teste no padrão de `BreakerTest.cs` e `MonsterTest.cs`.
 
 Alterados:

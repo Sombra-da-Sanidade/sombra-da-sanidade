@@ -40,8 +40,6 @@ namespace SombraDaSanidade.Interaction
         private SanityController sanity;
         private BatteryPity pity;
         private float feedbackUntil;
-        private string feedbackText;
-        private GUIStyle feedbackStyle;
 
         private const float FeedbackDuration = 1.8f;
 
@@ -171,44 +169,54 @@ namespace SombraDaSanidade.Interaction
                     float amount = flashlight != null && flashlight.Config != null ? flashlight.Config.batteryPickupAmount : 0f;
                     if (flashlight != null) flashlight.Recharge(amount);
                     if (pity != null) pity.NotifyBatteryFound();
-                    ShowFeedback($"Bateria +{amount:0}");
+                    ShowFeedback();
                     break;
                 case LootKind.Sedative:
                     // A corrotina da lentidão roda na sanidade do jogador, que continua ativa até o fim do efeito.
                     LithiumStabilizer.ApplyEffect(sanity, sanity);
-                    ShowFeedback("Sedativo: +sanidade, passos lentos");
+                    ShowFeedback();
                     break;
                 case LootKind.AdrenaSyn:
                     AdrenaSynModule.Apply(sanity != null ? sanity.GetComponent<PlayerController>() : null);
-                    ShowFeedback("Adrena-Syn: corre, mas a mente paga");
+                    ShowFeedback();
                     break;
                 default:
-                    ShowFeedback("Vazio");
+                    ShowFeedback();
                     break;
             }
 
             Opened?.Invoke(this, loot);
         }
 
-        private void ShowFeedback(string text)
+        private void ShowFeedback()
         {
-            feedbackText = text;
             feedbackUntil = Time.unscaledTime + FeedbackDuration;
         }
 
-        // Texto provisório sobre o armário, no padrão do prompt do PlayerInteractor.
+        // O ícone do item sobe do armário e some (hud_icons.json). Vazio: gaveta vazia, sem seta. Issue #64.
         private void OnGUI()
         {
-            if (Time.unscaledTime >= feedbackUntil) return;
+            if (Event.current.type != EventType.Repaint) return;
+            float left = feedbackUntil - Time.unscaledTime;
+            if (left <= 0f) return;
             if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) return;
             var cam = Camera.main;
-            if (cam == null) return;
+            if (cam == null || !UI.PixelHud.HasArt) return;
 
-            feedbackStyle ??= new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 16 };
-            feedbackStyle.normal.textColor = Loot == LootKind.Nothing ? new Color(0.6f, 0.6f, 0.6f) : new Color(0.95f, 0.85f, 0.5f);
-
-            Vector3 screen = cam.WorldToScreenPoint(transform.position + Vector3.up * 0.8f);
-            GUI.Label(new Rect(screen.x - 160, Screen.height - screen.y - 30, 320, 24), feedbackText, feedbackStyle);
+            UI.PixelHud.Begin();
+            float t = 1f - left / FeedbackDuration;
+            float alpha = t < 0.7f ? 1f : 1f - (t - 0.7f) / 0.3f;
+            var p = UI.PixelHud.WorldToGame(cam, transform.position + Vector3.up * 1.2f);
+            int y = p.y - Mathf.RoundToInt(Mathf.Min(1f, t * 2f) * 14f);
+            string icon = Loot switch
+            {
+                LootKind.Battery => "loot_battery",
+                LootKind.Sedative => "loot_sedative",
+                LootKind.AdrenaSyn => "loot_adrena",
+                _ => "loot_empty"
+            };
+            UI.PixelHud.Sprite("hud_icons", icon, p.x - 4, y, alpha);
+            if (Loot != LootKind.Nothing) UI.PixelHud.Sprite("hud_icons", "loot_plus", p.x + 4, y - 2, alpha);
         }
     }
 }
