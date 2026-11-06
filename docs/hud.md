@@ -47,3 +47,34 @@ Tudo é desenhado em "pixels de jogo": a tela é dividida pela base 320x180 e ca
 - **Frente 1:** o relógio multiplica e depois divide `PlayerController.SpeedMultiplier`, igual ao Estabilizador. Os dois se somam sem um apagar o outro.
 - **Frente 5:** `DemoHud.SetWatchHeld(bool)` abre o relógio por código (tutorial, cutscene). O HUD some sozinho fora de `GameState.Playing`.
 - **Cenas existentes:** `CreateHud` passa o `HudConfig` e o `FlashlightConfig` ao HUD. Numa cena gerada antes disso, o HUD usa os valores padrão e não desenha a marca do EMP até a cena ser gerada de novo.
+
+## Artes planejadas (ainda não ligadas ao código)
+
+Fontes em `art-src/UI/`, PNG em `Assets/_Project/Art/UI/` (o `PixelArtImporter` fatia a categoria `UI`). Tudo segue as regras acima: pixel de jogo, só paleta, sem número na tela de jogo. Fora do jogo (menus, vitória) número pode aparecer.
+
+| Folha | Célula | O que tem | Substitui | Frente |
+|---|---|---|---|---|
+| `skillcheck.json` | 48x32 | Multímetro analógico: `dial_body`, `dial_warn_0/1`, `dial_great_0/1`, `dial_fail_0..2`, `dial_hipnos` | `SkillCheckHud` (barra reta provisória) | 1, estilo da 3 |
+| `hud_bars.json` | 16x8 | Barra de canalização `hold_0..8`, `hold_paused`, `hold_done`; teclas largas `key_space`, `key_tab`, `key_esc` | `%` do prompt do `PlayerInteractor` | 1 |
+| `hud_icons.json` | 8x8 | Teclas (`key_e/f/q/r/1/2`, `mouse_l/r`), loot (`loot_*`), efeitos (`fx_adrena`, `fx_slow`, `fx_eco`), EMP (`emp_ready`, `emp_empty`), upgrades (`up_*`), `hd_full/empty`, `safe_zone` | Texto do `Locker` e do EMP; linha nova no relógio | 1 e 3 |
+| `ui_font.json` | 6x8 | Fonte bitmap maiúscula com acentos pt-BR; `char` e `advance` por frame | `GUI.skin` padrão nas telas | 5 |
+| `screens.json` | 16x16 | Kit CRT: `panel_*` (9-slice), `btn_*`, `cursor_*`, `slider_*`, `check_*`, selos de resultado, `rank_S/A/B/C`, `hd_slot_*` | `UpgradeTerminal`, telas do `GameManager`, menus novos | 5 (e 1 no terminal) |
+| `logo.json` | 160x40 | `logo` e `logo_glitch` | (novo) menu inicial | 5 |
+
+### Multímetro
+
+Aparece ao lado do Thomas durante a ejeção do HD. O sprite é só a caixa e o mostrador; o código pinta por cima, lendo o bloco `dial` do JSON:
+
+- faixa good em `d` e great em `e` nos pixels de `dial.arc` (cada um `[x, y, t]`, t de 0 a 1) entre `ZoneStart` e `ZoneStart + ZoneSize`;
+- ponteiro em `8`: reta de `dial.pivot` até `dial.needleRadius` no ângulo `angles[0] + (angles[1] - angles[0]) * NeedlePosition`.
+
+Estados: `Warning` alterna `dial_warn_0/1`; `Active` usa `dial_body` (ou `dial_hipnos` com sanidade < 35); `Result` usa `dial_great_*` ou `dial_fail_0..2`. A barra `hold_*` fica sob o Thomas e vira `hold_paused` durante a pausa do erro.
+
+### Relógio
+
+Ganha uma linha de ícones 8x8 embaixo (altura 46 → 56): efeitos ativos à esquerda (`fx_adrena` pisca nos últimos segundos), upgrades instalados à direita, e um LED âmbar do modo econômico ao lado do LED da Zona Segura. A marca do EMP ao lado da pilha pode virar `emp_ready`/`emp_empty`.
+
+### Implementação sugerida
+
+1. `refactor(ui)`: extrair paleta e primitivas do `DemoHud` (`Box`, `Fill`, `Fade`, `Hex`) para `UI/PixelHud.cs` e criar `UI/PixelFont.cs` (lê `ui_font` como máscara e recolore).
+2. Uma issue por linha da tabela acima, cada uma na frente indicada.

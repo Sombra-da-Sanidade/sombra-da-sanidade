@@ -11,14 +11,14 @@ using UnityEngine;
 namespace SombraDaSanidade.EditorTools
 {
     // Aplica as regras de importação de pixel art (docs/arte/guia-de-estilo.md) a tudo em
-    // Art/Tiles, Art/Sprites, Art/Monster, Art/Portraits, Art/Props e Art/Palette, e fatia as folhas usando o JSON de art-src/
+    // Art/Tiles, Art/Sprites, Art/Monster, Art/Portraits, Art/Props, Art/UI e Art/Palette, e fatia as folhas usando o JSON de art-src/
     // (mesmo arquivo que tools/art/export_sprites.py usa para gerar o PNG).
     public class PixelArtImporter : AssetPostprocessor
     {
         // Tile de 16px = 1 unidade do mundo (guia de estilo, "Escala").
         public const int PixelsPerUnit = 16;
         private const string ArtRoot = "Assets/_Project/Art/";
-        private static readonly string[] Categories = { "Tiles", "Sprites", "Monster", "Portraits", "Props", "Palette" };
+        private static readonly string[] Categories = { "Tiles", "Sprites", "Monster", "Portraits", "Props", "UI", "Palette" };
 
         [Serializable]
         private class Sheet
@@ -50,7 +50,8 @@ namespace SombraDaSanidade.EditorTools
             importer.alphaIsTransparency = true;
             importer.wrapMode = TextureWrapMode.Clamp;
             // O PlayerSpriteAnimator lê a folha do personagem para achar a lente da lanterna em cada quadro.
-            importer.isReadable = category == "Sprites";
+            // A fonte bitmap do HUD é lida como máscara e recolorida com a paleta (art-src/UI/ui_font.json).
+            importer.isReadable = category == "Sprites" || assetPath.EndsWith("UI/ui_font.png");
 
             var sheet = LoadSheet(category, assetPath);
             if (sheet == null || sheet.frames == null || sheet.frames.Length == 0)
