@@ -80,7 +80,7 @@ Status: rascunho (R), revisado (V), final (F).
 | Thomas Reis: retrato de diálogo (neutro, assustado) | `art-src/Portraits/thomas_portrait.json` | R |
 | Espécime Vazio: 10 animações (idle, andar e correr em 3 direções, escutar, grito, atordoado) + camada de brilho | `art-src/Monster/EspecimeB_sheet.json`, `EspecimeB_sheet_glow.json` | V (arte original da Frente 2, reduzida para 48x64) |
 | Itens: bateria, estabilizador, Adrena-Syn, HD | `art-src/Sprites/itens.json` | a fazer |
-| HUD e telas: multímetro, barras, ícones, fonte bitmap, kit CRT, logo (ver [hud.md](../hud.md#artes-planejadas-ainda-não-ligadas-ao-código)) | `art-src/UI/*.json` | R |
+| HUD e telas: multímetro, barras, ícones, fonte bitmap, kit CRT, logo (ver [hud.md](../hud.md#arte-em-pixel-art-srcui)) | `art-src/UI/*.json` | R |
 
 Tiles do laboratório: `floor_a`, `floor_seam`, `floor_b` (rachadura), `floor_c` (mancha), `floor_grate`, `floor_hazard`, `wall_top`, `wall_face`, `wall_face_pipes`, `wall_terminal`, `breaker_off`, `breaker_on`, `door_top`, `door_bottom`, `server_top`, `server_bottom`, `server_bottom_empty`, `puddle`, `blood_smear`, `papers`, `ceiling_lamp`.
 
