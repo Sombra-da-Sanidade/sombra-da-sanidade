@@ -24,6 +24,8 @@ namespace SombraDaSanidade.Player
 
         // Multiplicador para efeitos temporários (Adrena-Syn, Estabilizador de Lítio).
         public float SpeedMultiplier { get; set; } = 1f;
+        // Fim da lentidão do Estabilizador de Lítio (Time.time). O relógio mostra o efeito enquanto durar.
+        public float SlowedUntil { get; set; }
 
         private Rigidbody2D rb;
         private Camera cam;

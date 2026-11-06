@@ -46,6 +46,8 @@ namespace SombraDaSanidade.UI
         private Camera cam;
 
         private float batteryVisibleUntil;
+        private float empFailedUntil;
+        private AdrenaSynEffect adrena;
         private int lastBatterySegment = -1;
         private float drivesVisibleUntil;
         private int newestDrive = -1;
@@ -78,6 +80,7 @@ namespace SombraDaSanidade.UI
             {
                 flashlight.BatteryChanged += OnBatteryChanged;
                 flashlight.LitChanged += OnLitChanged;
+                flashlight.EmpFailed += OnEmpFailed;
                 lastBatterySegment = Segment(flashlight.BatteryRatio);
             }
             if (heartbeat != null) heartbeat.Beat += OnBeat;
@@ -95,6 +98,7 @@ namespace SombraDaSanidade.UI
             {
                 flashlight.BatteryChanged -= OnBatteryChanged;
                 flashlight.LitChanged -= OnLitChanged;
+                flashlight.EmpFailed -= OnEmpFailed;
             }
             if (heartbeat != null) heartbeat.Beat -= OnBeat;
             if (GameManager.Instance != null) GameManager.Instance.DriveCollected -= OnDriveCollected;
@@ -141,6 +145,13 @@ namespace SombraDaSanidade.UI
         private void OnLitChanged(bool lit)
         {
             batteryVisibleUntil = Time.time + Config.batteryShowSeconds;
+        }
+
+        // Clique direito sem EMP: a pilha aparece com o raio cortado piscando.
+        private void OnEmpFailed(EmpFailReason reason)
+        {
+            empFailedUntil = Time.time + Config.empFailShowSeconds;
+            batteryVisibleUntil = Mathf.Max(batteryVisibleUntil, empFailedUntil);
         }
 
         private void OnDriveCollected(int count)
@@ -312,12 +323,16 @@ namespace SombraDaSanidade.UI
                 Box(x + 2 + i * 3, y + 1, 2, 3, c, alpha);
             }
             // Marca do EMP em cima da pilha: azul se a carga paga um pulso, vermelha se não.
-            if (flashlightConfig != null && flashlightConfig.maxBattery > 0f)
+            // Usa os valores da lanterna, que já incluem o Capacitor Duplo e a Célula Extra.
+            if (flashlightConfig != null && flashlight.MaxBattery > 0f)
             {
-                int mark = x + 1 + Mathf.RoundToInt(12f * flashlightConfig.empCost / flashlightConfig.maxBattery);
-                bool canEmp = flashlight.Battery >= flashlightConfig.empCost;
+                int mark = x + 1 + Mathf.RoundToInt(12f * Mathf.Clamp01(flashlight.EmpCost / flashlight.MaxBattery));
+                bool canEmp = flashlight.Battery >= flashlight.EmpCost;
                 Box(mark, y - 2, 1, 2, canEmp ? Eletrico4 : Emergencia3, alpha);
             }
+            // Raio cortado piscando ao lado do polo depois de um clique direito sem EMP.
+            if (Time.time < empFailedUntil && Mathf.Repeat(Time.time * 6f, 1f) < 0.6f)
+                PixelHud.Sprite("hud_icons", "emp_empty", x + 16, y - 2, alpha);
         }
 
         // Três gavetas de HD. No canto, só depois de coletar; no relógio, sempre.
@@ -342,7 +357,8 @@ namespace SombraDaSanidade.UI
         // Relógio no pulso: sobe do canto inferior direito. ECG, HDs e bateria, sem números.
         private void DrawWatch()
         {
-            int w = 62, h = 46;
+            bool row = HasArt;
+            int w = 62, h = row ? 56 : 46;
             float ease = 1f - (1f - watchRaise) * (1f - watchRaise);
             int x = Screen.width / Px - w - 8;
             int y = Mathf.RoundToInt(Mathf.Lerp(Screen.height / (float)Px + 4, Screen.height / (float)Px - h - 8, ease));
@@ -366,9 +382,53 @@ namespace SombraDaSanidade.UI
             DrawDrives(sx, sy + EcgHeight + 3, watch: true);
             if (flashlight != null) DrawBattery(sx + EcgWidth - 15, sy + EcgHeight + 4, 1f);
 
-            // LED âmbar quando está sob a luz de uma Zona Segura
+            // LED âmbar quando está sob a luz de uma Zona Segura; ao lado, o do modo econômico (Filtro Âmbar)
             if (sanity != null && sanity.InSafeZone) Box(x + w - 9, y + 2, 2, 1, Ambar2, 1f);
+            if (flashlight != null && flashlight.HasAmberFilter) Box(x + w - 13, y + 2, 2, 1, flashlight.IsEcoMode ? Ambar1 : Concreto2, 1f);
+
+            if (row) DrawWatchRow(sx, sy + EcgHeight + 14);
         }
+
+        // Linha de baixo do relógio: efeitos ativos à esquerda, upgrades da Lux-90 à direita (ícones 8x8).
+        private void DrawWatchRow(int x, int y)
+        {
+            int left = x;
+            if (player != null)
+            {
+                if (adrena == null) adrena = player.GetComponent<AdrenaSynEffect>();
+                if (adrena != null && adrena.IsActive)
+                {
+                    bool ending = adrena.Remaining < Config.effectEndingSeconds && Mathf.Repeat(Time.time * 4f, 1f) < 0.5f;
+                    PixelHud.Sprite("hud_icons", "fx_adrena", left, y, ending ? 0.35f : 1f);
+                    left += 9;
+                }
+                if (Time.time < player.SlowedUntil)
+                {
+                    PixelHud.Sprite("hud_icons", "fx_slow", left, y);
+                    left += 9;
+                }
+            }
+            if (flashlight == null) return;
+            var installed = flashlight.Installed;
+            int right = x + EcgWidth - 8;
+            for (int i = installed.Count - 1; i >= 0 && right >= left; i--)
+            {
+                if (installed[i] == null) continue;
+                PixelHud.Sprite("hud_icons", UpgradeIcon(installed[i].effect), right, y);
+                right -= 9;
+            }
+        }
+
+        // Ícone de cada upgrade em hud_icons.json (docs/upgrades-lux90.md).
+        public static string UpgradeIcon(LuxUpgradeEffect effect) => effect switch
+        {
+            LuxUpgradeEffect.RangeMultiplier => "up_lens",
+            LuxUpgradeEffect.MaxBattery => "up_cell",
+            LuxUpgradeEffect.EmpCost => "up_capacitor",
+            LuxUpgradeEffect.StunDuration => "up_coil",
+            LuxUpgradeEffect.AmberFilter => "up_amber",
+            _ => "up_resonator"
+        };
 
         // Legenda sem moldura, centrada embaixo: nome em fósforo e fala em branco, com sombra para ler sobre a cena.
         // A fala é digitada letra a letra (AudioLogPlayer); a posição usa a linha inteira para o texto não andar.
