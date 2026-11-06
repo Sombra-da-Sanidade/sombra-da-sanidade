@@ -1,0 +1,278 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5349c2e92bee43929ad0c7d4387a45af, type: 3}
+  m_Name: HudArt
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.UI.HudArt
+  sheets:
+  - id: skillcheck
+    texture: {fileID: 2800000, guid: 688435137731c4a1e4964314e19b5197, type: 3}
+    cell: {x: 48, y: 32}
+    columns: 5
+    frames:
+    - dial_body
+    - dial_warn_0
+    - dial_warn_1
+    - dial_great_0
+    - dial_great_1
+    - dial_fail_0
+    - dial_fail_1
+    - dial_fail_2
+    - dial_hipnos
+    - example_active
+    - example_great
+    chars: 
+    advances: 
+  - id: hud_icons
+    texture: {fileID: 2800000, guid: d63aaaffcf1690d4d09504a7370b4bea, type: 3}
+    cell: {x: 8, y: 8}
+    columns: 8
+    frames:
+    - key_e
+    - key_f
+    - key_q
+    - key_r
+    - key_1
+    - key_2
+    - mouse_l
+    - mouse_r
+    - loot_battery
+    - loot_sedative
+    - loot_adrena
+    - loot_empty
+    - loot_plus
+    - fx_adrena
+    - fx_slow
+    - fx_eco
+    - emp_ready
+    - emp_empty
+    - up_lens
+    - up_cell
+    - up_capacitor
+    - up_coil
+    - up_amber
+    - up_resonator
+    - hd_full
+    - hd_empty
+    - safe_zone
+    chars: 
+    advances: 
+  - id: hud_bars
+    texture: {fileID: 2800000, guid: 72bbffcf395a65b1f147f992fb2920bb, type: 3}
+    cell: {x: 16, y: 8}
+    columns: 8
+    frames:
+    - key_space
+    - key_tab
+    - key_esc
+    - hold_0
+    - hold_1
+    - hold_2
+    - hold_3
+    - hold_4
+    - hold_5
+    - hold_6
+    - hold_7
+    - hold_8
+    - hold_paused
+    - hold_done
+    chars: 
+    advances: 
+  - id: ui_font
+    texture: {fileID: 2800000, guid: 33fa117155425ce7b971e6186144efe3, type: 3}
+    cell: {x: 6, y: 8}
+    columns: 16
+    frames:
+    - ch_A
+    - ch_B
+    - ch_C
+    - ch_D
+    - ch_E
+    - ch_F
+    - ch_G
+    - ch_H
+    - ch_I
+    - ch_J
+    - ch_K
+    - ch_L
+    - ch_M
+    - ch_N
+    - ch_O
+    - ch_P
+    - ch_Q
+    - ch_R
+    - ch_S
+    - ch_T
+    - ch_U
+    - ch_V
+    - ch_W
+    - ch_X
+    - ch_Y
+    - ch_Z
+    - ch_A_acute
+    - ch_A_grave
+    - ch_A_circ
+    - ch_A_tilde
+    - ch_E_acute
+    - ch_E_circ
+    - ch_I_acute
+    - ch_O_acute
+    - ch_O_circ
+    - ch_O_tilde
+    - ch_U_acute
+    - ch_C_cedilla
+    - ch_0
+    - ch_1
+    - ch_2
+    - ch_3
+    - ch_4
+    - ch_5
+    - ch_6
+    - ch_7
+    - ch_8
+    - ch_9
+    - ch_space
+    - ch_period
+    - ch_comma
+    - ch_colon
+    - ch_semicolon
+    - ch_excl
+    - ch_question
+    - ch_minus
+    - ch_plus
+    - ch_equals
+    - ch_slash
+    - ch_percent
+    - ch_lparen
+    - ch_rparen
+    - ch_lbracket
+    - ch_rbracket
+    - ch_gt
+    - ch_lt
+    - ch_apos
+    - ch_quote
+    - ch_underscore
+    - ch_hash
+    chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZ\xC1\xC0\xC2\xC3\xC9\xCA\xCD\xD3\xD4\xD5\xDA\xC70123456789
+      .,:;!?-+=/%()[]><'\"_#"
+    advances: 06000000060000000600000006000000060000000600000006000000060000000400000006000000060000000600000006000000060000000600000006000000060000000600000006000000060000000600000006000000060000000600000006000000060000000600000006000000060000000600000006000000060000000400000006000000060000000600000006000000060000000500000004000000050000000500000005000000050000000500000005000000050000000500000004000000020000000200000002000000020000000200000005000000040000000400000004000000040000000600000003000000030000000300000003000000040000000400000002000000040000000500000006000000
+  - id: screens
+    texture: {fileID: 2800000, guid: fe933e1fcc784573e8cbb41b24cd30ed, type: 3}
+    cell: {x: 16, y: 16}
+    columns: 9
+    frames:
+    - panel_tl
+    - panel_t
+    - panel_tr
+    - panel_l
+    - panel_c
+    - panel_r
+    - panel_bl
+    - panel_b
+    - panel_br
+    - btn_l
+    - btn_c
+    - btn_r
+    - btn_sel_l
+    - btn_sel_c
+    - btn_sel_r
+    - cursor_0
+    - cursor_1
+    - slider_track
+    - slider_fill
+    - slider_knob
+    - slider_knob_sel
+    - check_off
+    - check_on
+    - stamp_escaped
+    - stamp_dead_monster
+    - stamp_dead_mind
+    - rank_S
+    - rank_A
+    - rank_B
+    - rank_C
+    - hd_slot_full
+    - hd_slot_empty
+    chars: 
+    advances: 
+  - id: logo
+    texture: {fileID: 2800000, guid: 74585defa34cca2e196f60c44424930e, type: 3}
+    cell: {x: 160, y: 40}
+    columns: 1
+    frames:
+    - logo
+    - logo_glitch
+    chars: 
+    advances: 
+  dialArc:
+  - {x: 11, y: 14, z: 0.005}
+  - {x: 12, y: 14, z: 0.018}
+  - {x: 11, y: 13, z: 0.034}
+  - {x: 12, y: 13, z: 0.049}
+  - {x: 13, y: 13, z: 0.066}
+  - {x: 12, y: 12, z: 0.077}
+  - {x: 13, y: 12, z: 0.096}
+  - {x: 13, y: 11, z: 0.122}
+  - {x: 14, y: 11, z: 0.144}
+  - {x: 13, y: 10, z: 0.147}
+  - {x: 14, y: 10, z: 0.169}
+  - {x: 14, y: 9, z: 0.191}
+  - {x: 15, y: 10, z: 0.194}
+  - {x: 15, y: 9, z: 0.216}
+  - {x: 16, y: 9, z: 0.243}
+  - {x: 16, y: 8, z: 0.261}
+  - {x: 17, y: 9, z: 0.272}
+  - {x: 17, y: 8, z: 0.29}
+  - {x: 17, y: 7, z: 0.305}
+  - {x: 18, y: 8, z: 0.32}
+  - {x: 18, y: 7, z: 0.334}
+  - {x: 19, y: 8, z: 0.353}
+  - {x: 19, y: 7, z: 0.364}
+  - {x: 20, y: 7, z: 0.397}
+  - {x: 20, y: 6, z: 0.404}
+  - {x: 21, y: 7, z: 0.43}
+  - {x: 21, y: 6, z: 0.436}
+  - {x: 22, y: 7, z: 0.465}
+  - {x: 22, y: 6, z: 0.468}
+  - {x: 23, y: 6, z: 0.5}
+  - {x: 23, y: 7, z: 0.5}
+  - {x: 24, y: 6, z: 0.532}
+  - {x: 24, y: 7, z: 0.535}
+  - {x: 25, y: 6, z: 0.564}
+  - {x: 25, y: 7, z: 0.57}
+  - {x: 26, y: 6, z: 0.596}
+  - {x: 26, y: 7, z: 0.603}
+  - {x: 27, y: 7, z: 0.636}
+  - {x: 27, y: 8, z: 0.647}
+  - {x: 28, y: 7, z: 0.666}
+  - {x: 28, y: 8, z: 0.68}
+  - {x: 29, y: 7, z: 0.695}
+  - {x: 29, y: 8, z: 0.71}
+  - {x: 29, y: 9, z: 0.728}
+  - {x: 30, y: 8, z: 0.739}
+  - {x: 30, y: 9, z: 0.757}
+  - {x: 31, y: 9, z: 0.784}
+  - {x: 31, y: 10, z: 0.806}
+  - {x: 32, y: 9, z: 0.809}
+  - {x: 32, y: 10, z: 0.831}
+  - {x: 33, y: 10, z: 0.853}
+  - {x: 32, y: 11, z: 0.856}
+  - {x: 33, y: 11, z: 0.878}
+  - {x: 33, y: 12, z: 0.904}
+  - {x: 34, y: 12, z: 0.923}
+  - {x: 33, y: 13, z: 0.934}
+  - {x: 34, y: 13, z: 0.951}
+  - {x: 35, y: 13, z: 0.966}
+  - {x: 34, y: 14, z: 0.982}
+  - {x: 35, y: 14, z: 0.995}
+  dialPivot: {x: 23, y: 19}
+  dialNeedleRadius: 11
+  dialAngles: {x: 158, y: 22}
