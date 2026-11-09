@@ -48,11 +48,23 @@ namespace SombraDaSanidade.Monster
             get
             {
                 if (config == null) return 0f;
-                float speed = Mathf.Min(config.baseSpeed * SpeedMultiplier, config.maxSpeed);
+                float speed = IsFurious ? config.furySpeed : Mathf.Min(config.baseSpeed * SpeedMultiplier, config.maxSpeed);
                 if (State == MonsterState.Chase)
                     speed = Mathf.Min(speed * config.chaseSpeedMultiplier, Mathf.Max(config.chaseMaxSpeed, config.maxSpeed));
                 return speed * (MonsterSafeMode.Enabled ? config.safeModeSpeedMultiplier : 1f);
             }
+        }
+
+        // Fúria da Eclusa (#44): ligada pela purga (Level.EscapeSequence). Velocidade e audição da coluna Eclusa
+        // da Proposta 1 e todos os comportamentos da Executiva.
+        public bool IsFurious { get; private set; }
+
+        public void SetFury(bool on)
+        {
+            if (IsFurious == on) return;
+            IsFurious = on;
+            if (on) SetBehaviours(MonsterWingBehaviours.Executiva);
+            ApplySpeed();
         }
 
         // Pegou o jogador e está tocando a cena de morte (MonsterKillScene). A IA fica parada até o Game Over.
@@ -144,7 +156,12 @@ namespace SombraDaSanidade.Monster
         // Start, não OnEnable: garante que o Awake do GameManager e o bake do NavMesh já rodaram.
         private void Start()
         {
-            if (GameManager.Instance != null) GameManager.Instance.DriveCollected += OnDriveCollected;
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.DriveCollected += OnDriveCollected;
+                // Cenas que já começam com HDs (Eclusa, #44) partem da velocidade acumulada.
+                if (GameManager.Instance.DrivesCollected > 0) OnDriveCollected(GameManager.Instance.DrivesCollected);
+            }
 
             if (flashlight == null) flashlight = FindAnyObjectByType<FlashlightController>();
             if (player == null && flashlight != null) player = flashlight.transform;
@@ -543,7 +560,9 @@ namespace SombraDaSanidade.Monster
 
         private void OnNoise(Vector2 position, float radius)
         {
-            float hear = Mathf.Max(radius, config != null ? config.hearingRadius : 0f);
+            float hearing = config == null ? 0f
+                : IsFurious ? Mathf.Max(config.hearingRadius, config.furyHearingRadius) : config.hearingRadius;
+            float hear = Mathf.Max(radius, hearing);
             if (((Vector2)transform.position - position).sqrMagnitude <= hear * hear)
                 Alert(position);
             else

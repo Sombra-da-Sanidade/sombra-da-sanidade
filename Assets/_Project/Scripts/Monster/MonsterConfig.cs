@@ -87,6 +87,12 @@ namespace SombraDaSanidade.Monster
         [Tooltip("Chance, em cada nó de decisão da patrulha, de voltar a um ruído antigo (não o último).")]
         [Range(0f, 1f)] public float noiseMemoryChance = 0.3f;
 
+        [Header("Eclusa: fúria durante a purga (#44, Proposta 1 do v1.1)")]
+        [Tooltip("Velocidade base na fúria, no lugar da base + bônus dos HDs (coluna Eclusa: 4.6). O galope e o modo seguro continuam multiplicando.")]
+        public float furySpeed = 4.6f;
+        [Tooltip("Raio auditivo na fúria (coluna Eclusa: 9).")]
+        public float furyHearingRadius = 9f;
+
         [Header("Modo seguro (#48, opcional)")]
         [Tooltip("Velocidade no modo seguro, multiplicando a normal. Não está no GDD.")]
         [Range(0.3f, 1f)] public float safeModeSpeedMultiplier = 0.8f;
