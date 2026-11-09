@@ -187,6 +187,13 @@ namespace SombraDaSanidade.EditorTools
                     Check($"Todos os HDs coletados ({gm.DrivesCollected}/{gm.DrivesRequired})", gm.HasAllDrives);
                     Check("Jogo retoma depois das escolhas de upgrade", !UpgradeTerminal.IsOpen && Time.timeScale > 0f);
                     var door = Object.FindAnyObjectByType<ExitDoor>();
+                    // Fuga da Eclusa (#44): com terminal, a porta só abre depois de inserir os HDs nele.
+                    if (door.Terminal != null)
+                    {
+                        Check("Porta externa trancada antes do terminal", !door.IsUnlocked);
+                        door.Terminal.CompleteInteract();
+                        Check("Terminal da eclusa destrava a porta", door.IsUnlocked);
+                    }
                     Teleport(player, door.transform.position + Vector3.up * 0.3f);
                     stepStart = Time.realtimeSinceStartup;
                     Next(10);
