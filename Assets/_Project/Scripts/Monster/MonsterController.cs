@@ -48,7 +48,7 @@ namespace SombraDaSanidade.Monster
             get
             {
                 if (config == null) return 0f;
-                float speed = Mathf.Min(config.baseSpeed * SpeedMultiplier, config.maxSpeed);
+                float speed = Mathf.Min(BaseSpeed * SpeedMultiplier, config.maxSpeed);
                 if (State == MonsterState.Chase)
                     speed = Mathf.Min(speed * config.chaseSpeedMultiplier, Mathf.Max(config.chaseMaxSpeed, config.maxSpeed));
                 return speed * (MonsterSafeMode.Enabled ? config.safeModeSpeedMultiplier : 1f);
@@ -293,6 +293,22 @@ namespace SombraDaSanidade.Monster
             SpeedMultiplier = multiplier;
             ApplySpeed();
         }
+
+        // Velocidade e raio auditivo da ala (DifficultyProfile, #30 / Proposta 1 do v1.1). Sem perfil, valem os
+        // do MonsterConfig. O bônus por HD (GDD regra 4) multiplica a velocidade da ala.
+        public float BaseSpeed => baseSpeedOverride > 0f ? baseSpeedOverride : config != null ? config.baseSpeed : 0f;
+        public float HearingRadius => hearingOverride > 0f ? hearingOverride : config != null ? config.hearingRadius : 0f;
+
+        private float baseSpeedOverride = -1f;
+        private float hearingOverride = -1f;
+
+        public void SetBaseSpeed(float speed)
+        {
+            baseSpeedOverride = speed;
+            ApplySpeed();
+        }
+
+        public void SetHearingRadius(float radius) => hearingOverride = radius;
 
         // ---------- Estados ----------
 
@@ -543,7 +559,7 @@ namespace SombraDaSanidade.Monster
 
         private void OnNoise(Vector2 position, float radius)
         {
-            float hear = Mathf.Max(radius, config != null ? config.hearingRadius : 0f);
+            float hear = Mathf.Max(radius, HearingRadius);
             if (((Vector2)transform.position - position).sqrMagnitude <= hear * hear)
                 Alert(position);
             else
@@ -608,7 +624,9 @@ namespace SombraDaSanidade.Monster
 
         private void OnDriveCollected(int total)
         {
-            if (config != null) SetSpeedMultiplier(1f + config.speedBonusPerDrive * total);
+            // Só os HDs desta ala: a velocidade da ala (BaseSpeed) já conta os das alas anteriores.
+            int here = total - (GameManager.Instance != null ? GameManager.Instance.StartingDrives : 0);
+            if (config != null) SetSpeedMultiplier(1f + config.speedBonusPerDrive * Mathf.Max(0, here));
         }
 
         // ---------- Movimento ----------

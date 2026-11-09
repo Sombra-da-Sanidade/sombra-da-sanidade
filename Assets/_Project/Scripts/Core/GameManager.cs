@@ -16,8 +16,11 @@ namespace SombraDaSanidade.Core
         public static GameManager Instance { get; private set; }
 
         [SerializeField] private int drivesRequired = 3;
+        [Tooltip("HDs entregues nas alas anteriores (cena de ala: Executiva começa com 2 de 3).")]
+        [SerializeField] private int startingDrives;
 
         public GameState State { get; private set; } = GameState.Playing;
+        public int StartingDrives => startingDrives;
         public bool IsPlaying => State == GameState.Playing;
         public int DrivesCollected { get; private set; }
         public int DrivesRequired => drivesRequired;
@@ -41,6 +44,8 @@ namespace SombraDaSanidade.Core
             }
             Instance = this;
             Time.timeScale = 1f;
+            startingDrives = Mathf.Clamp(startingDrives, 0, Mathf.Max(0, drivesRequired - 1));
+            DrivesCollected = startingDrives;
         }
 
         private void OnDestroy()

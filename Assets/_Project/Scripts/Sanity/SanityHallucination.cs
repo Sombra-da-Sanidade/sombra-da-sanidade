@@ -73,7 +73,7 @@ namespace SombraDaSanidade.Sanity
             if (IsShowing) UpdatePhantom();
 
             var config = sanity.Config;
-            if (sanity.Value >= config.hallucinationsBelow || sanity.State == SanityState.Dead)
+            if (!allowed || sanity.Value >= config.hallucinationsBelow || sanity.State == SanityState.Dead)
             {
                 nextTimer = -1f; // desarma: ao cair de novo, espera um intervalo inteiro
                 return;
@@ -152,7 +152,23 @@ namespace SombraDaSanidade.Sanity
             phantom.color = new Color(phantomColor.r, phantomColor.g, phantomColor.b, phantomColor.a * a);
         }
 
-        private static float NextInterval(SanityConfig config) =>
-            Random.Range(config.hallucinationMinInterval, config.hallucinationMaxInterval);
+        // Intervalo da ala (DifficultyProfile, Proposta 1 do v1.1). enabled = false: não ocorre na ala.
+        public void SetSchedule(bool enabled, float minInterval, float maxInterval)
+        {
+            allowed = enabled;
+            intervalOverride = new Vector2(minInterval, Mathf.Max(minInterval, maxInterval));
+            nextTimer = -1f;
+        }
+
+        public bool Allowed => allowed;
+        public Vector2 Interval => intervalOverride.x > 0f ? intervalOverride
+            : sanity != null && sanity.Config != null
+                ? new Vector2(sanity.Config.hallucinationMinInterval, sanity.Config.hallucinationMaxInterval)
+                : Vector2.zero;
+
+        private bool allowed = true;
+        private Vector2 intervalOverride = new Vector2(-1f, -1f);
+
+        private float NextInterval(SanityConfig config) => Random.Range(Interval.x, Interval.y);
     }
 }

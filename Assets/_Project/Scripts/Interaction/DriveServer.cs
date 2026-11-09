@@ -17,8 +17,21 @@ namespace SombraDaSanidade.Interaction
         [SerializeField] private Color loadedColor = new Color(0.3f, 1f, 0.45f);
         [SerializeField] private Color emptyColor = new Color(0.25f, 0.25f, 0.25f);
 
+        [Tooltip("Começa travado por senha (Ala Executiva, HD-03): só ejeta depois do KeypadLock liberar.")]
+        [SerializeField] private bool locked;
+        [SerializeField] private Color lockedColor = new Color(0.87f, 0.25f, 0.22f);
+
         public string Prompt => "Ejetar HD";
-        public bool CanInteract => !ejected && config != null;
+        public bool CanInteract => !ejected && !locked && config != null;
+        public bool IsLocked => locked;
+
+        // Senha certa no terminal ao lado (KeypadLock).
+        public void Unlock()
+        {
+            if (!locked) return;
+            locked = false;
+            if (indicator != null && !ejected) indicator.color = loadedColor;
+        }
         public float HoldDuration => config.ejectDuration;
 
         // Disparado ao ejetar: gancho para logs, legendas e efeitos que vierem depois.
@@ -41,7 +54,7 @@ namespace SombraDaSanidade.Interaction
 
         private void Start()
         {
-            if (indicator != null) indicator.color = loadedColor;
+            if (indicator != null) indicator.color = locked ? lockedColor : loadedColor;
             EnsurePlayerComponents();
         }
 

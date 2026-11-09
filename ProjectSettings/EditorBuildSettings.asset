@@ -17,5 +17,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/Scenes/Main/Beta.unity
     guid: 781fd657338041238bdb1b1a9e401dae
+  - enabled: 1
+    path: Assets/_Project/Scenes/Wings/AlaExecutiva.unity
+    guid: 39374f579508b3447a532309196e5e70
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
