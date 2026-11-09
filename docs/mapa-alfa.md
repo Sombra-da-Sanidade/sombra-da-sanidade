@@ -42,17 +42,21 @@ Cena `Assets/_Project/Scenes/Wings/AlaMedica.unity`, gerada pelo mesmo builder a
 | Enfermaria | oeste | Disjuntor com lâmpada, 3 armários |
 | Laboratório | leste | Disjuntor com lâmpada, estabilizador, 2 armários |
 | Salão central | meio | Disjuntor com lâmpada (atalho entre as alas laterais) |
-| Arquivo | em cima | HD-01, onde o monstro começa |
+| Arquivo | em cima | HD-01, onde o monstro dorme até o primeiro encontro |
 
 - **Dois loops:** o anel externo (Antessala → Enfermaria → Arquivo → Laboratório → Antessala) e o atalho pelo Salão central, que divide o anel em duas voltas menores. Sem becos (GDD 4.1).
 - **Saída:** a porta abre com 1 HD (`GameManager.drivesRequired = 1`, definido pelo builder).
-- **Armários (`A`):** só blocos cinzas marcando a posição; o loot de 60% (GDD 6) vem depois.
-- **Duração:** a meta de 3 a 5 min (GDD 7) precisa ser medida no playtest. Se ficar curta, alongar os corredores do anel no `.txt`.
+- **Armários (`A`):** loot pela tabela da ala (bateria +30 ou sedativo, #29 e #46).
+- **Introdução (Proposta 4 do v1.1, `Level/WingIntro`):** o monstro começa adormecido (invisível, parado, sem colisão). Depois de 60 s, quando o jogador entra na Enfermaria (gatilho `x`) ou no Laboratório (`y`), ele acorda no corredor norte e passa pelo fundo da sala, perto da lâmpada, até o Salão central (rota `1 2 3` ou `4 5 6`). Se o jogador demorar 100 s ou pegar o HD antes, ele acorda na rota mais longe do jogador.
+- **Primeiro encontro:** na rota ele ignora ruído. Se for iluminado, dá o grito de estática e vai investigar onde o jogador estava, sem Perseguição; depois de 4 s a luz volta a valer a regra normal. Sem luz, termina a rota e começa a patrulha.
+- **Checkpoint (#45, Proposta 2):** ao abrir a porta com o HD-01, `Level/WingCheckpoint` salva `checkpoint.json` em `Application.persistentDataPath` (no WebGL, IndexedDB) e a tela de vitória mostra **ALA MÉDICA CONCLUÍDA** e **PROGRESSO SALVO**. Carregar o checkpoint fica para as outras alas (`Checkpoint.TryLoad` já existe).
+- **Duração:** a meta de 3 a 5 min (GDD 7) precisa ser medida no playtest (o tempo aparece na tela de vitória). A introdução já garante pelo menos 1 min. Se ficar curta, alongar os corredores do anel no `.txt`; se passar de 5 min, reduzir `calmSeconds` do `WingIntro` no builder.
 
 Teste em batch:
 
 ```bash
 Unity -batchmode -projectPath . -executeMethod SombraDaSanidade.EditorTools.SmokeTest.RunBatchAlaMedica
+Unity -batchmode -projectPath . -executeMethod SombraDaSanidade.EditorTools.AlaMedicaIntroTest.RunBatch
 ```
 
 ## Pendências

@@ -44,8 +44,20 @@ namespace SombraDaSanidade.UI
             PixelHud.Dim(PixelHud.Vazio, 0.9f);
             PixelHud.Panel(x, y, w, h);
             PixelHud.Sprite("screens", "stamp_escaped", x + 14, y + 12, 1f, 2);
-            PixelHud.Text("VOCÊ ESCAPOU", x + 52, y + 18, PixelHud.Fosforo5, 1f, 2);
-            PixelHud.Text("ECLUSA ABERTA. HDS ENTREGUES À SUPERFÍCIE.", x + 52, y + 36, PixelHud.Fosforo3);
+            // Fim de ala (Ala Médica no vertical slice): o título é a ala e o checkpoint é a recompensa.
+            var wing = Level.WingCheckpoint.Instance;
+            if (wing != null)
+            {
+                PixelHud.Text(Level.WingCheckpoint.DisplayName(wing.Wing) + " CONCLUÍDA", x + 52, y + 18, PixelHud.Fosforo5, 1f, 2);
+                PixelHud.Text("PORTA PARA O SAGUÃO DESTRAVADA.", x + 52, y + 36, PixelHud.Fosforo3);
+                if (wing.StatusLine.Length > 0)
+                    PixelHud.TextCentered(wing.StatusLine, x + w / 2, y + 119, wing.Saved ? PixelHud.Fosforo5 : PixelHud.Emergencia4);
+            }
+            else
+            {
+                PixelHud.Text("VOCÊ ESCAPOU", x + 52, y + 18, PixelHud.Fosforo5, 1f, 2);
+                PixelHud.Text("ECLUSA ABERTA. HDS ENTREGUES À SUPERFÍCIE.", x + 52, y + 36, PixelHud.Fosforo3);
+            }
 
             for (int i = 0; i < gm.DrivesRequired; i++)
                 PixelHud.Sprite("screens", i < gm.DrivesCollected ? "hd_slot_full" : "hd_slot_empty", x + 14 + i * 18, y + 56);

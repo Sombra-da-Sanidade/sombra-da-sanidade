@@ -113,3 +113,4 @@ Marcos: Protótipo (semana 4), Vertical slice com Ala Médica (semana 8), Versã
 | 1.0.2 | 05/11/2026 | Skill check de multímetro na ejeção de HD (12 s), números iniciais pendentes do v1.1 (#33) |
 | 1.0.3 | 05/11/2026 | Upgrade da Lux-90 (1 de 2) ao ejetar cada HD, Proposta 2 pendente do v1.1 (#31) |
 | 1.0.4 | 06/11/2026 | HUD e telas em pixel art (multímetro, prompt sem número, pausa com Esc), #63 e #64 |
+| 1.0.5 | 09/11/2026 | Ala Médica do vertical slice: 1 min sem monstro e primeiro encontro roteirizado (Proposta 4), checkpoint JSON com "Progresso salvo" ao concluir a ala (Proposta 2, #45) |
