@@ -106,8 +106,10 @@ namespace SombraDaSanidade.Core
             string body;
             if (State == GameState.Victory)
             {
-                title = "VOCÊ ESCAPOU";
+                var wing = Level.WingCheckpoint.Instance;
+                title = wing != null ? Level.WingCheckpoint.DisplayName(wing.Wing) + " CONCLUÍDA" : "VOCÊ ESCAPOU";
                 body = $"HDs: {DrivesCollected}/{drivesRequired}   Tempo: {FormatTime(ElapsedTime)}";
+                if (wing != null && wing.StatusLine.Length > 0) body += "   " + wing.StatusLine;
             }
             else
             {

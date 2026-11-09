@@ -67,13 +67,7 @@ namespace SombraDaSanidade.Beta
             _ => MonsterWingBehaviours.Medica
         };
 
-        public static string DisplayName(string wing) => wing switch
-        {
-            "Medica" => "ALA MÉDICA",
-            "Energia" => "ALA DE ENERGIA",
-            "Executiva" => "ALA EXECUTIVA",
-            _ => "SAGUÃO"
-        };
+        public static string DisplayName(string wing) => Level.WingCheckpoint.DisplayName(wing);
 
         private void OnGUI()
         {

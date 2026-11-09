@@ -32,7 +32,11 @@ namespace SombraDaSanidade.EditorTools
         private const string AlaMedicaLayoutFile = "art-src/Maps/ala-medica.txt";
 
         // Caracteres que são chão (o resto é parede/teto).
-        private const string FloorChars = ".,hwpbL@MmiAa";
+        private const string FloorChars = ".,hwpbL@MmiAa" + IntroMarkers;
+
+        // Marcadores da introdução da Ala Médica (WingIntro): rotas 1-3 e 4-6, gatilhos x e y. São chão; o
+        // desenho é o do vizinho da esquerda (grade no corredor, piso liso na sala).
+        private const string IntroMarkers = "123456xy";
 
         [MenuItem("Sombra da Sanidade/Gerar cena Alfa (tiles)", priority = 2)]
         public static void BuildFromMenu()
@@ -53,7 +57,66 @@ namespace SombraDaSanidade.EditorTools
 
         // Batchmode: -executeMethod SombraDaSanidade.EditorTools.AlfaSceneBuilder.BuildAlaMedica
         // A ala só tem o HD-01, então a porta para o saguão abre com 1 HD.
-        public static void BuildAlaMedica() => Build(AlaMedicaLayoutFile, AlaMedicaScenePath, drivesRequired: 1, wing: "Medica");
+        public static void BuildAlaMedica()
+        {
+            var map = LoadLayout(AlaMedicaLayoutFile);
+            if (map == null) return;
+            BuildFromLayout(map, AlaMedicaScenePath, drivesRequired: 1, (x, y) => "Medica", AddWingFlow);
+        }
+
+        // Proposta 4 do v1.1: primeiro minuto sem monstro e encontro roteirizado. Proposta 2 / #45: checkpoint
+        // com "Progresso salvo" ao concluir a ala.
+        private static void AddWingFlow(BuildContext ctx)
+        {
+            var go = new GameObject("WingFlow");
+            var checkpoint = go.AddComponent<SombraDaSanidade.Level.WingCheckpoint>();
+            var cso = new SerializedObject(checkpoint);
+            cso.FindProperty("wing").stringValue = "Medica";
+            cso.FindProperty("nextWing").stringValue = "Energia";
+            cso.ApplyModifiedPropertiesWithoutUndo();
+
+            var intro = go.AddComponent<SombraDaSanidade.Level.WingIntro>();
+            var so = new SerializedObject(intro);
+            so.FindProperty("monster").objectReferenceValue = UnityEngine.Object.FindAnyObjectByType<MonsterController>();
+            var variants = so.FindProperty("variants");
+            variants.arraySize = 2;
+            WriteVariant(ctx.Map, variants.GetArrayElementAtIndex(0), "Enfermaria", "123", 'x');
+            WriteVariant(ctx.Map, variants.GetArrayElementAtIndex(1), "Laboratorio", "456", 'y');
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void WriteVariant(Layout map, SerializedProperty variant, string name, string routeChars, char trigger)
+        {
+            var route = new List<Vector2>();
+            foreach (char c in routeChars)
+            {
+                var cell = Find(map, c);
+                if (cell.Count == 0) Debug.LogError($"Rota {name}: marcador {c} não está na planta.");
+                else route.Add(new Vector2(cell[0].x + 0.5f, cell[0].y + 0.5f));
+            }
+            var cells = Find(map, trigger);
+            if (cells.Count == 0) Debug.LogError($"Rota {name}: gatilho {trigger} não está na planta.");
+
+            variant.FindPropertyRelative("name").stringValue = name;
+            var points = variant.FindPropertyRelative("route");
+            points.arraySize = route.Count;
+            for (int i = 0; i < route.Count; i++) points.GetArrayElementAtIndex(i).vector2Value = route[i];
+            if (cells.Count > 0)
+            {
+                int x0 = cells.Min(c => c.x), y0 = cells.Min(c => c.y);
+                int x1 = cells.Max(c => c.x) + 1, y1 = cells.Max(c => c.y) + 1;
+                variant.FindPropertyRelative("trigger").rectValue = new Rect(x0, y0, x1 - x0, y1 - y0);
+            }
+        }
+
+        private static List<Vector2Int> Find(Layout map, char c)
+        {
+            var cells = new List<Vector2Int>();
+            for (int y = 0; y < map.Height; y++)
+                for (int x = 0; x < map.Width; x++)
+                    if (map[x, y] == c) cells.Add(new Vector2Int(x, y));
+            return cells;
+        }
 
         // wing nulo = nome da ala pela posição no mapa (Alfa tem as 3 alas lado a lado).
         private static void Build(string layoutFile, string scenePath, int drivesRequired, string wing)
@@ -214,6 +277,8 @@ namespace SombraDaSanidade.EditorTools
                 {
                     var cell = new Vector3Int(x, y, 0);
                     char c = map[x, y];
+                    for (int left = x - 1; IntroMarkers.IndexOf(c) >= 0; left--)
+                        c = left >= 0 && map.IsFloor(left, y) ? map[left, y] : '.';
                     if (map.IsFloor(x, y))
                     {
                         string f = c == ',' ? "floor_grate" : c == 'h' ? "floor_hazard" : pool[rng.Next(pool.Length)];

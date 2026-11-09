@@ -102,6 +102,15 @@ namespace SombraDaSanidade.Monster
 
         private bool chasingBeforeStun;
 
+        // Encontro roteirizado (Proposta 4 do v1.1): anda por uma rota fixa e, se for iluminado, grita e
+        // investiga em vez de perseguir. Depois dá uns segundos de folga antes de a luz valer de novo.
+        private const float ScriptedLightGrace = 4f;
+        private List<Vector2> route;
+        private int routeIndex;
+        private bool routeStarted;
+        private bool scriptedReaction;
+        private float lightGraceUntil = float.NegativeInfinity;
+
         private void Awake()
         {
             agent = GetComponent<NavMeshAgent>();
@@ -190,8 +199,15 @@ namespace SombraDaSanidade.Monster
                 return;
             }
 
+            if (route != null)
+            {
+                UpdateRoute();
+                AvoidSafeZones();
+                return;
+            }
+
             // Modo econômico do Filtro Âmbar (#31) ilumina sem atrair.
-            if (IsLitByFlashlight() && flashlight.AttractsMonster) OnLit();
+            if (Time.time >= lightGraceUntil && IsLitByFlashlight() && flashlight.AttractsMonster) OnLit();
 
             switch (State)
             {
@@ -209,6 +225,7 @@ namespace SombraDaSanidade.Monster
         public void Stun(float duration)
         {
             if (IsKilling) return;
+            route = null;
             if (State != MonsterState.Stunned) chasingBeforeStun = State == MonsterState.Chase;
             IsDetecting = false;
             stateTimer = duration;
@@ -225,7 +242,7 @@ namespace SombraDaSanidade.Monster
         public void Alert(Vector2 position)
         {
             RememberNoise(position);
-            if (State == MonsterState.Stunned || State == MonsterState.Chase) return;
+            if (IsOnRoute || State == MonsterState.Stunned || State == MonsterState.Chase) return;
             lastNoiseVisited = true;
             EnterInvestigate(position);
         }
@@ -255,6 +272,20 @@ namespace SombraDaSanidade.Monster
             Behaviours = behaviours;
             if (!Has(MonsterBehaviour.Search)) searchLeft = 0;
             BehavioursChanged?.Invoke(behaviours);
+        }
+
+        // Encontro roteirizado: segue `points` em ordem sem ligar para ruído e, no fim, volta à patrulha.
+        // Se for iluminado no caminho, grita e investiga o ponto do jogador (sem Perseguição). Pode ser chamado
+        // antes do Start; a rota começa quando o agente estiver no NavMesh.
+        public bool IsOnRoute => route != null;
+
+        public void FollowRoute(IReadOnlyList<Vector2> points)
+        {
+            if (points == null || points.Count == 0) return;
+            route = new List<Vector2>(points);
+            routeIndex = 0;
+            routeStarted = false;
+            if (State != MonsterState.Patrol) SetState(MonsterState.Patrol);
         }
 
         public void SetSpeedMultiplier(float multiplier)
@@ -418,6 +449,36 @@ namespace SombraDaSanidade.Monster
             Detected?.Invoke();
         }
 
+        private void UpdateRoute()
+        {
+            if (IsLitByFlashlight() && flashlight.AttractsMonster)
+            {
+                // Grito igual ao da Perseguição; o UpdateChase troca a corrida por investigação.
+                route = null;
+                scriptedReaction = true;
+                OnLit();
+                return;
+            }
+
+            if (!routeStarted)
+            {
+                routeStarted = true;
+                waiting = false;
+                MoveTo(route[routeIndex]);
+                return;
+            }
+            if (!Arrived()) return;
+
+            routeIndex++;
+            if (routeIndex < route.Count)
+            {
+                MoveTo(route[routeIndex]);
+                return;
+            }
+            route = null;
+            EnterPatrol();
+        }
+
         private void UpdateChase()
         {
             if (IsDetecting)
@@ -427,6 +488,13 @@ namespace SombraDaSanidade.Monster
                 IsDetecting = false;
                 agent.isStopped = false;
                 repathTimer = 0f;
+                if (scriptedReaction)
+                {
+                    scriptedReaction = false;
+                    lightGraceUntil = Time.time + ScriptedLightGrace;
+                    EnterInvestigate(lastKnownPlayerPos);
+                    return;
+                }
             }
 
             bool tracking = player != null && Time.time - lastSeenTime <= config.chaseMemory;
