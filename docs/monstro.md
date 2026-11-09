@@ -90,6 +90,17 @@ Números em `MonsterConfig` (`breakerCheck*`, `noiseMemory*`).
 
 **Ainda depende do #30:** a velocidade e o raio auditivo por ala (tabela da Proposta 1 do v1.1). O `DifficultyProfile` vai ajustar esses números e chamar `SetBehaviours` na troca de ala.
 
+## Fúria da Eclusa (#44)
+
+Quando o terminal da eclusa recebe os 3 HDs, a purga (`Level/EscapeSequence`) chama `MonsterController.SetFury(true)`:
+
+- **Velocidade:** `MonsterConfig.furySpeed` (4.6, coluna Eclusa da Proposta 1) no lugar da base + bônus dos HDs. O galope da Perseguição e o modo seguro continuam multiplicando.
+- **Audição:** raio mínimo `furyHearingRadius` (9).
+- **Comportamentos:** todos os da Executiva. O `BetaWingTracker` não troca mais os comportamentos enquanto ele estiver em fúria.
+- O barulho da eclusa abrindo (raio 40 no `EscapeConfig`) o chama para o terminal.
+
+Detalhes da fase em [eclusa.md](eclusa.md).
+
 ## Diretor de tensão (#35)
 
 `Core/TensionDirector` é a curva dente-de-serra do GDD 7 em código. Base: o menace gauge do Alien: Isolation e o ciclo do Left 4 Dead ([pesquisa](pesquisa/ritmo-e-tensao.md), Proposta 7).
