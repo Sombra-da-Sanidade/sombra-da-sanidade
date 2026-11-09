@@ -187,6 +187,19 @@ namespace SombraDaSanidade.Beta
             if (GUILayout.Button("+1 HD") && GameManager.Instance != null) GameManager.Instance.CollectDrive();
             GUILayout.EndHorizontal();
 
+            var escape = Level.EscapeSequence.Instance;
+            if (escape != null)
+            {
+                GUILayout.Label("Fuga da Eclusa", headerStyle);
+                GUILayout.BeginHorizontal();
+                if (GUILayout.Button("+3 HDs") && GameManager.Instance != null)
+                    while (!GameManager.Instance.HasAllDrives) GameManager.Instance.CollectDrive();
+                if (GUILayout.Button("Iniciar purga") && escape.Terminal != null && !escape.Terminal.Activated)
+                    escape.Terminal.CompleteInteract();
+                if (GUILayout.Button("Purga em 10 s")) escape.SetRemaining(10f);
+                GUILayout.EndHorizontal();
+            }
+
             GUILayout.Label("Ir para", headerStyle);
             int col = 0;
             GUILayout.BeginHorizontal();
@@ -216,9 +229,12 @@ namespace SombraDaSanidade.Beta
             string follow = wings != null && !wings.FollowPlayer ? " (forçada no painel)" : "";
             GUILayout.Label($"Ala do jogador: {wing}{follow}");
             if (monster != null)
-                GUILayout.Label($"Monstro: {monster.State}, comportamentos {monster.Behaviours}, velocidade {monster.CurrentSpeed:0.00}");
+                GUILayout.Label($"Monstro: {monster.State}{(monster.IsFurious ? " (FÚRIA)" : "")}, comportamentos {monster.Behaviours}, velocidade {monster.CurrentSpeed:0.00}");
             var tension = TensionDirector.Instance;
             if (tension != null) GUILayout.Label($"Tensão: {tension.Value:0.00} ({tension.Phase})");
+            var escape = Level.EscapeSequence.Instance;
+            if (escape != null)
+                GUILayout.Label(escape.Active ? $"Purga: faltam {escape.Remaining:0} s (só aqui, nunca no HUD)" : "Purga: aguardando os HDs no terminal");
             if (sanity != null) GUILayout.Label($"Sanidade: {sanity.Value:0} ({sanity.State})");
             if (flashlight != null) GUILayout.Label($"Bateria: {flashlight.Battery:0}/{flashlight.MaxBattery:0}, upgrades: {flashlight.Installed.Count}");
         }

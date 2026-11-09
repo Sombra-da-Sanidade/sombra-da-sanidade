@@ -77,12 +77,17 @@ namespace SombraDaSanidade.UI
         private static void DrawGameOver(GameManager gm, int x, int y, int w, int h)
         {
             bool mind = gm.LastDeathCause == DeathCause.Sanity;
+            bool purge = gm.LastDeathCause == DeathCause.Purge;
             PixelHud.Dim(PixelHud.Emergencia1, 1f);
-            PixelHud.Dim(PixelHud.Vazio, 0.75f);
+            PixelHud.Dim(PixelHud.Vazio, purge ? 0.55f : 0.75f);
             int cx = PixelHud.Width / 2;
+            // Purga (#44): ainda sem selo próprio; usa o das garras até a arte chegar.
             PixelHud.Sprite("screens", mind ? "stamp_dead_mind" : "stamp_dead_monster", cx - 24, y + 4, 1f, 3);
             PixelHud.TextCentered("FIM DA LINHA", cx, y + 64, mind ? PixelHud.Hipnos2 : PixelHud.Emergencia4, 1f, 2);
-            PixelHud.TextCentered(mind ? "SUA MENTE COLAPSOU NO ESCURO." : "O ESPÉCIME VAZIO TE ALCANÇOU.", cx, y + 84, PixelHud.Concreto7);
+            string cause = mind ? "SUA MENTE COLAPSOU NO ESCURO."
+                : purge ? "A PURGA DA ECLUSA TE ALCANÇOU."
+                : "O ESPÉCIME VAZIO TE ALCANÇOU.";
+            PixelHud.TextCentered(cause, cx, y + 84, PixelHud.Concreto7);
             cachedFailures = -1;
         }
 

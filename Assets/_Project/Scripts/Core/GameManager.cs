@@ -7,7 +7,7 @@ namespace SombraDaSanidade.Core
 {
     public enum GameState { Playing, GameOver, Victory }
 
-    public enum DeathCause { Monster, Sanity }
+    public enum DeathCause { Monster, Sanity, Purge }
 
     // Estado da partida, HDs coletados e condições de vitória/derrota (GDD 4.4).
     // Um por cena. As telas de fim ficam em UI.ResultScreen (issue #64).
@@ -16,6 +16,8 @@ namespace SombraDaSanidade.Core
         public static GameManager Instance { get; private set; }
 
         [SerializeField] private int drivesRequired = 3;
+        [Tooltip("HDs com que a cena começa. A Eclusa (#44) começa com os 3, trazidos das alas anteriores.")]
+        [SerializeField, Min(0)] private int startingDrives;
 
         public GameState State { get; private set; } = GameState.Playing;
         public bool IsPlaying => State == GameState.Playing;
@@ -41,6 +43,7 @@ namespace SombraDaSanidade.Core
             }
             Instance = this;
             Time.timeScale = 1f;
+            DrivesCollected = Mathf.Min(startingDrives, drivesRequired);
         }
 
         private void OnDestroy()
@@ -114,9 +117,12 @@ namespace SombraDaSanidade.Core
             else
             {
                 title = "FIM DA LINHA";
-                body = LastDeathCause == DeathCause.Monster
-                    ? "O Espécime Vazio te alcançou."
-                    : "Sua mente colapsou no escuro.";
+                body = LastDeathCause switch
+                {
+                    DeathCause.Monster => "O Espécime Vazio te alcançou.",
+                    DeathCause.Purge => "A purga da eclusa te alcançou.",
+                    _ => "Sua mente colapsou no escuro."
+                };
             }
 
             float w = Screen.width;
