@@ -288,6 +288,12 @@ namespace SombraDaSanidade.Monster
             if (State != MonsterState.Patrol) SetState(MonsterState.Patrol);
         }
 
+        // Perfil da ala (#30): o GameManager troca o config por uma cópia ajustada antes do Awake.
+        public void UseConfig(MonsterConfig tuned)
+        {
+            if (tuned != null) config = tuned;
+        }
+
         public void SetSpeedMultiplier(float multiplier)
         {
             SpeedMultiplier = multiplier;

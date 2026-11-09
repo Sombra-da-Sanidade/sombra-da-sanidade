@@ -53,6 +53,9 @@ namespace SombraDaSanidade.EditorTools
         // Ala Médica (issue #12): a porta abre com o HD-01, então "todos os HDs" aqui é 1.
         public static void RunBatchAlaMedica() => Start(batch: true, AlfaSceneBuilder.AlaMedicaScenePath);
 
+        // Ala de Energia (#42): o servidor do HD-02 só liga depois da subestação (o passo 7 religa por código).
+        public static void RunBatchAlaEnergia() => Start(batch: true, AlfaSceneBuilder.AlaEnergiaScenePath);
+
         private static void Start(bool batch, string sceneOverride = null)
         {
             string scene = sceneOverride ?? (System.IO.File.Exists(PrototypeSceneBuilder.DemoScenePath)
@@ -161,6 +164,8 @@ namespace SombraDaSanidade.EditorTools
                 case 7:
                     Release();
                     CheckInput("F liga a lanterna de novo", flashlight.IsSwitchedOn);
+                    // Ala de Energia: religa a subestação antes (o teste da ala cobre o reparo de verdade).
+                    foreach (var sub in Object.FindObjectsByType<Substation>()) sub.CompleteInteract();
                     // Leva o jogador ao primeiro servidor e segura E de verdade.
                     var server = Object.FindAnyObjectByType<DriveServer>();
                     Teleport(player, server.transform.position + Vector3.down * 1.1f);

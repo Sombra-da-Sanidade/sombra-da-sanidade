@@ -39,6 +39,12 @@ namespace SombraDaSanidade.Sanity
 
         private int safeZoneCount;
 
+        // Perfil da ala (#30): o GameManager troca o config por uma cópia ajustada antes do Awake.
+        public void UseConfig(SanityConfig tuned)
+        {
+            if (tuned != null) config = tuned;
+        }
+
         private void Awake()
         {
             if (config == null)

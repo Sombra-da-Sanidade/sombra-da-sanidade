@@ -30,9 +30,15 @@ namespace SombraDaSanidade.EditorTools
         private const string LayoutFile = "art-src/Maps/alfa.txt";
         public const string AlaMedicaScenePath = Root + "/Scenes/Wings/AlaMedica.unity";
         private const string AlaMedicaLayoutFile = "art-src/Maps/ala-medica.txt";
+        public const string AlaEnergiaScenePath = Root + "/Scenes/Wings/AlaEnergia.unity";
+        private const string AlaEnergiaLayoutFile = "art-src/Maps/ala-energia.txt";
 
         // Caracteres que são chão (o resto é parede/teto).
-        private const string FloorChars = ".,hwpbL@MmiAa" + IntroMarkers;
+        private const string FloorChars = ".,hwpbL@MmiAa" + IntroMarkers + EnergiaFloorChars;
+
+        // Ala de Energia (#42): c cabos, v faixa de alta tensão, t transformador, o bobina de cabo,
+        // ( e ) pontas do atalho só do monstro.
+        private const string EnergiaFloorChars = "cvto()";
 
         // Marcadores da introdução da Ala Médica (WingIntro): rotas 1-3 e 4-6, gatilhos x e y. São chão; o
         // desenho é o do vizinho da esquerda (grade no corredor, piso liso na sala).
@@ -52,8 +58,73 @@ namespace SombraDaSanidade.EditorTools
             BuildAlaMedica();
         }
 
+        [MenuItem("Sombra da Sanidade/Gerar cena Ala de Energia (tiles)", priority = 4)]
+        public static void BuildAlaEnergiaFromMenu()
+        {
+            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            BuildAlaEnergia();
+        }
+
         // Batchmode: -executeMethod SombraDaSanidade.EditorTools.AlfaSceneBuilder.Build
         public static void Build() => Build(LayoutFile, ScenePath, drivesRequired: 3, wing: null);
+
+        // Batchmode: -executeMethod SombraDaSanidade.EditorTools.AlfaSceneBuilder.BuildAlaEnergia
+        // Fase 2 (GDD 7): religar a subestação, ejetar o HD-02 e voltar à porta. 1 HD nesta ala.
+        public static void BuildAlaEnergia()
+        {
+            var map = LoadLayout(AlaEnergiaLayoutFile);
+            if (map == null) return;
+            var profile = DifficultyProfiles.GetOrCreate("Energia");
+            int breakers = Find(map, 'K').Count;
+            if (breakers != profile.breakersAvailable)
+                Debug.LogError($"Ala de Energia: a planta tem {breakers} disjuntores e o perfil pede {profile.breakersAvailable}.");
+            BuildFromLayout(map, AlaEnergiaScenePath, drivesRequired: 1, (x, y) => "Energia", AddEnergiaFlow);
+        }
+
+        // Perfil da ala (#30), checkpoint (#45), atalho do monstro, subestação ligada ao servidor e pistas.
+        private static void AddEnergiaFlow(BuildContext ctx)
+        {
+            var profile = DifficultyProfiles.GetOrCreate("Energia");
+            var gm = UnityEngine.Object.FindAnyObjectByType<GameManager>();
+            var gmSo = new SerializedObject(gm);
+            gmSo.FindProperty("profile").objectReferenceValue = profile;
+            gmSo.FindProperty("priorDrives").intValue = 1;   // aberta direto, sem checkpoint: a Médica já deu o HD-01
+            gmSo.ApplyModifiedPropertiesWithoutUndo();
+
+            var go = new GameObject("WingFlow");
+            var checkpoint = go.AddComponent<SombraDaSanidade.Level.WingCheckpoint>();
+            var cso = new SerializedObject(checkpoint);
+            cso.FindProperty("wing").stringValue = "Energia";
+            cso.FindProperty("nextWing").stringValue = "Executiva";
+            cso.ApplyModifiedPropertiesWithoutUndo();
+
+            var substation = ctx.Objectives.GetComponentInChildren<Substation>();
+            var server = ctx.Objectives.GetComponentInChildren<DriveServer>();
+            if (substation == null || server == null) Debug.LogError("Ala de Energia: falta a subestação (U) ou o servidor (S) na planta.");
+            if (server != null) PrototypeSceneBuilder.SetRef(server, "requiredPower", substation);
+            var objectives = go.AddComponent<SombraDaSanidade.Level.WingObjectives>();
+            PrototypeSceneBuilder.SetRef(objectives, "substation", substation);
+            PrototypeSceneBuilder.SetRef(objectives, "server", server);
+
+            // Atalho só do monstro entre Controle A e B, através da parede de 3 tiles (docs/beta.md).
+            var from = Find(ctx.Map, '(');
+            var to = Find(ctx.Map, ')');
+            if (from.Count == 1 && to.Count == 1)
+                PrototypeSceneBuilder.CreateMonsterShortcut(go.transform, "MonsterShortcut",
+                    new Vector2(from[0].x + 0.5f, from[0].y + 0.5f), new Vector2(to[0].x + 0.5f, to[0].y + 0.5f));
+            else
+                Debug.LogError("Ala de Energia: a planta precisa de uma ponta ( e uma ) para o atalho do monstro.");
+
+            // Pistas em fósforo: a luz de teto protege (perto do primeiro disjuntor) e o EMP na hora certa.
+            var first = ctx.Objectives.Cast<Transform>().Where(t => t.name.StartsWith("Breaker_Energia"))
+                .OrderBy(t => ((Vector2)t.position - (Vector2)ctx.Player.transform.position).sqrMagnitude).FirstOrDefault();
+            if (first != null)
+                PrototypeSceneBuilder.CreateClue(ctx.Items, "Clue_LuzDoTeto", (Vector2)first.position + new Vector2(-2.5f, -1.2f),
+                    "A LUZ DO TETO ELE NÃO CRUZA", 0.05f);
+            if (substation != null)
+                PrototypeSceneBuilder.CreateClue(ctx.Items, "Clue_Emp", (Vector2)substation.transform.position + Vector2.down * 2.2f,
+                    "ESPERE ELE CHEGAR. DEPOIS O PULSO.", 0.05f);
+        }
 
         // Batchmode: -executeMethod SombraDaSanidade.EditorTools.AlfaSceneBuilder.BuildAlaMedica
         // A ala só tem o HD-01, então a porta para o saguão abre com 1 HD.
@@ -185,6 +256,9 @@ namespace SombraDaSanidade.EditorTools
                     {
                         case 'S': CreateServer(objectives, square, $"DriveServer_{wingAt(x, y)}", inFront, center); break;
                         case 'K': CreateBreaker(objectives, square, $"Breaker_{wingAt(x, y)}_{++breakers}", inFront); break;
+                        case 'U': CreateSubstation(objectives, $"Substation_{wingAt(x, y)}", inFront, new Vector3Int(x, y, 0), tiles); break;
+                        case 't': CreateDecor(items, square, $"Transformer_{x}_{y}", center, "transformer", onFloor: false); break;
+                        case 'o': CreateDecor(items, square, $"CableCoil_{x}_{y}", center, "cable_coil", onFloor: true); break;
                         case 'E': exitCells.Add(new Vector2Int(x, y)); break;
                         case '@': playerSpawn = center; break;
                         case 'M': monsterSpawn = center; break;
@@ -281,9 +355,15 @@ namespace SombraDaSanidade.EditorTools
                         c = left >= 0 && map.IsFloor(left, y) ? map[left, y] : '.';
                     if (map.IsFloor(x, y))
                     {
-                        string f = c == ',' ? "floor_grate" : c == 'h' ? "floor_hazard" : pool[rng.Next(pool.Length)];
+                        string f = c switch
+                        {
+                            ',' or '(' or ')' => "floor_grate",
+                            'h' => "floor_hazard",
+                            'c' => "floor_cables",
+                            _ => pool[rng.Next(pool.Length)]
+                        };
                         Set(floor, tiles, cell, f);
-                        string decal = c switch { 'w' => "puddle", 'p' => "papers", 'b' => "blood_smear", 'L' => "ceiling_lamp", _ => null };
+                        string decal = c switch { 'w' => "puddle", 'p' => "papers", 'b' => "blood_smear", 'L' => "ceiling_lamp", 'v' => "warning_high_voltage", _ => null };
                         if (decal != null) Set(decals, tiles, cell, decal);
                         continue;
                     }
@@ -291,9 +371,13 @@ namespace SombraDaSanidade.EditorTools
                     // Parede em vista 3/4: duas fileiras de face acima do chão, depois o topo escuro.
                     string t;
                     if (map.IsFloor(x, y - 1))
-                        t = c switch { 'S' => "server_bottom", 'K' => "breaker_off", 'T' => "wall_terminal", 'P' => "wall_face_pipes", 'E' => "door_bottom", _ => "wall_face" };
+                        t = c switch
+                        {
+                            'S' => "server_bottom", 'K' => "breaker_off", 'T' => "wall_terminal", 'P' => "wall_face_pipes",
+                            'E' => "door_bottom", 'U' => "substation_off", 'Q' => "wall_face_panel", _ => "wall_face"
+                        };
                     else if (map.IsFloor(x, y - 2))
-                        t = map[x, y - 1] switch { 'S' => "server_top", 'E' => "door_top", _ => "wall_face" };
+                        t = map[x, y - 1] switch { 'S' => "server_top", 'E' => "door_top", 'U' => "substation_top", _ => "wall_face" };
                     else if (NearFloor(map, x, y))
                         t = "wall_top";
                     else
@@ -386,6 +470,34 @@ namespace SombraDaSanidade.EditorTools
         {
             PrototypeSceneBuilder.CreateBreaker(parent, square, name, floorCell);
             parent.Find(name).GetComponent<SpriteRenderer>().enabled = false;   // o desenho é o tile breaker_off
+        }
+
+        // Console da subestação (#42): o desenho é o tile substation_off na parede; ao religar, a Substation troca
+        // pelo substation_on. O trigger de interação fica no chão logo à frente.
+        private static void CreateSubstation(Transform parent, string name, Vector2 floorCell, Vector3Int wallCell,
+            Dictionary<string, Tile> tiles)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+            go.transform.position = floorCell;
+            var col = go.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            col.size = new Vector2(1.6f, 1.4f);
+            var substation = go.AddComponent<Substation>();
+            var so = new SerializedObject(substation);
+            so.FindProperty("wallTiles").objectReferenceValue = GameObject.Find("Grid/Walls").GetComponent<Tilemap>();
+            so.FindProperty("tileCell").vector3IntValue = wallCell;
+            so.FindProperty("poweredTile").objectReferenceValue = tiles.TryGetValue("substation_on", out var on) ? on : null;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // Decoração da Ala de Energia (Art/Props), sem colisão: o NavMesh do monstro só conhece as paredes, então
+        // um obstáculo sólido fora delas poderia prendê-lo. onFloor: desenhada no chão, sob o jogador.
+        private static void CreateDecor(Transform parent, Sprite square, string name, Vector2 cell, string sprite, bool onFloor)
+        {
+            var go = PrototypeSceneBuilder.CreateBlock(parent, square, name, cell, new Vector2(0.8f, 0.8f), new Color(0.35f, 0.38f, 0.45f));
+            var art = PrototypeSceneBuilder.UseProp(go, sprite, Vector2.one, 2);
+            if (art != null && onFloor) art.sortingOrder = -7;
         }
 
         // Armário encostado na parede, com o Locker (Frente 1, issue #29) e a tabela de loot da ala (#46).
