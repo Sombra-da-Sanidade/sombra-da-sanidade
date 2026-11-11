@@ -139,7 +139,7 @@ namespace SombraDaSanidade.EditorTools
                     float avg = gm.AverageSanity;
                     Check($"Sanidade média entre a cheia e a metade ({avg:P0})", avg > 0.45f && avg < 0.95f);
                     var config = RankConfig.Load();
-                    var expected = config.RankFor(config.Score(gm.ElapsedTime, gm.DrivesRequired, avg, gm.EmpsUsed, gm.Deaths));
+                    var expected = config.RankFor(config.Score(gm.RunTime, gm.DrivesRequired, avg, gm.RunEmps, gm.Deaths));
                     Check($"Vitória calcula o rank ({gm.FinalRank}, nota {gm.RankScore:0.00})",
                         gm.State == GameState.Victory && gm.FinalRank == expected);
                     Check("Primeiro rank da cena é o melhor e fica salvo",

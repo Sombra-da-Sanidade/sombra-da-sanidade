@@ -12,7 +12,8 @@ Frente 5, issue #32 (e o CONTINUAR da #45). Fluxo do GDD 8: Menu → Briefing �
 | Game Over | `ResultScreen` | Selo e frase da causa (`DeathCause`); R ou o botão reiniciam |
 
 - **JOGAR** começa uma partida nova: zera as mortes e apaga o checkpoint antigo.
-- **CONTINUAR** aparece quando há checkpoint salvo (#45) e a cena da próxima ala está no Build Profile. O nome da cena segue a Ala Médica: `Ala` + ala (`AlaEnergia`, `AlaExecutiva`). Enquanto essas cenas não existirem, o botão não aparece.
+- **CONTINUAR** aparece quando há checkpoint salvo (#45) e a cena da próxima ala está no Build Profile. O nome da cena segue a Ala Médica: `Ala` + ala (`AlaEnergia`, `AlaExecutiva`). Enquanto essas cenas não existirem, o botão não aparece. O que o checkpoint guarda está em [checkpoint.md](checkpoint.md).
+- **Estatísticas entre alas:** tempo, EMPs, sanidade média, mortes, HDs e falhas somam as alas anteriores, vindas do checkpoint.
 
 ## Estatísticas
 

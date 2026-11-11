@@ -5,15 +5,29 @@ using UnityEngine;
 namespace SombraDaSanidade.Core
 {
     // Checkpoint entre alas (GDD 10, issue #45): um JSON local salvo ao concluir cada ala. No WebGL o
-    // persistentDataPath fica no IndexedDB do navegador. Continuar na próxima ala (TryLoad) é das outras alas.
+    // persistentDataPath fica no IndexedDB do navegador. O Level.WingCheckpoint salva ao concluir uma ala e
+    // restaura ao entrar na próxima (pelo CONTINUAR do Menu ou ao reiniciar depois de um Game Over).
     [Serializable]
     public class CheckpointData
     {
         public string lastWing;       // ala concluída ("Medica", "Energia", "Executiva")
         public string nextWing;       // onde o jogador recomeça
-        public int drives;            // HDs entregues até aqui
-        public float elapsedSeconds;  // tempo da ala (para o rank da #49)
+        public int drives;            // HDs entregues até aqui, somando as alas
+        public float elapsedSeconds;  // tempo da ala concluída
         public string savedAtUtc;     // ISO 8601
+
+        // Estado do Thomas ao sair da ala (#45).
+        public float battery;
+        public float sanity;
+        public string[] upgrades = new string[0];   // nomes dos assets LuxUpgrade instalados (#31)
+
+        // Estatísticas do rank (#32) da partida até aqui.
+        public float totalSeconds;
+        public int deaths;
+        public int emps;
+        public float sanitySum;       // integral da sanidade (0 a 1) no tempo
+        public float sanitySeconds;
+        public int skillCheckFailures;
     }
 
     public static class Checkpoint
