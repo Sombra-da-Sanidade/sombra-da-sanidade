@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SombraDaSanidade.UI
 {
     // Telas de fim de partida com o kit CRT (screens.json). Chamado pelo OnGUI do GameManager.
-    // Vitória: gavetas de HD, tempo e falhas no multímetro (o rank vem na #49). Game over: selo da causa
+    // Vitória: gavetas de HD, rank S/A/B/C e estatísticas (#32). Game over: selo da causa
     // (garras vermelhas para o Espécime, espiral roxa para a mente). Fora do jogo número pode aparecer. Issue #64.
     public static class ResultScreen
     {
@@ -51,7 +51,7 @@ namespace SombraDaSanidade.UI
                 PixelHud.Text(Level.WingCheckpoint.DisplayName(wing.Wing) + " CONCLUÍDA", x + 52, y + 18, PixelHud.Fosforo5, 1f, 2);
                 PixelHud.Text("PORTA PARA O SAGUÃO DESTRAVADA.", x + 52, y + 36, PixelHud.Fosforo3);
                 if (wing.StatusLine.Length > 0)
-                    PixelHud.TextCentered(wing.StatusLine, x + w / 2, y + 119, wing.Saved ? PixelHud.Fosforo5 : PixelHud.Emergencia4);
+                    PixelHud.TextCentered(wing.StatusLine, x + w / 2, y + 123, wing.Saved ? PixelHud.Fosforo5 : PixelHud.Emergencia4);
             }
             else
             {
@@ -68,10 +68,21 @@ namespace SombraDaSanidade.UI
                 foreach (var server in Object.FindObjectsByType<DriveServer>(FindObjectsSortMode.None))
                     cachedFailures += server.SkillCheckFailures;
             }
-            string time = FormatTime(gm.ElapsedTime);
-            Stat("TEMPO", time, x + 14, y + 82, x + 180);
-            Stat("HDS", $"{gm.TotalDrives}/{gm.TotalDrivesRequired}", x + 14, y + 93, x + 180);
-            Stat("FALHAS NO MULTÍMETRO", cachedFailures.ToString(), x + 14, y + 104, x + 180);
+            // Avaliação do auditor (#32, Proposta 3): selo do rank e o melhor já tirado nesta cena.
+            int rankX = x + w - 46;
+            PixelHud.TextCentered("RANK", rankX + 16, y + 44, PixelHud.Fosforo3);
+            PixelHud.Sprite("screens", "rank_" + gm.FinalRank, rankX, y + 52, 1f, 2);
+            var best = GameManager.BestRank(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+            if (gm.IsNewBestRank) PixelHud.Text("NOVO MELHOR RANK", x + 14, y + 76, PixelHud.Ambar2);
+            else if (best != null) PixelHud.Text("MELHOR RANK: " + best.Value, x + 14, y + 76, PixelHud.Fosforo3);
+
+            int left = x + 14, leftEnd = x + 136, right = x + 150, rightEnd = x + w - 14;
+            Stat("TEMPO", FormatTime(gm.ElapsedTime), left, y + 88, leftEnd);
+            Stat("HDS", $"{gm.TotalDrives}/{gm.TotalDrivesRequired}", left, y + 99, leftEnd);
+            Stat("FALHAS MULTÍMETRO", cachedFailures.ToString(), left, y + 110, leftEnd);
+            Stat("SANIDADE MÉDIA", Mathf.RoundToInt(gm.AverageSanity * 100f) + "%", right, y + 88, rightEnd);
+            Stat("EMPS", gm.EmpsUsed.ToString(), right, y + 99, rightEnd);
+            Stat("MORTES", gm.Deaths.ToString(), right, y + 110, rightEnd);
         }
 
         private static void DrawGameOver(GameManager gm, int x, int y, int w, int h)

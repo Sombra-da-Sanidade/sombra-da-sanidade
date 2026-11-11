@@ -71,7 +71,7 @@ Fontes em `art-src/UI/`, PNG em `Assets/_Project/Art/UI/`. O código lê tudo pe
 | "Carga insuficiente para EMP" | Raio cortado piscando ao lado da pilha (`FlashlightController.EmpFailed`) |
 | Relógio sem efeitos | Linha nova (altura 56): Adrena-Syn (pisca nos últimos 3 s), lentidão do Estabilizador (`PlayerController.SlowedUntil`) e upgrades instalados; LED âmbar do modo econômico |
 | Terminal de upgrade em caixa padrão | Terminal Aethelgard com dois cartões, ícone, nome e efeito; clique ou 1/2 |
-| Fim de partida em texto | `ResultScreen`: vitória com gavetas, tempo e falhas no multímetro; game over com selo da causa. R ou o botão reiniciam |
+| Fim de partida em texto | `ResultScreen`: vitória com gavetas, selo do rank e estatísticas (#32); game over com selo da causa. R ou o botão reiniciam |
 
 ### Pausa e configurações
 
@@ -79,10 +79,10 @@ Fontes em `art-src/UI/`, PNG em `Assets/_Project/Art/UI/`. O código lê tudo pe
 
 ### Menu inicial (Frente 5, #32)
 
-`MainMenuScreen` tem logo, JOGAR (abre o briefing com os controles e INICIAR TURNO), CONFIGURAÇÕES e SAIR. **Sombra da Sanidade > Criar cena de Menu** gera `Scenes/Main/Menu.unity`. O builder não mexe no Build Profile: a Frente 5 decide a ordem das cenas e a cena do jogo (`gameScene`, padrão `Beta`).
+`MainMenuScreen` tem logo, CONTINUAR (só com checkpoint), JOGAR (abre o briefing com os controles e INICIAR TURNO), CONFIGURAÇÕES, SAIR e o melhor rank. **Sombra da Sanidade > Criar cena de Menu** gera `Scenes/Main/Menu.unity`, que é a cena 0 do Build Profile e a primeira da build WebGL. Fluxo, estatísticas e rank: [telas-e-rank.md](telas-e-rank.md).
 
 ### Testes
 
 **Sombra da Sanidade > Rodar teste do HUD em pixel art** (`HudArtTest`): texturas, todo frame usado pelo código, cobertura da fonte, arco do multímetro e pausa.
 
-Ainda não ligados: `rank_*` (bônus no rank, #49), `fx_eco` e `safe_zone` (o LED do relógio cumpre o papel), `emp_ready`.
+Ainda não ligados: `fx_eco` e `safe_zone` (o LED do relógio cumpre o papel), `emp_ready`.

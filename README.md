@@ -8,7 +8,7 @@ Survival horror psicológico em 2D top-down feito em Unity para a disciplina de 
 
 Versão beta (WebGL): https://sombra-da-sanidade.github.io/sombra-da-sanidade/
 
-A cena publicada é a [Beta](docs/beta.md): mapa gerado com tudo o que já foi implementado e painel de teste no F1.
+A build abre no Menu, e JOGAR carrega a [Beta](docs/beta.md): mapa gerado com tudo o que já foi implementado e painel de teste no F1.
 
 Para publicar uma versão nova: gere o build pelo menu **Sombra da Sanidade > Build WebGL** e rode `tools/publish-webgl.sh`. O script envia `Builds/WebGL` para o branch `gh-pages`.
 
@@ -55,6 +55,7 @@ Para publicar uma versão nova: gere o build pelo menu **Sombra da Sanidade > Bu
 | [docs/monstro.md](docs/monstro.md) | Espécime Vazio: estados, regras e contratos da IA |
 | [docs/sanidade.md](docs/sanidade.md) | Sanidade: dreno, efeitos, batimento em 3 faixas |
 | [docs/hud.md](docs/hud.md) | HUD diegético: pilha, HDs, relógio no Tab, legendas |
+| [docs/telas-e-rank.md](docs/telas-e-rank.md) | Menu, briefing, vitória com rank S/A/B/C e CONTINUAR |
 | [docs/narrativa/logs.md](docs/narrativa/logs.md) | Roteiros dos logs da Dra. Vance (rascunho para o grupo) |
 | [docs/dificuldade.md](docs/dificuldade.md) | `DifficultyProfile`: valores por ala e quem lê cada um |
 | [docs/arte/guia-de-estilo.md](docs/arte/guia-de-estilo.md) | Direção de arte: paleta, escala, regras de desenho, fichas de personagem |

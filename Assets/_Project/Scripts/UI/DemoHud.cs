@@ -278,6 +278,8 @@ namespace SombraDaSanidade.UI
         private void OnGUI()
         {
             if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) return;
+            // Pausa (ou outra tela modal) aberta: a pilha e as legendas não podem ficar por cima do painel.
+            if (ModalScreen.IsOpen) return;
             if (Event.current.type != EventType.Repaint) return;
 
             Begin();

@@ -48,6 +48,8 @@ namespace SombraDaSanidade.Flashlight
         public event Action<LuxUpgrade> UpgradeInstalled;
         // Clique direito sem EMP: o HUD pisca a marca do EMP ao lado da pilha (DemoHud).
         public event Action<EmpFailReason> EmpFailed;
+        // Pulso disparado (gastou a carga): o GameManager conta os EMPs para o rank (#32).
+        public event Action EmpFired;
 
         private float rangeMultiplier = 1f;
         private float maxBatteryOverride = -1f;
@@ -194,6 +196,7 @@ namespace SombraDaSanidade.Flashlight
                 return;
             }
 
+            EmpFired?.Invoke();
             if (hitsMonster) monster.Stun(EmpStunDuration);
             // Atordoar primeiro evita que o alvo reaja ao ruído do próprio EMP (GDD 4.3 e 6.3).
             NoiseBus.Emit(transform.position, config.empNoiseRadius);

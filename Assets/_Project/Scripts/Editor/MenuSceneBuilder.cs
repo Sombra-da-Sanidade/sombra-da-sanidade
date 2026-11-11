@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SombraDaSanidade.EditorTools
 {
     // Gera Scenes/Main/Menu.unity: câmera preta e o MainMenuScreen (kit CRT de art-src/UI).
-    // Não mexe no Build Profile: a ordem das cenas e a cena inicial da build WebGL são da Frente 5 (#32).
+    // O Menu é a cena 0 do Build Profile e a primeira da build WebGL (WebGLBuilder), #32.
     public static class MenuSceneBuilder
     {
         public const string ScenePath = "Assets/_Project/Scenes/Main/Menu.unity";
@@ -26,7 +26,7 @@ namespace SombraDaSanidade.EditorTools
             new GameObject("MainMenu").AddComponent<MainMenuScreen>();
 
             EditorSceneManager.SaveScene(scene, ScenePath);
-            Debug.Log($"[Menu] Cena criada em {ScenePath}. Adicione ao Build Profile antes da cena do jogo.");
+            Debug.Log($"[Menu] Cena criada em {ScenePath}.");
         }
 
         // Batchmode: -executeMethod SombraDaSanidade.EditorTools.MenuSceneBuilder.BuildBatch

@@ -1,10 +1,12 @@
+using SombraDaSanidade.Core;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 namespace SombraDaSanidade.UI
 {
-    // Menu inicial com o kit CRT: logo, JOGAR (abre o briefing), CONFIGURAÇÕES e SAIR.
+    // Menu inicial com o kit CRT: logo, CONTINUAR (com checkpoint, #45), JOGAR (abre o briefing), CONFIGURAÇÕES,
+    // SAIR e o melhor rank da cena do jogo (#32).
     // A cena é gerada por Sombra da Sanidade > Criar cena de Menu (MenuSceneBuilder). Frente 5, issues #32 e #64.
     public class MainMenuScreen : MonoBehaviour
     {
@@ -16,7 +18,9 @@ namespace SombraDaSanidade.UI
 
         private enum Page { Main, Briefing, Settings }
 
-        private static readonly string[] Items = { "JOGAR", "CONFIGURAÇÕES", "SAIR" };
+        private const string Continue = "CONTINUAR", Play = "JOGAR", Options = "CONFIGURAÇÕES", Quit = "SAIR";
+        private string[] items = { Play, Options, Quit };
+        private string continueScene;
         private const string Briefing =
             "COMPLEXO EREBUS, SUB-NÍVEL 4. APAGÃO TOTAL. RECUPERE OS 3 HDS DOS SERVIDORES E SAIA PELA ECLUSA.";
 
@@ -25,11 +29,28 @@ namespace SombraDaSanidade.UI
         private int selected;
 
         public string GameScene { get => gameScene; set => gameScene = value; }
+        public bool HasContinue => continueScene != null;
+        public string ContinueScene => continueScene;
 
         private void Start()
         {
             Time.timeScale = 1f;
             GameSettings.Apply();
+            RefreshContinue();
+        }
+
+        // #45: com checkpoint salvo e a cena da próxima ala no Build Profile, o menu oferece CONTINUAR.
+        // A cena da ala segue o nome da Ala Médica: "Ala" + nome da ala (AlaEnergia, AlaExecutiva).
+        public void RefreshContinue()
+        {
+            continueScene = null;
+            if (Checkpoint.TryLoad(out var data) && !string.IsNullOrEmpty(data.nextWing))
+            {
+                string scene = "Ala" + data.nextWing;
+                if (Application.CanStreamedLevelBeLoaded(scene)) continueScene = scene;
+            }
+            items = continueScene != null ? new[] { Continue, Play, Options, Quit } : new[] { Play, Options, Quit };
+            selected = 0;
         }
 
         private void Update()
@@ -46,8 +67,8 @@ namespace SombraDaSanidade.UI
                     else if (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame) StartGame();
                     break;
                 default:
-                    if (kb.wKey.wasPressedThisFrame || kb.upArrowKey.wasPressedThisFrame) selected = (selected + Items.Length - 1) % Items.Length;
-                    if (kb.sKey.wasPressedThisFrame || kb.downArrowKey.wasPressedThisFrame) selected = (selected + 1) % Items.Length;
+                    if (kb.wKey.wasPressedThisFrame || kb.upArrowKey.wasPressedThisFrame) selected = (selected + items.Length - 1) % items.Length;
+                    if (kb.sKey.wasPressedThisFrame || kb.downArrowKey.wasPressedThisFrame) selected = (selected + 1) % items.Length;
                     if (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame) Activate(selected);
                     break;
             }
@@ -55,15 +76,31 @@ namespace SombraDaSanidade.UI
 
         private void Activate(int index)
         {
-            if (index == 0) page = Page.Briefing;
-            else if (index == 1) { page = Page.Settings; settings.Reset(); }
-            else Application.Quit();
+            switch (items[index])
+            {
+                case Continue: Load(continueScene); break;
+                case Play: page = Page.Briefing; break;
+                case Options: page = Page.Settings; settings.Reset(); break;
+                default: Application.Quit(); break;
+            }
         }
 
+        // Partida nova: zera as mortes do rank (#32) e o checkpoint antigo (#45).
         public void StartGame()
         {
-            if (Application.CanStreamedLevelBeLoaded(gameScene)) SceneManager.LoadScene(gameScene);
-            else Debug.LogWarning($"[Menu] A cena '{gameScene}' não está no Build Profile.");
+            if (!Application.CanStreamedLevelBeLoaded(gameScene))
+            {
+                Debug.LogWarning($"[Menu] A cena '{gameScene}' não está no Build Profile.");
+                return;
+            }
+            Checkpoint.Clear();
+            Load(gameScene);
+        }
+
+        private static void Load(string scene)
+        {
+            RunStats.StartRun();
+            SceneManager.LoadScene(scene);
         }
 
         private void OnGUI()
@@ -92,8 +129,9 @@ namespace SombraDaSanidade.UI
 
             const int bw = 104;
             int bx = cx - bw / 2;
-            int ButtonY(int i) => h / 2 - 16 + i * 18;
-            for (int i = 0; i < Items.Length; i++)
+            int top = h / 2 - 16 - (items.Length - 3) * 9;   // com CONTINUAR, a lista sobe meio botão
+            int ButtonY(int i) => top + i * 18;
+            for (int i = 0; i < items.Length; i++)
             {
                 if (!PixelHud.MouseOver(bx, ButtonY(i) + 2, bw, 11)) continue;
                 selected = i;
@@ -103,7 +141,9 @@ namespace SombraDaSanidade.UI
 
             bool glitch = Mathf.Repeat(Time.unscaledTime, glitchEvery) < 0.14f;
             PixelHud.Sprite("logo", glitch ? "logo_glitch" : "logo", cx - 80, h / 2 - 76);
-            for (int i = 0; i < Items.Length; i++) PixelHud.Button(Items[i], bx, ButtonY(i), bw, i == selected);
+            for (int i = 0; i < items.Length; i++) PixelHud.Button(items[i], bx, ButtonY(i), bw, i == selected);
+            var best = GameManager.BestRank(gameScene);
+            if (best != null) PixelHud.TextCentered("MELHOR RANK: " + best.Value, cx, ButtonY(items.Length) + 4, PixelHud.Fosforo3);
             PixelHud.Sprite("hud_bars", "key_space", cx - 68, h - 20);
             PixelHud.Text("CONFIRMAR", cx - 48, h - 18, PixelHud.Fosforo3);
             PixelHud.Sprite("hud_bars", "key_esc", cx + 8, h - 20);

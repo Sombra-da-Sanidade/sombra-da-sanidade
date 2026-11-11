@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SombraDaSanidade.EditorTools
 {
-    // Build WebGL da mini demo em Builds/WebGL (pasta ignorada pelo git).
+    // Build WebGL em Builds/WebGL (pasta ignorada pelo git): Menu e a cena do jogo.
     // Também roda em batchmode: -executeMethod SombraDaSanidade.EditorTools.WebGLBuilder.Build
     public static class WebGLBuilder
     {
@@ -35,9 +35,12 @@ namespace SombraDaSanidade.EditorTools
             PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Gzip;
             PlayerSettings.WebGL.decompressionFallback = true;
 
+            // Menu primeiro (#32): é a cena que abre no navegador e carrega a do jogo (MainMenuScreen.gameScene, Beta).
+            string[] scenes = File.Exists(MenuSceneBuilder.ScenePath) ? new[] { MenuSceneBuilder.ScenePath, scene } : new[] { scene };
+
             var options = new BuildPlayerOptions
             {
-                scenes = new[] { scene },
+                scenes = scenes,
                 locationPathName = OutputDir,
                 target = BuildTarget.WebGL,
                 options = BuildOptions.None
@@ -47,7 +50,7 @@ namespace SombraDaSanidade.EditorTools
             var summary = report.summary;
             if (summary.result == BuildResult.Succeeded)
             {
-                Debug.Log($"Build WebGL ok: {OutputDir} ({summary.totalSize / (1024 * 1024)} MB, cena {scene})");
+                Debug.Log($"Build WebGL ok: {OutputDir} ({summary.totalSize / (1024 * 1024)} MB, cenas {string.Join(", ", scenes)})");
                 if (!Application.isBatchMode) EditorUtility.RevealInFinder(OutputDir);
             }
             else
