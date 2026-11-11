@@ -25,10 +25,25 @@ namespace SombraDaSanidade.Core
         public DeathCause LastDeathCause { get; private set; }
         public float ElapsedTime { get; private set; }
 
-        // Estatísticas do rank (#32, Proposta 3). Tempo e EMPs contam desde o último reinício; mortes, a partida toda.
-        public float AverageSanity => sanityTime > 0f ? sanitySum / sanityTime : 1f;   // 0 a 1
+        // Estatísticas do rank (#32, Proposta 3). EmpsUsed e ElapsedTime contam desde o último reinício da cena;
+        // os Run* somam as alas anteriores trazidas pelo checkpoint (#45). Mortes valem a partida toda.
         public int EmpsUsed { get; private set; }
         public int Deaths => RunStats.Deaths;
+        public float RunTime => RunStats.CarriedSeconds + ElapsedTime;
+        public int RunEmps => RunStats.CarriedEmps + EmpsUsed;
+        public int RunDrives => RunStats.CarriedDrives + DrivesCollected;
+        public float SanitySum => RunStats.CarriedSanitySum + sanitySum;
+        public float SanitySeconds => RunStats.CarriedSanitySeconds + sanityTime;
+        public float AverageSanity => SanitySeconds > 0f ? SanitySum / SanitySeconds : 1f;   // 0 a 1
+
+        // Falhas no multímetro da partida: alas anteriores mais os servidores desta cena. Percorre a cena: não chamar por frame.
+        public int CountSkillCheckFailures()
+        {
+            int total = RunStats.CarriedSkillCheckFailures;
+            foreach (var server in FindObjectsByType<Interaction.DriveServer>(FindObjectsSortMode.None))
+                total += server.SkillCheckFailures;
+            return total;
+        }
 
         // Calculados na vitória.
         public float RankScore { get; private set; }
@@ -139,7 +154,8 @@ namespace SombraDaSanidade.Core
         private void ScoreRank()
         {
             var config = RankConfig.Load();
-            RankScore = config.Score(ElapsedTime, drivesRequired, AverageSanity, EmpsUsed, Deaths);
+            // Tempo ideal pelos HDs da partida inteira: as alas anteriores também contam.
+            RankScore = config.Score(RunTime, RunStats.CarriedDrives + drivesRequired, AverageSanity, RunEmps, Deaths);
             FinalRank = config.RankFor(RankScore);
             string scene = SceneManager.GetActiveScene().name;
             var best = BestRank(scene);
@@ -171,7 +187,7 @@ namespace SombraDaSanidade.Core
             {
                 var wing = Level.WingCheckpoint.Instance;
                 title = wing != null ? Level.WingCheckpoint.DisplayName(wing.Wing) + " CONCLUÍDA" : "VOCÊ ESCAPOU";
-                body = $"Rank {FinalRank}   HDs: {DrivesCollected}/{drivesRequired}   Tempo: {FormatTime(ElapsedTime)}";
+                body = $"Rank {FinalRank}   HDs: {DrivesCollected}/{drivesRequired}   Tempo: {FormatTime(RunTime)}";
                 if (wing != null && wing.StatusLine.Length > 0) body += "   " + wing.StatusLine;
             }
             else
