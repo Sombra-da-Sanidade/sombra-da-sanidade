@@ -11,6 +11,8 @@ namespace SombraDaSanidade.Core
 
     // Estado da partida, HDs coletados e condições de vitória/derrota (GDD 4.4).
     // Um por cena. As telas de fim ficam em UI.ResultScreen (issue #64).
+    // Ordem cedo: o perfil da ala (#30) e os HDs anteriores (#45) ficam prontos antes do Awake dos outros sistemas.
+    [DefaultExecutionOrder(-400)]
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance { get; private set; }
@@ -24,9 +26,18 @@ namespace SombraDaSanidade.Core
 
         public event Action<DifficultyProfile> ProfileChanged;
 
+        [Tooltip("HDs entregues em alas anteriores quando não há checkpoint (cena aberta direto). " +
+                 "Com um checkpoint que aponta para esta ala, vale o número salvo.")]
+        [SerializeField] private int priorDrives;
+
         public GameState State { get; private set; } = GameState.Playing;
         public bool IsPlaying => State == GameState.Playing;
+        // HDs desta ala (porta, HUD e velocidade do monstro, que já sobe de ala em ala pelo perfil).
         public int DrivesCollected { get; private set; }
+        // HDs entregues em alas anteriores (checkpoint #45).
+        public int PriorDrives { get; private set; }
+        // HDs da partida inteira: escolhe o log da Dra. Vance, a escolha de upgrade e o skill check (HD-01, 02, 03).
+        public int TotalDrives => PriorDrives + DrivesCollected;
         public int DrivesRequired => drivesRequired;
         public bool HasAllDrives => DrivesCollected >= drivesRequired;
         public DeathCause LastDeathCause { get; private set; }
@@ -48,6 +59,14 @@ namespace SombraDaSanidade.Core
             }
             Instance = this;
             Time.timeScale = 1f;
+            PriorDrives = LoadPriorDrives();
+        }
+
+        private int LoadPriorDrives()
+        {
+            if (difficulty != null && Checkpoint.TryLoad(out var data) && data.nextWing == difficulty.wing)
+                return Mathf.Max(0, data.drives);
+            return Mathf.Max(0, priorDrives);
         }
 
         private void OnDestroy()

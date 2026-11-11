@@ -15,11 +15,17 @@ Ficam em `Assets/_Project/ScriptableObjects/Config/`. Ajustar um número é só 
 | `hallucinations` | não | sim | sim | sim |
 | `hallucinationInterval` (s) | | 20-30 | 15-25 | 10-15 |
 | `lootTable` | `LootTable_Medica` (70% bateria) | `LootTable_Energia` (60%) | `LootTable_Executiva` (45%) | `LootTable_Eclusa` (0%) |
+| `wing` | Medica | Energia | Executiva | Eclusa |
+| `batteryChance` | 0.7 | 0.6 | 0.45 | 0 |
+| `breakersAvailable` | 3 | 3 | 2 | 0 |
+| `monsterDelaySeconds` | 0 | 0 | 0 | 0 |
 
-Duas linhas da Proposta 1 não viraram campo do perfil:
+Campos usados pelos builders e testes das alas (Frente 4):
 
-- **Disjuntores disponíveis:** é quantos a Frente 4 coloca no mapa de cada ala.
-- **Monstro presente desde:** o primeiro minuto sem monstro da Ala Médica já é feito pelo `WingIntro` da cena, com o encontro roteirizado (ver [mapa-alfa.md](mapa-alfa.md)).
+- **`wing`:** casa o perfil com o checkpoint (#45).
+- **`batteryChance`:** o teste da ala confere que a `lootTable` bate com ela.
+- **`breakersAvailable`:** o builder confere com os disjuntores da planta.
+- **`monsterDelaySeconds`:** fica 0 na Médica, porque o primeiro minuto sem monstro é feito pelo `WingIntro` da cena (ver [mapa-alfa.md](mapa-alfa.md)).
 
 ## Como usar
 

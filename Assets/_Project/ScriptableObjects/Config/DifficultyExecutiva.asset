@@ -12,10 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa9d36c0997d4862b68fde40fe8c70ef, type: 3}
   m_Name: DifficultyExecutiva
   m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Core.DifficultyProfile
+  wing: Executiva
   monsterSpeed: 4.2
   monsterHearingRadius: 7
   monsterBehaviours: 15
+  monsterDelaySeconds: 0
   darknessDrain: 2
   hallucinations: 1
   hallucinationInterval: {x: 15, y: 25}
   lootTable: {fileID: 11400000, guid: e09d70d5201144a88d37dc1f742a44a4, type: 2}
+  batteryChance: 0.45
+  breakersAvailable: 2

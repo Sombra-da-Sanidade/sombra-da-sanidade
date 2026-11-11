@@ -59,6 +59,58 @@ Unity -batchmode -projectPath . -executeMethod SombraDaSanidade.EditorTools.Smok
 Unity -batchmode -projectPath . -executeMethod SombraDaSanidade.EditorTools.AlaMedicaIntroTest.RunBatch
 ```
 
+## Ala de Energia (issue #42)
+
+Cena `Assets/_Project/Scenes/Wings/AlaEnergia.unity`. Ela é gerada a partir de `art-src/Maps/ala-energia.txt` pelo menu **Sombra da Sanidade > Gerar cena Ala de Energia (tiles)**. O mapa tem 72×50 tiles e segue o padrão da Médica.
+
+| Sala | Onde | O que tem |
+|---|---|---|
+| Antessala | embaixo | Início do jogador, porta para o saguão, **disjuntor a 3,6 m do início** (Proposta 4: primeiro reparo sem pressão), armário |
+| Casa de Máquinas | oeste | Disjuntor com lâmpada, 3 armários, estabilizador, bobina de cabo |
+| Transformadores | leste | Disjuntor com lâmpada, 2 armários, estabilizador, transformadores |
+| Controle A e B | meio | Duas salas lado a lado, separadas por uma parede de 3 tiles com o **atalho só do monstro** (`(` e `)` na planta). Adrena-Syn no Controle B |
+| Subestação | em cima | Console da subestação (`U`), servidor do HD-02 e o monstro |
+
+**Caminhos:**
+- **Três loops, sem becos:** o anel externo (Antessala → Casa de Máquinas → Subestação → Transformadores → Antessala) e duas voltas menores, Casa → Controle A → Subestação e Antessala → Controle B → Transformadores.
+- **Atalho do monstro:** o jogador dá a volta entre os dois Controles, mas o monstro atravessa a parede pelo atalho.
+
+**Objetivo (GDD 7, Fase 2):**
+- **Ordem:** religar a subestação, ejetar o HD-02 e voltar à porta. Uma linha no topo da tela (`Level/WingObjectives`) mostra o passo atual por 8 s sempre que ele muda.
+- **Subestação (`Interaction/Substation`):**
+  - Segurar E por 6 s. Soltar ou se mexer zera o progresso.
+  - É barulhento: um estalo no começo (raio 10), descargas a cada 1,5 s (raio 10) e um zumbido ao ligar (raio 12).
+  - O monstro começa na mesma sala, então ele chega antes do fim. O EMP dá 4 s de stun: precisa ser disparado quando ele chega, e não antes.
+  - Até a subestação voltar, o servidor fica "sem energia" (`DriveServer.requiredPower`, com o LED vermelho escuro) e não deixa ejetar.
+
+**Dificuldade (#30, Proposta 1):**
+- O `GameManager` recebe o `Difficulty_Energia` e aplica os valores numa cópia do `MonsterConfig` e do `SanityConfig`: velocidade 3.85, raio auditivo 6, dreno de 1.5/s no escuro e alucinação a cada 20 a 30 s.
+- O mesmo perfil dá ao monstro os comportamentos da Energia (`BreakerCheck` e `Shortcuts`, #37).
+- O monstro está presente desde a entrada.
+- São **3 disjuntores**, conforme a tabela da Proposta 1 (o mapa Alfa tinha 2). O builder acusa erro se a planta não bater com `breakersAvailable`.
+
+**HD-02:**
+- O `GameManager.TotalDrives` soma os HDs de alas anteriores: vem do checkpoint ou, se a cena for aberta direto, do `priorDrives = 1`.
+- Assim o HD da cena toca o VANCE-02, abre a escolha Capacitor Duplo / Bobina Longa e usa o skill check do HD-02.
+- A porta abre com 1 HD.
+
+**Checkpoint (#45):** ao concluir, salva `lastWing = Energia`, `nextWing = Executiva` e `drives = 2`. Se o checkpoint aponta para a Energia, o `GameManager` lê os HDs dele.
+
+**Arte nova:**
+- Tiles em `lab_tiles.json`: `floor_cables`, `wall_face_panel`, `substation_top`, `substation_off`, `substation_on` e o decal `warning_high_voltage`.
+- Props em `props.json`: `transformer` e `cable_coil`.
+- Os chars novos estão na legenda do `.txt`.
+
+**Duração:** a meta é de 5 a 7 min (GDD 7) e precisa ser medida no playtest. Se ficar curta, aumentar `repairDuration` ou os raios de ruído da `Substation`. Se passar, encurtar os corredores do anel no `.txt`.
+
+Teste em batch:
+
+```bash
+Unity -batchmode -projectPath . -executeMethod SombraDaSanidade.EditorTools.AlfaSceneBuilder.BuildAlaEnergia -quit
+Unity -batchmode -projectPath . -executeMethod SombraDaSanidade.EditorTools.AlaEnergiaTest.RunBatch
+Unity -batchmode -projectPath . -executeMethod SombraDaSanidade.EditorTools.SmokeTest.RunBatchAlaEnergia
+```
+
 ## Pendências
 
 - **Zona Segura do disjuntor (Frente 4):** a lâmpada de teto é só desenho até o `Breaker` acender a luz e ligar o `MonsterRepellent`.
