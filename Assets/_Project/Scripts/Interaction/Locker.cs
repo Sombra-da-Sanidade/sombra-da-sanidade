@@ -21,7 +21,8 @@ namespace SombraDaSanidade.Interaction
         [SerializeField, Range(0f, 1f)] private float openedTint = 0.45f;
         [Tooltip("Sprite do armário aberto (Art/Props). Vazio: só escurece o sprite atual.")]
         [SerializeField] private Sprite openedSprite;
-        [Tooltip("Tabela de loot da ala (extra #46). Vazio: usa as chances fixas do InteractionConfig (GDD 6).")]
+        [Tooltip("Tabela de loot da ala (extra #46). Vazio: usa a do DifficultyProfile ativo (#30) ou, sem perfil, " +
+                 "as chances fixas do InteractionConfig (GDD 6).")]
         [SerializeField] private LootTable table;
 
         public string Prompt => "Abrir armário";
@@ -100,6 +101,9 @@ namespace SombraDaSanidade.Interaction
             flashlight = FindAnyObjectByType<FlashlightController>();
             sanity = FindAnyObjectByType<SanityController>();
             pity = BatteryPity.On(flashlight, config);
+            // Sem tabela própria: usa a da ala (DifficultyProfile, #30). No Start o GameManager já acordou.
+            var profile = DifficultyProfile.Active;
+            if (table == null && profile != null && profile.lootTable != null) SetTable(profile.lootTable);
         }
 
         public void BeginInteract() { }

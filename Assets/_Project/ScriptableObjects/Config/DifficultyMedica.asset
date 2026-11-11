@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa9d36c0997d4862b68fde40fe8c70ef, type: 3}
+  m_Name: DifficultyMedica
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Core.DifficultyProfile
+  monsterSpeed: 3.5
+  monsterHearingRadius: 5
+  monsterBehaviours: 1
+  darknessDrain: 1
+  hallucinations: 0
+  hallucinationInterval: {x: 20, y: 30}
+  lootTable: {fileID: 11400000, guid: 2945ffb39aae46ada91dca2b63f55f05, type: 2}

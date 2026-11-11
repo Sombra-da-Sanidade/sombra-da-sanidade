@@ -17,6 +17,13 @@ namespace SombraDaSanidade.Core
 
         [SerializeField] private int drivesRequired = 3;
 
+        [Tooltip("Dificuldade desta ala (Proposta 1). Vazio: os sistemas usam os próprios configs.")]
+        [SerializeField] private DifficultyProfile difficulty;
+
+        public DifficultyProfile ActiveProfile => difficulty;
+
+        public event Action<DifficultyProfile> ProfileChanged;
+
         public GameState State { get; private set; } = GameState.Playing;
         public bool IsPlaying => State == GameState.Playing;
         public int DrivesCollected { get; private set; }
@@ -58,6 +65,13 @@ namespace SombraDaSanidade.Core
 
             var kb = Keyboard.current;
             if (kb != null && kb.rKey.wasPressedThisFrame) Restart();
+        }
+
+        public void SetProfile(DifficultyProfile profile)
+        {
+            if (profile == difficulty) return;
+            difficulty = profile;
+            ProfileChanged?.Invoke(profile);
         }
 
         public void CollectDrive()

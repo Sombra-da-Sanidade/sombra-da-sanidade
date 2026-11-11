@@ -4,8 +4,8 @@ namespace SombraDaSanidade.Monster
 {
     // Comportamentos que o monstro ganha por ala (#36 e #37, Proposta 8 em docs/pesquisa/propostas.md).
     // Como no Alien: Isolation, destravam por progresso (ala), nunca por número de mortes do jogador.
-    // O conjunto ativo vem do MonsterConfig.behaviours e pode ser trocado com MonsterController.SetBehaviours
-    // (o DifficultyProfile de cada ala, #30, chama isso com um dos presets de MonsterWingBehaviours).
+    // O conjunto ativo vem do DifficultyProfile da ala (#30) ou, sem perfil, do MonsterConfig.behaviours.
+    // Também pode ser trocado com MonsterController.SetBehaviours.
     [Flags]
     public enum MonsterBehaviour
     {
@@ -22,7 +22,7 @@ namespace SombraDaSanidade.Monster
         NoiseMemory = 1 << 3,
     }
 
-    // Conjuntos por ala, para o DifficultyProfile (#30) usar. Cada ala soma os comportamentos da anterior.
+    // Conjuntos por ala, os mesmos dos assets de DifficultyProfile (#30). Cada ala soma os comportamentos da anterior.
     public static class MonsterWingBehaviours
     {
         public const MonsterBehaviour Medica = MonsterBehaviour.Search;
