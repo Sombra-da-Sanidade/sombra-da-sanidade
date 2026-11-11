@@ -8,6 +8,8 @@ namespace SombraDaSanidade.EditorTools
     // em vez do mapa do jogo. Ao terminar, cada teste volta para a cena que estava aberta antes
     // (pelo menu) ou deixa a Alfa aberta (em batch, que é a cena que o Unity reabre depois).
     // Também dá um atalho de menu para abrir a Alfa.
+    // O checkpoint (#45) vai para um arquivo temporário vazio durante o teste: assim nenhum teste lê o save
+    // deixado por outro (a ala restaurava o estado de um teste anterior) nem suja o save do jogo.
     [InitializeOnLoad]
     public static class TestScenes
     {
@@ -34,6 +36,12 @@ namespace SombraDaSanidade.EditorTools
         {
             string path = SceneManager.GetActiveScene().path;
             SessionState.SetString(ReturnKey, string.IsNullOrEmpty(path) ? AlfaSceneBuilder.ScenePath : path);
+            // Teste que já preparou o próprio checkpoint (CheckpointTest) mantém o dele.
+            if (Core.Checkpoint.PathOverride == null)
+            {
+                Core.Checkpoint.PathOverride = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "sombra-tests", "checkpoint.json");
+                Core.Checkpoint.Clear();
+            }
         }
 
         // Chamar no fim do teste, no lugar de ExitPlaymode/Exit: sai do Play, reabre a cena e, em batch, fecha o Unity.
@@ -49,6 +57,7 @@ namespace SombraDaSanidade.EditorTools
         {
             if (change != PlayModeStateChange.EnteredEditMode || !SessionState.GetBool(PendingKey, false)) return;
             SessionState.SetBool(PendingKey, false);
+            Core.Checkpoint.PathOverride = null;
             bool batch = SessionState.GetBool(BatchKey, false);
             string scene = batch ? AlfaSceneBuilder.ScenePath : SessionState.GetString(ReturnKey, AlfaSceneBuilder.ScenePath);
             if (System.IO.File.Exists(scene)) EditorSceneManager.OpenScene(scene);
