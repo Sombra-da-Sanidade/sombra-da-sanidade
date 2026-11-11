@@ -25,12 +25,43 @@ namespace SombraDaSanidade.Core
         public DeathCause LastDeathCause { get; private set; }
         public float ElapsedTime { get; private set; }
 
+        // Estatísticas do rank (#32, Proposta 3). Tempo e EMPs contam desde o último reinício; mortes, a partida toda.
+        public float AverageSanity => sanityTime > 0f ? sanitySum / sanityTime : 1f;   // 0 a 1
+        public int EmpsUsed { get; private set; }
+        public int Deaths => RunStats.Deaths;
+
+        // Calculados na vitória.
+        public float RankScore { get; private set; }
+        public Rank FinalRank { get; private set; }
+        public bool IsNewBestRank { get; private set; }
+
         public event Action<int> DriveCollected;
         public event Action<DeathCause> GameOverTriggered;
         public event Action VictoryTriggered;
 
         private GUIStyle titleStyle;
         private GUIStyle bodyStyle;
+        private Sanity.SanityController sanity;
+        private Flashlight.FlashlightController flashlight;
+        private float sanitySum;
+        private float sanityTime;
+
+        private const string BestRankKey = "Sombra.BestRank.";
+
+        // Melhor rank já tirado na cena, ou null. Salvo em PlayerPrefs (Proposta 3: incentivar a rejogar).
+        public static Rank? BestRank(string scene)
+        {
+            int value = PlayerPrefs.GetInt(BestRankKey + scene, -1);
+            return value < 0 ? (Rank?)null : (Rank)value;
+        }
+
+        public static void SaveBestRank(string scene, Rank rank)
+        {
+            PlayerPrefs.SetInt(BestRankKey + scene, (int)rank);
+            PlayerPrefs.Save();
+        }
+
+        public static void ClearBestRank(string scene) => PlayerPrefs.DeleteKey(BestRankKey + scene);
 
         private void Awake()
         {
@@ -43,9 +74,22 @@ namespace SombraDaSanidade.Core
             Time.timeScale = 1f;
         }
 
+        private void Start()
+        {
+            sanity = FindAnyObjectByType<Sanity.SanityController>();
+            flashlight = FindAnyObjectByType<Flashlight.FlashlightController>();
+            if (flashlight != null) flashlight.EmpFired += OnEmpFired;
+        }
+
         private void OnDestroy()
         {
+            if (flashlight != null) flashlight.EmpFired -= OnEmpFired;
             if (Instance == this) Instance = null;
+        }
+
+        private void OnEmpFired()
+        {
+            if (IsPlaying) EmpsUsed++;
         }
 
         private void Update()
@@ -53,6 +97,12 @@ namespace SombraDaSanidade.Core
             if (IsPlaying)
             {
                 ElapsedTime += Time.deltaTime;
+                // Média no tempo, não por frame: a taxa de quadros não muda a nota.
+                if (sanity != null && sanity.isActiveAndEnabled)
+                {
+                    sanitySum += sanity.Ratio * Time.deltaTime;
+                    sanityTime += Time.deltaTime;
+                }
                 return;
             }
 
@@ -72,6 +122,7 @@ namespace SombraDaSanidade.Core
             if (!IsPlaying) return;
             State = GameState.GameOver;
             LastDeathCause = cause;
+            RunStats.AddDeath();
             Time.timeScale = 0f;
             GameOverTriggered?.Invoke(cause);
         }
@@ -81,7 +132,19 @@ namespace SombraDaSanidade.Core
             if (!IsPlaying || !HasAllDrives) return;
             State = GameState.Victory;
             Time.timeScale = 0f;
+            ScoreRank();
             VictoryTriggered?.Invoke();
+        }
+
+        private void ScoreRank()
+        {
+            var config = RankConfig.Load();
+            RankScore = config.Score(ElapsedTime, drivesRequired, AverageSanity, EmpsUsed, Deaths);
+            FinalRank = config.RankFor(RankScore);
+            string scene = SceneManager.GetActiveScene().name;
+            var best = BestRank(scene);
+            IsNewBestRank = best == null || FinalRank > best.Value;
+            if (IsNewBestRank) SaveBestRank(scene, FinalRank);
         }
 
         public void Restart()
@@ -108,7 +171,7 @@ namespace SombraDaSanidade.Core
             {
                 var wing = Level.WingCheckpoint.Instance;
                 title = wing != null ? Level.WingCheckpoint.DisplayName(wing.Wing) + " CONCLUÍDA" : "VOCÊ ESCAPOU";
-                body = $"HDs: {DrivesCollected}/{drivesRequired}   Tempo: {FormatTime(ElapsedTime)}";
+                body = $"Rank {FinalRank}   HDs: {DrivesCollected}/{drivesRequired}   Tempo: {FormatTime(ElapsedTime)}";
                 if (wing != null && wing.StatusLine.Length > 0) body += "   " + wing.StatusLine;
             }
             else
