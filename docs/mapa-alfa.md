@@ -84,7 +84,7 @@ Cena `Assets/_Project/Scenes/Wings/AlaEnergia.unity`. Ela é gerada a partir de 
   - Até a subestação voltar, o servidor fica "sem energia" (`DriveServer.requiredPower`, com o LED vermelho escuro) e não deixa ejetar.
 
 **Dificuldade (#30, Proposta 1):**
-- O `GameManager` recebe o `Difficulty_Energia` e aplica os valores numa cópia do `MonsterConfig` e do `SanityConfig`: velocidade 3.85, raio auditivo 6, dreno de 1.5/s no escuro e alucinação a cada 20 a 30 s.
+- O `GameManager` recebe o `DifficultyEnergia`, lido pelos sistemas via `DifficultyProfile.Active`: velocidade 3.85, raio auditivo 6, dreno de 1.5/s no escuro e alucinação a cada 20 a 30 s.
 - O mesmo perfil dá ao monstro os comportamentos da Energia (`BreakerCheck` e `Shortcuts`, #37).
 - O monstro está presente desde a entrada.
 - São **3 disjuntores**, conforme a tabela da Proposta 1 (o mapa Alfa tinha 2). O builder acusa erro se a planta não bater com `breakersAvailable`.
@@ -103,9 +103,32 @@ Cena `Assets/_Project/Scenes/Wings/AlaEnergia.unity`. Ela é gerada a partir de 
 
 **Duração:** a meta é de 5 a 7 min (GDD 7) e precisa ser medida no playtest. Se ficar curta, aumentar `repairDuration` ou os raios de ruído da `Substation`. Se passar, encurtar os corredores do anel no `.txt`.
 
+## Ala Executiva (issue #43)
+
+Cena `Assets/_Project/Scenes/Wings/AlaExecutiva.unity`, gerada pelo mesmo builder a partir de `art-src/Maps/ala-executiva.txt` (menu **Sombra da Sanidade > Gerar cena Ala Executiva (tiles)**). 80×56 tiles.
+
+| Sala | Onde | O que tem |
+|---|---|---|
+| Recepção | embaixo | Início do jogador, porta para o saguão, pista da entrada, estabilizador, Módulo Neural, armário |
+| Sala de Reuniões | oeste | Disjuntor com lâmpada, mesa (cobertura), 2 armários, Módulo Neural, 1 dígito da senha |
+| RH | leste | Disjuntor com lâmpada, estantes, 2 armários, Módulo Neural, estabilizador, 1 dígito |
+| Escritórios | meio | Baias, 2 armários, 1 dígito (atalho entre as alas laterais e para a Diretoria) |
+| Diretoria | em cima | HD-03 com trava de senha, teclado, monstro, 1 dígito |
+
+- **Loops:** anel externo (Recepção → Reuniões → Diretoria → RH → Recepção), atalho pelos Escritórios e corredor Escritórios → Diretoria. Sem becos (GDD 4.1).
+- **Monstro presente desde a entrada** (Proposta 1), começando na Diretoria, com os comportamentos da Executiva (memória curta, #37).
+- **HDs:** a ala começa com os 2 das alas anteriores (`GameManager.priorDrives = 2`, ou o número do checkpoint), e a porta abre com o HD desta ala (`TotalDrives` = 3). Por isso o skill check, o log da Dra. Vance e a escolha de upgrade são os do HD-03. O bônus de +10% por HD só conta os HDs desta ala, porque a velocidade da ala já inclui os anteriores.
+- **Senha (GDD 7, "Senhas com sanidade baixa"):** o servidor do HD-03 começa travado (LED vermelho). O teclado ao lado (`X` na planta, `Interaction/KeypadLock`) pede 4 dígitos, sorteados a cada partida. Cada dígito está numa pista em fósforo (`d`, `Level/CodeClue`), que só aparece com sanidade < 35 e mostra a posição: `SENHA _ 7 _ _`. Com o teclado aberto: números digitam, Backspace apaga, Enter confirma e E fecha. O jogo não pausa. Senha errada faz um bipe que o monstro ouve (raio 9).
+- **Módulo Neural (`n`, `Sanity/NeuralModule`):** -15 de sanidade e as pistas aparecem com qualquer sanidade por 20 s (`SanityConfig.neuralModuleCost` e `neuralModuleRevealSeconds`). É o atalho para ler a senha sem enlouquecer no escuro. Arte: `neural_module` em `art-src/Props/props.json`.
+- **Pista da entrada (Proposta 4, `z`):** "AS PAREDES SÓ FALAM COM QUEM ENLOUQUECE", perto do início, também só com sanidade baixa.
+- **Dificuldade (Proposta 1, #30):** o `GameManager` recebe o `DifficultyExecutiva` (ver [dificuldade.md](dificuldade.md)): velocidade 4.2, raio auditivo 7, dreno no escuro 2.0/s, alucinações a cada 15-25 s, tabela de loot com 45% de bateria e 2 disjuntores. Os perfis das 4 alas são gerados com os valores da tabela por **Sombra da Sanidade > Gerar perfis de dificuldade** (`Editor/DifficultyProfileBuilder`). A Médica ainda não usa o seu perfil.
+- **Checkpoint (#45):** ao concluir, salva `lastWing = Executiva`, `nextWing = Eclusa`, `drives = 3`, e a tela de vitória mostra **ALA EXECUTIVA CONCLUÍDA**.
+- **Duração:** a meta de 5 a 7 min (GDD 7) precisa ser medida no playtest. Se ficar curta, aumentar os dígitos (mais `d` na planta) ou reduzir `neuralModuleRevealSeconds`. Se passar de 7 min, tirar um dígito ou pôr mais Módulos Neurais.
+
 Teste em batch:
 
 ```bash
+Unity -batchmode -projectPath . -executeMethod SombraDaSanidade.EditorTools.AlaExecutivaTest.RunBatch
 Unity -batchmode -projectPath . -executeMethod SombraDaSanidade.EditorTools.AlfaSceneBuilder.BuildAlaEnergia -quit
 Unity -batchmode -projectPath . -executeMethod SombraDaSanidade.EditorTools.AlaEnergiaTest.RunBatch
 Unity -batchmode -projectPath . -executeMethod SombraDaSanidade.EditorTools.SmokeTest.RunBatchAlaEnergia

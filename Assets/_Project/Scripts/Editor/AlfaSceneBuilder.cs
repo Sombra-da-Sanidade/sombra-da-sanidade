@@ -22,7 +22,8 @@ namespace SombraDaSanidade.EditorTools
     // Ala Executiva ligadas por corredores em loop (GDD 4.1). Jogador, monstro, HUD e sanidade vêm do
     // PrototypeSceneBuilder, então a cena se comporta igual ao protótipo.
     // Menu: Sombra da Sanidade > Gerar cena Alfa (tiles). Mudar o mapa = editar o .txt e gerar de novo.
-    // A mesma montagem gera a Ala Médica (issue #12) a partir de art-src/Maps/ala-medica.txt.
+    // A mesma montagem gera a Ala Médica (issue #12) a partir de art-src/Maps/ala-medica.txt e a Ala Executiva
+    // (issue #43) a partir de art-src/Maps/ala-executiva.txt.
     public static class AlfaSceneBuilder
     {
         private const string Root = "Assets/_Project";
@@ -30,11 +31,13 @@ namespace SombraDaSanidade.EditorTools
         private const string LayoutFile = "art-src/Maps/alfa.txt";
         public const string AlaMedicaScenePath = Root + "/Scenes/Wings/AlaMedica.unity";
         private const string AlaMedicaLayoutFile = "art-src/Maps/ala-medica.txt";
+        public const string AlaExecutivaScenePath = Root + "/Scenes/Wings/AlaExecutiva.unity";
+        private const string AlaExecutivaLayoutFile = "art-src/Maps/ala-executiva.txt";
         public const string AlaEnergiaScenePath = Root + "/Scenes/Wings/AlaEnergia.unity";
         private const string AlaEnergiaLayoutFile = "art-src/Maps/ala-energia.txt";
 
         // Caracteres que são chão (o resto é parede/teto).
-        private const string FloorChars = ".,hwpbL@MmiAa" + IntroMarkers + EnergiaFloorChars;
+        private const string FloorChars = ".,hwpbL@MmiAan" + NeighborMarkers + EnergiaFloorChars;
 
         // Ala de Energia (#42): c cabos, v faixa de alta tensão, t transformador, o bobina de cabo,
         // ( e ) pontas do atalho só do monstro.
@@ -44,11 +47,22 @@ namespace SombraDaSanidade.EditorTools
         // desenho é o do vizinho da esquerda (grade no corredor, piso liso na sala).
         private const string IntroMarkers = "123456xy";
 
+        // Marcadores sem desenho próprio (desenhados como o vizinho da esquerda): os da introdução e as pistas
+        // da Ala Executiva (d = dígito da senha, z = pista da entrada).
+        private const string NeighborMarkers = IntroMarkers + "dz";
+
         [MenuItem("Sombra da Sanidade/Gerar cena Alfa (tiles)", priority = 2)]
         public static void BuildFromMenu()
         {
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
             Build();
+        }
+
+        [MenuItem("Sombra da Sanidade/Gerar cena Ala Executiva (tiles)", priority = 4)]
+        public static void BuildAlaExecutivaFromMenu()
+        {
+            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            BuildAlaExecutiva();
         }
 
         [MenuItem("Sombra da Sanidade/Gerar cena Ala Médica (tiles)", priority = 3)]
@@ -133,6 +147,77 @@ namespace SombraDaSanidade.EditorTools
             var map = LoadLayout(AlaMedicaLayoutFile);
             if (map == null) return;
             BuildFromLayout(map, AlaMedicaScenePath, drivesRequired: 1, (x, y) => "Medica", AddWingFlow);
+        }
+
+        // Batchmode: -executeMethod SombraDaSanidade.EditorTools.AlfaSceneBuilder.BuildAlaExecutiva
+        // A ala só tem o HD-03 e começa com os 2 das alas anteriores: a porta abre com 3 de 3.
+        public static void BuildAlaExecutiva()
+        {
+            var map = LoadLayout(AlaExecutivaLayoutFile);
+            if (map == null) return;
+            // Cria/atualiza o asset antes; carrega de novo depois do NewScene (a referência de antes fica inválida).
+            var profile = DifficultyProfiles.GetOrCreate("Executiva");
+            int breakers = Find(map, 'K').Count;
+            if (profile != null && breakers != profile.breakersAvailable)
+                Debug.LogError($"Ala Executiva: a planta tem {breakers} disjuntores e o perfil pede {profile.breakersAvailable}.");
+            BuildFromLayout(map, AlaExecutivaScenePath, drivesRequired: 1, (x, y) => "Executiva",
+                ctx => AddExecutivaFlow(ctx, DifficultyProfiles.GetOrCreate("Executiva")));
+        }
+
+        // Ala Executiva (GDD 7): monstro presente desde a entrada, perfil de dificuldade da ala (Proposta 1),
+        // servidor do HD-03 travado por senha, um dígito por pista em fósforo (d) e a pista da entrada (z,
+        // Proposta 4). Checkpoint ao concluir (#45).
+        private static void AddExecutivaFlow(BuildContext ctx, DifficultyProfile profile)
+        {
+            var gm = UnityEngine.Object.FindAnyObjectByType<GameManager>();
+            var gmSo = new SerializedObject(gm);
+            gmSo.FindProperty("difficulty").objectReferenceValue = profile;
+            gmSo.FindProperty("priorDrives").intValue = 2;   // aberta direto, sem checkpoint: Médica e Energia já deram 2 HDs
+            gmSo.ApplyModifiedPropertiesWithoutUndo();
+
+            var go = new GameObject("WingFlow");
+            var checkpoint = go.AddComponent<SombraDaSanidade.Level.WingCheckpoint>();
+            var cso = new SerializedObject(checkpoint);
+            cso.FindProperty("wing").stringValue = "Executiva";
+            cso.FindProperty("nextWing").stringValue = "Eclusa";
+            cso.ApplyModifiedPropertiesWithoutUndo();
+
+            // Trava de senha: o teclado (X) libera o servidor da ala.
+            var keypad = UnityEngine.Object.FindAnyObjectByType<KeypadLock>();
+            var server = ctx.Objectives.GetComponentInChildren<DriveServer>();
+            if (keypad == null || server == null)
+            {
+                Debug.LogError("Ala Executiva: a planta precisa de um servidor (S) e de um teclado (X).");
+                return;
+            }
+            PrototypeSceneBuilder.SetRef(keypad, "server", server);
+            var sso = new SerializedObject(server);
+            sso.FindProperty("locked").boolValue = true;
+            sso.ApplyModifiedPropertiesWithoutUndo();
+
+            var digits = Find(ctx.Map, 'd');
+            var kso = new SerializedObject(keypad);
+            kso.FindProperty("digits").intValue = Mathf.Clamp(digits.Count, 1, 6);
+            kso.ApplyModifiedPropertiesWithoutUndo();
+            if (digits.Count < 1) Debug.LogError("Ala Executiva: nenhuma pista de senha (d) na planta.");
+
+            // Pistas da senha: o texto ("SENHA _ 7 _ _") é montado em jogo, com a senha sorteada.
+            var clues = new GameObject("CodeClues").transform;
+            for (int i = 0; i < digits.Count; i++)
+            {
+                var pos = new Vector2(digits[i].x + 0.5f, digits[i].y + 0.5f);
+                PrototypeSceneBuilder.CreateClue(clues, $"Clue_Senha_{i + 1}", pos, "SENHA", 0.05f);
+                var clue = clues.Find($"Clue_Senha_{i + 1}").gameObject.AddComponent<SombraDaSanidade.Level.CodeClue>();
+                PrototypeSceneBuilder.SetRef(clue, "keypad", keypad);
+                var so = new SerializedObject(clue);
+                so.FindProperty("index").intValue = i;
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
+
+            // Proposta 4 do v1.1: perto da entrada, a dica do mecanismo, também só com a sanidade baixa.
+            foreach (var cell in Find(ctx.Map, 'z'))
+                PrototypeSceneBuilder.CreateClue(clues, "Clue_Entrada", new Vector2(cell.x + 0.5f, cell.y + 0.5f),
+                    "AS PAREDES SÓ FALAM\nCOM QUEM ENLOUQUECE", 0.05f);
         }
 
         // Proposta 4 do v1.1: primeiro minuto sem monstro e encontro roteirizado. Proposta 2 / #45: checkpoint
@@ -265,6 +350,8 @@ namespace SombraDaSanidade.EditorTools
                         case 'm': patrol.Add(center); break;
                         case 'i': PrototypeSceneBuilder.CreateStabilizer(items, square, $"Stabilizer_{x}_{y}", center); break;
                         case 'a': PrototypeSceneBuilder.CreateAdrenaSyn(items, square, $"AdrenaSyn_{x}_{y}", center); break;
+                        case 'n': CreateNeuralModule(items, square, $"NeuralModule_{x}_{y}", center); break;
+                        case 'X': CreateKeypad(objectives, square, $"Keypad_{wingAt(x, y)}", inFront, center); break;
                         case 'A':
                             if (lockers == null) lockers = new GameObject("Lockers").transform;
                             CreateLocker(lockers, square, $"Locker_{wingAt(x, y)}_{x}_{y}", center, wingAt(x, y));
@@ -273,7 +360,7 @@ namespace SombraDaSanidade.EditorTools
                 }
             }
             if (exitCells.Count > 0) CreateExit(objectives, square, exitCells);
-            CreateClues(items, objectives);
+            CreateClues(items, objectives, map);
 
             var player = PrototypeSceneBuilder.CreatePlayer(square, playerConfig, flashlightConfig, sanityConfig, wallLayer, playerSpawn);
             PrototypeSceneBuilder.CreateCamera(player.transform);
@@ -351,7 +438,7 @@ namespace SombraDaSanidade.EditorTools
                 {
                     var cell = new Vector3Int(x, y, 0);
                     char c = map[x, y];
-                    for (int left = x - 1; IntroMarkers.IndexOf(c) >= 0; left--)
+                    for (int left = x - 1; NeighborMarkers.IndexOf(c) >= 0; left--)
                         c = left >= 0 && map.IsFloor(left, y) ? map[left, y] : '.';
                     if (map.IsFloor(x, y))
                     {
@@ -373,7 +460,7 @@ namespace SombraDaSanidade.EditorTools
                     if (map.IsFloor(x, y - 1))
                         t = c switch
                         {
-                            'S' => "server_bottom", 'K' => "breaker_off", 'T' => "wall_terminal", 'P' => "wall_face_pipes",
+                            'S' => "server_bottom", 'K' => "breaker_off", 'T' => "wall_terminal", 'X' => "wall_terminal", 'P' => "wall_face_pipes",
                             'E' => "door_bottom", 'U' => "substation_off", 'Q' => "wall_face_panel", _ => "wall_face"
                         };
                     else if (map.IsFloor(x, y - 2))
@@ -507,6 +594,52 @@ namespace SombraDaSanidade.EditorTools
                 PrototypeSceneBuilder.LoadLootTable(wing));
         }
 
+        // Módulo Neural (Ala Executiva): cartucho roxo (Hipnos, a cor da Revelação pela Loucura) com brilho.
+        private static void CreateNeuralModule(Transform parent, Sprite square, string name, Vector2 cell)
+        {
+            var color = new Color(0.49f, 0.29f, 0.54f);
+            var go = PrototypeSceneBuilder.CreateBlock(parent, square, name, cell, new Vector2(0.4f, 0.4f), color);
+            var col = go.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            col.size = new Vector2(3f, 3f); // compensa a escala pequena do bloco
+            PrototypeSceneBuilder.UseProp(go, "neural_module", new Vector2(1.2f, 1.2f), 5);
+
+            var glow = new GameObject("Glow").AddComponent<Light2D>();
+            glow.transform.SetParent(go.transform, false);
+            glow.lightType = Light2D.LightType.Point;
+            glow.color = color;
+            glow.intensity = 0.6f;
+            glow.pointLightOuterRadius = 1.3f;
+
+            go.AddComponent<NeuralModule>();
+        }
+
+        // Teclado da trava de senha: o desenho é o tile wall_terminal; o trigger fica no chão em frente e um
+        // LED na parede mostra o estado (vermelho travado, verde liberado). O servidor é ligado depois.
+        private static void CreateKeypad(Transform parent, Sprite square, string name, Vector2 floorCell, Vector2 wallCell)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+            go.transform.position = floorCell;
+            var col = go.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            col.size = new Vector2(1.6f, 1.4f);
+            var led = PrototypeSceneBuilder.CreateBlock(go.transform, square, "Screen",
+                wallCell + new Vector2(0f, -0.2f), new Vector2(0.3f, 0.12f), new Color(0.87f, 0.25f, 0.22f));
+            led.GetComponent<SpriteRenderer>().sortingOrder = 6;
+
+            var glow = new GameObject("Glow").AddComponent<Light2D>();
+            glow.transform.SetParent(go.transform, false);
+            glow.transform.position = wallCell;
+            glow.lightType = Light2D.LightType.Point;
+            glow.color = new Color(0.33f, 0.72f, 0.44f);
+            glow.intensity = 0.35f;
+            glow.pointLightOuterRadius = 1.4f;
+
+            var keypad = go.AddComponent<KeypadLock>();
+            PrototypeSceneBuilder.SetRef(keypad, "screen", led.GetComponent<SpriteRenderer>());
+        }
+
         // Eclusa: as portas são tiles; o trigger fica no chão em frente e uma faixa de luz mostra o estado
         // (vermelha trancada, verde com os 3 HDs).
         private static void CreateExit(Transform parent, Sprite square, List<Vector2Int> cells)
@@ -526,8 +659,10 @@ namespace SombraDaSanidade.EditorTools
         }
 
         // Pistas em fósforo provisórias (Revelação pela Loucura) até a Frente 4 ter os puzzles.
-        private static void CreateClues(Transform items, Transform objectives)
+        private static void CreateClues(Transform items, Transform objectives, Layout map)
         {
+            // A Ala Executiva tem a própria pista da entrada (z, Proposta 4).
+            if (Find(map, 'z').Count > 0) return;
             var breaker = objectives.Cast<Transform>().FirstOrDefault(t => t.name.StartsWith("Breaker_Medica"));
             if (breaker != null)
                 PrototypeSceneBuilder.CreateClue(items, "Clue_Fusivel", (Vector2)breaker.position + Vector2.down * 1.6f, "FUSÍVEL 3-7-1", 0.05f);

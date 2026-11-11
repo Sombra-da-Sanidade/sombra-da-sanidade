@@ -20,9 +20,22 @@ namespace SombraDaSanidade.Interaction
         [SerializeField] private Substation requiredPower;
         [SerializeField] private Color unpoweredColor = new Color(0.55f, 0.12f, 0.1f);
 
+        [Tooltip("Começa travado por senha (Ala Executiva, HD-03): só ejeta depois do KeypadLock liberar.")]
+        [SerializeField] private bool locked;
+        [SerializeField] private Color lockedColor = new Color(0.87f, 0.25f, 0.22f);
+
         public string Prompt => "Ejetar HD";
-        public bool CanInteract => !ejected && config != null && IsPowered;
+        public bool CanInteract => !ejected && !locked && config != null && IsPowered;
         public bool IsPowered => requiredPower == null || requiredPower.IsPowered;
+        public bool IsLocked => locked;
+
+        // Senha certa no terminal ao lado (KeypadLock).
+        public void Unlock()
+        {
+            if (!locked) return;
+            locked = false;
+            RefreshIndicator();
+        }
         public float HoldDuration => config.ejectDuration;
 
         // Disparado ao ejetar: gancho para logs, legendas e efeitos que vierem depois.
@@ -55,11 +68,11 @@ namespace SombraDaSanidade.Interaction
             if (requiredPower != null) requiredPower.Powered -= RefreshIndicator;
         }
 
-        // LED: vermelho escuro sem energia, verde com o HD, apagado depois de ejetar.
+        // LED: vermelho escuro sem energia, vermelho travado por senha, verde com o HD, apagado depois de ejetar.
         private void RefreshIndicator()
         {
             if (indicator == null) return;
-            indicator.color = ejected ? emptyColor : IsPowered ? loadedColor : unpoweredColor;
+            indicator.color = ejected ? emptyColor : !IsPowered ? unpoweredColor : locked ? lockedColor : loadedColor;
         }
 
         // Cenas geradas antes do #33 não têm o SkillCheck no jogador: cria aqui.

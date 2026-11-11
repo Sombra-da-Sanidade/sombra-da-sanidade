@@ -100,6 +100,9 @@ namespace SombraDaSanidade.EditorTools
 
                     // Reparo da subestação de verdade: segura E parado em frente ao console.
                     player.enabled = false;
+                    // O monstro começa na sala da subestação: sem isto ele às vezes alcança o jogador antes do EMP
+                    // roteirizado. Vai para a entrada e volta pelo WarpMonster do passo seguinte.
+                    WarpMonster(monster, player.transform.position);
                     Teleport(player, (Vector2)substation.transform.position + Vector2.down * 0.2f);
                     NoiseBus.NoiseEmitted += CountNoise;
                     noises = 0;

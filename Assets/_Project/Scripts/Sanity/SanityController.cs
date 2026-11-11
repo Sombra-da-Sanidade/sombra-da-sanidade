@@ -30,9 +30,13 @@ namespace SombraDaSanidade.Sanity
         // Distância até o monstro (infinita sem monstro ativo). Usada pelo batimento em faixas (issue #38).
         public float DistanceToMonster { get; private set; } = float.MaxValue;
         // Limiar das pistas em fósforo (GDD regra 5: 35). O upgrade Ressonador Neural (#31) sobe para 50.
-        public float RevealCluesBelow => revealOverride >= 0f ? revealOverride : config.revealCluesBelow;
+        // O Módulo Neural (Ala Executiva) revela as pistas por alguns segundos com qualquer sanidade.
+        public float RevealCluesBelow => IsRevealForced ? float.PositiveInfinity
+            : revealOverride >= 0f ? revealOverride : config.revealCluesBelow;
+        public bool IsRevealForced => Time.time < forcedRevealUntil;
 
         private float revealOverride = -1f;
+        private float forcedRevealUntil = -1f;
 
         // Dreno no escuro: o da ala ou, sem perfil, o do config.
         public float DarknessDrain
@@ -118,6 +122,12 @@ namespace SombraDaSanidade.Sanity
         public void SetRevealCluesBelow(float value)
         {
             revealOverride = value;
+        }
+
+        // Pistas visíveis por `seconds` com qualquer sanidade (Módulo Neural). Tomar de novo só renova.
+        public void ForceRevealClues(float seconds)
+        {
+            forcedRevealUntil = Mathf.Max(forcedRevealUntil, Time.time + seconds);
         }
 
         // Chamado pelo trigger da Zona Segura ao entrar/sair. Contador para suportar zonas sobrepostas.

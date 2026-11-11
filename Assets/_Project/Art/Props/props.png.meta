@@ -285,6 +285,28 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: neural_module
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 0
+        width: 16
+        height: 24
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bbd87b956ca24ec47a2164d3342dc7e0
+      internalID: -324854631
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -305,6 +327,7 @@ TextureImporter:
       locker_open: 790179679
       log_terminal_off: -1485023004
       log_terminal_on: -1201670257
+      neural_module: -324854631
       stabilizer: 705051789
       transformer: -543187092
   mipmapLimitGroupName: 

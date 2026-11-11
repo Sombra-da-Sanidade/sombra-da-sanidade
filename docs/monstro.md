@@ -88,10 +88,10 @@ Números em `MonsterConfig` (`searchPoints`, `searchRadius`, `searchCandidates`,
 
 Números em `MonsterConfig` (`breakerCheck*`, `noiseMemory*`).
 
-**Perfil por ala (#30, mínimo feito no #42):** cada cena de ala tem um `Core/DifficultyProfile` no `GameManager`, com os assets em `ScriptableObjects/Config/Difficulty/` (valores da Proposta 1 do v1.1).
-- No `Awake`, o perfil cria uma cópia do `MonsterConfig` com a velocidade, o raio auditivo e os comportamentos da ala, e a entrega ao monstro com `UseConfig`. Os assets não mudam.
-- O bônus de +10% por HD conta só os HDs da própria ala, porque a velocidade da tabela já inclui os das alas anteriores.
-- Por enquanto só a Ala de Energia usa o perfil. Ligar a Médica (raio 5, 1 min sem monstro) muda o balanceamento dela e fica para quando ela for revista.
+**Perfil por ala (#30):** cada cena de ala aponta um `Core/DifficultyProfile` no `GameManager` (assets em `ScriptableObjects/Config/Difficulty<Ala>.asset`, valores da Proposta 1 do v1.1). Detalhes em [dificuldade.md](dificuldade.md).
+- O monstro lê velocidade, raio auditivo e comportamentos de `DifficultyProfile.Active`. Os assets de config não mudam.
+- Com perfil, o bônus de +10% por HD não vale: a velocidade da tabela já inclui o aumento de ala em ala.
+- Energia e Executiva usam o perfil. Ligar a Médica (raio 5) muda o balanceamento dela e fica para quando ela for revista.
 
 ## Diretor de tensão (#35)
 
