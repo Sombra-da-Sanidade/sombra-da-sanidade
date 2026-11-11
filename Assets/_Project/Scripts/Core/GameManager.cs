@@ -7,7 +7,7 @@ namespace SombraDaSanidade.Core
 {
     public enum GameState { Playing, GameOver, Victory }
 
-    public enum DeathCause { Monster, Sanity }
+    public enum DeathCause { Monster, Sanity, Purge }
 
     // Estado da partida, HDs coletados e condições de vitória/derrota (GDD 4.4).
     // Um por cena. As telas de fim ficam em UI.ResultScreen (issue #64).
@@ -38,6 +38,8 @@ namespace SombraDaSanidade.Core
         public int PriorDrives { get; private set; }
         // HDs da partida inteira: escolhe o log da Dra. Vance, a escolha de upgrade e o skill check (HD-01, 02, 03).
         public int TotalDrives => PriorDrives + DrivesCollected;
+        // HDs da partida ao fim desta ala (HUD e tela de resultado mostram a partida inteira).
+        public int TotalDrivesRequired => PriorDrives + drivesRequired;
         public int DrivesRequired => drivesRequired;
         public bool HasAllDrives => DrivesCollected >= drivesRequired;
         public DeathCause LastDeathCause { get; private set; }
@@ -147,9 +149,12 @@ namespace SombraDaSanidade.Core
             else
             {
                 title = "FIM DA LINHA";
-                body = LastDeathCause == DeathCause.Monster
-                    ? "O Espécime Vazio te alcançou."
-                    : "Sua mente colapsou no escuro.";
+                body = LastDeathCause switch
+                {
+                    DeathCause.Monster => "O Espécime Vazio te alcançou.",
+                    DeathCause.Purge => "A purga da eclusa te alcançou.",
+                    _ => "Sua mente colapsou no escuro."
+                };
             }
 
             float w = Screen.width;

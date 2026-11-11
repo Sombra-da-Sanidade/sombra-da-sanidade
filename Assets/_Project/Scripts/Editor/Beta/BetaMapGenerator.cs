@@ -6,7 +6,8 @@ using UnityEngine;
 namespace SombraDaSanidade.EditorTools
 {
     // Gera a planta da cena Beta a partir de uma seed, no mesmo formato de caracteres da art-src/Maps/alfa.txt
-    // (legenda lá). Saguão embaixo no centro com a eclusa, Ala Médica a oeste, Ala de Energia a leste e
+    // (legenda lá). Saguão embaixo no centro com o terminal da eclusa (a porta externa fica na sala mais longe,
+    // #44), Ala Médica a oeste, Ala de Energia a leste e
     // Ala Executiva ao norte. Cada ala tem 3 ou 4 salas ligadas por corredores em loop (GDD 4.1, sem becos),
     // um servidor de HD, disjuntores, armários, itens, terminal de log e pontos de patrulha.
     // A Energia ganha duas salas lado a lado, separadas por uma parede fina: o atalho só do monstro (#37).
@@ -146,18 +147,21 @@ namespace SombraDaSanidade.EditorTools
                 problem = "sem parede livre para a eclusa";
                 return null;
             }
-            for (int x = ex; x < ex + 4; x++)
-            {
-                c[x, ey] = 'E';
-                c[x, ey + 1] = '#';
-                c[x, ey + 2] = '#';
-            }
+            // Fuga da Eclusa (#44): no saguão fica o terminal (U) que recebe os 3 HDs; a porta externa (E) vai para
+            // a sala mais longe dele, para a purga virar uma corrida de verdade.
+            c[ex + 1, ey] = 'G';
             c[HubRect.x + HubRect.width / 2, HubRect.y + 1] = '@';
             c[ex + 1, ey - 3] = 'L';
 
-            // Objetos por ala.
             var used = new HashSet<Vector2Int>();
             for (int x = ex - 1; x < ex + 5; x++) used.Add(new Vector2Int(x, ey));
+            if (!PlaceExternalDoor(c, info, used))
+            {
+                problem = "sem parede livre para a porta externa da eclusa";
+                return null;
+            }
+
+            // Objetos por ala.
             PlaceWing(c, rng, info.Rooms[Medica], used, items: "i");
             PlaceWing(c, rng, info.Rooms[Energia], used, items: "a");
             PlaceWing(c, rng, info.Rooms[Executiva], used, items: "ia");
@@ -336,6 +340,35 @@ namespace SombraDaSanidade.EditorTools
 
         // Objeto de parede (servidor, disjuntor, terminal, canos) na face norte da sala: chão logo abaixo,
         // parede acima (duas fileiras para o servidor, que desenha a parte de cima no tile de cima).
+        // Distância mínima (em linha reta, tiles) entre o centro do saguão e a porta externa.
+        public const float MinDoorDistance = 25f;
+
+        // Porta externa (4 tiles) na parede norte da sala mais longe do saguão em que couber.
+        private static bool PlaceExternalDoor(char[,] c, Info info, HashSet<Vector2Int> used)
+        {
+            var rooms = info.Rooms.Where(kv => kv.Key != Saguao).SelectMany(kv => kv.Value)
+                .Where(r => Vector2.Distance(r.center, HubRect.center) >= MinDoorDistance)
+                .OrderByDescending(r => Vector2.Distance(r.center, HubRect.center));
+            foreach (var r in rooms)
+            {
+                int y = r.yMax;
+                for (int x = r.x + 1; x <= r.xMax - 5; x++)
+                {
+                    bool solid = true;
+                    for (int dx = -1; dx <= 4 && solid; dx++)
+                        for (int dy = 0; dy <= 2 && solid; dy++)
+                            solid = c[x + dx, y + dy] == '#';
+                    for (int dx = 0; dx < 4 && solid; dx++)
+                        solid = c[x + dx, y - 1] == '.';
+                    if (!solid) continue;
+                    for (int dx = 0; dx < 4; dx++) c[x + dx, y] = 'E';
+                    for (int dx = -1; dx <= 4; dx++) used.Add(new Vector2Int(x + dx, y));
+                    return true;
+                }
+            }
+            return false;
+        }
+
         private static void PlaceOnNorthWall(char[,] c, System.Random rng, RectInt r, char what, HashSet<Vector2Int> used,
             bool needsTwoRows, bool lamp = false)
         {
@@ -413,7 +446,9 @@ namespace SombraDaSanidade.EditorTools
             if (!Find(c, 'i').Any() || !Find(c, 'a').Any()) return "faltam itens";
 
             // Objetos de parede: o chão em frente precisa ser alcançável. Objetos de chão: a própria célula.
-            foreach (char w in "SKTE")
+            if (Find(c, 'G').Count != 1) return "sem terminal da eclusa";
+            if (Find(c, 'E').Count != 4) return "sem porta externa";
+            foreach (char w in "SKTEU")
                 foreach (var p in Find(c, w))
                     if (!reach[p.x, p.y - 1]) return $"{w} em ({p.x},{p.y}) inalcançável";
             foreach (char f in "AiaMm")

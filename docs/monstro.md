@@ -93,6 +93,17 @@ Números em `MonsterConfig` (`breakerCheck*`, `noiseMemory*`).
 - Com perfil, o bônus de +10% por HD não vale: a velocidade da tabela já inclui o aumento de ala em ala.
 - Energia e Executiva usam o perfil. Ligar a Médica (raio 5) muda o balanceamento dela e fica para quando ela for revista.
 
+## Fúria da Eclusa (#44)
+
+Quando o terminal da eclusa recebe os 3 HDs, a purga (`Level/EscapeSequence`) chama `MonsterController.SetFury(true)`:
+
+- **Velocidade:** `MonsterConfig.furySpeed` (4.6, coluna Eclusa da Proposta 1) no lugar da base + bônus dos HDs. O galope da Perseguição e o modo seguro continuam multiplicando.
+- **Audição:** raio mínimo `furyHearingRadius` (9).
+- **Comportamentos:** todos os da Executiva. O `BetaWingTracker` não troca mais os comportamentos enquanto ele estiver em fúria.
+- O barulho da eclusa abrindo (raio 40 no `EscapeConfig`) o chama para o terminal.
+
+Detalhes da fase em [eclusa.md](eclusa.md).
+
 ## Diretor de tensão (#35)
 
 `Core/TensionDirector` é a curva dente-de-serra do GDD 7 em código. Base: o menace gauge do Alien: Isolation e o ciclo do Left 4 Dead ([pesquisa](pesquisa/ritmo-e-tensao.md), Proposta 7).

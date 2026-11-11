@@ -118,7 +118,8 @@ namespace SombraDaSanidade.EditorTools
             points.AddRange(Named<AdrenaSynModule>(_ => "Adrena-Syn", 1f));
             points.AddRange(Named<LithiumStabilizer>(_ => "Estabilizador", 1f));
             points.AddRange(Named<AudioLogTerminal>(o => $"Log {Wing(o.name)}", 1f));
-            points.AddRange(Named<ExitDoor>(_ => "Eclusa", 1.5f));
+            points.AddRange(Named<EclusaTerminal>(_ => "Terminal da eclusa", 1f));
+            points.AddRange(Named<ExitDoor>(_ => "Porta externa", 1.5f));
             points.AddRange(markers);
             var monster = Object.FindAnyObjectByType<MonsterController>();
             if (monster != null) points.Add(("Perto do monstro", Marker(beta, "MonsterArea", (Vector2)monster.transform.position + Vector2.down * 4f)));

@@ -17,7 +17,7 @@ Corredores de 3 tiles de largura fecham um loop: Saguão → Médica → Executi
 
 ## Como mudar o mapa
 
-1. Edite `art-src/Maps/alfa.txt`. Cada caractere é um tile, e a legenda está no começo do arquivo: `#` parede, `.` chão, `,` corredor, `S` servidor de HD, `K` disjuntor, `E` eclusa, `@` jogador, `M` monstro, `m` patrulha etc.
+1. Edite `art-src/Maps/alfa.txt`. Cada caractere é um tile, e a legenda está no começo do arquivo: `#` parede, `.` chão, `,` corredor, `S` servidor de HD, `K` disjuntor, `E` porta externa da eclusa, `U` terminal da eclusa ([eclusa.md](eclusa.md)), `@` jogador, `M` monstro, `m` patrulha etc.
 2. No Unity, use **Sombra da Sanidade > Gerar cena Alfa (tiles)**.
 
 O gerador (`Scripts/Editor/AlfaSceneBuilder.cs`) faz:

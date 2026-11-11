@@ -17,7 +17,7 @@ O gerador (`BetaMapGenerator`) descarta mapas inválidos e tenta a seed + 1000, 
 
 ## O mapa
 
-- **Saguão** (embaixo, no meio): início do jogador e a eclusa (3 HDs para abrir).
+- **Saguão** (embaixo, no meio): início do jogador e o terminal da eclusa (recebe os 3 HDs e inicia a purga). A porta externa fica na sala mais longe do saguão ([eclusa.md](eclusa.md)).
 - **Ala Médica** (oeste), **Ala de Energia** (leste) e **Ala Executiva** (norte): 3 ou 4 salas cada, ligadas por corredores em loop (GDD 4.1, sem becos).
 - Em cada ala: 1 servidor de HD, disjuntores com lâmpada, 2 ou 3 armários com a tabela de loot da ala, terminal com log da Dra. Vance, itens (Estabilizador, Adrena-Syn) e decalques.
 - **Energia:** duas salas lado a lado separadas por uma parede de 3 tiles, com o atalho só do monstro (grade no chão das duas pontas).
@@ -40,6 +40,7 @@ O gerador (`BetaMapGenerator`) descarta mapas inválidos e tenta a seed + 1000, 
 | Atalho do monstro | Ligado só na Energia (ou forçando "Energia" no painel) |
 | Modo seguro | Painel F1 |
 | Diretor de tensão | Valor e fase só no painel F1 (nunca no HUD) |
+| Fuga da Eclusa (#44) | E no terminal do saguão com os 3 HDs; correr até a porta externa antes da purga |
 
 ## Painel de teste (F1)
 
@@ -48,7 +49,8 @@ Pausa o jogo. Mostra seed, ala, estado e comportamentos do monstro, tensão, san
 - **Comportamentos do monstro:** seguir a ala do jogador, ou forçar Médica, Energia ou Executiva.
 - **Monstro:** modo seguro, atordoar, ligar/desligar, ruído no jogador.
 - **Jogador:** sanidade 100/30/10, bateria cheia ou 10, +1 HD.
-- **Ir para:** cada servidor, disjuntor, armário, item, terminal, eclusa, atalho e perto do monstro.
+- **Fuga da Eclusa:** +3 HDs, iniciar purga, purga em 10 s. O tempo que falta aparece só aqui (GDD 8).
+- **Ir para:** cada servidor, disjuntor, armário, item, terminal, terminal da eclusa, porta externa, atalho e perto do monstro.
 
 **F2** força um skill check enquanto o jogador segura E num servidor.
 

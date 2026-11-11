@@ -35,6 +35,8 @@ namespace SombraDaSanidade.EditorTools
         private const string AlaExecutivaLayoutFile = "art-src/Maps/ala-executiva.txt";
         public const string AlaEnergiaScenePath = Root + "/Scenes/Wings/AlaEnergia.unity";
         private const string AlaEnergiaLayoutFile = "art-src/Maps/ala-energia.txt";
+        public const string EclusaScenePath = Root + "/Scenes/Wings/Eclusa.unity";
+        private const string EclusaLayoutFile = "art-src/Maps/eclusa.txt";
 
         // Caracteres que são chão (o resto é parede/teto).
         private const string FloorChars = ".,hwpbL@MmiAan" + NeighborMarkers + EnergiaFloorChars;
@@ -147,6 +149,28 @@ namespace SombraDaSanidade.EditorTools
             var map = LoadLayout(AlaMedicaLayoutFile);
             if (map == null) return;
             BuildFromLayout(map, AlaMedicaScenePath, drivesRequired: 1, (x, y) => "Medica", AddWingFlow);
+        }
+
+        [MenuItem("Sombra da Sanidade/Gerar cena Eclusa (tiles)", priority = 3)]
+        public static void BuildEclusaFromMenu()
+        {
+            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            BuildEclusa();
+        }
+
+        // Batchmode: -executeMethod SombraDaSanidade.EditorTools.AlfaSceneBuilder.BuildEclusa
+        // Fase 4 (GDD 7, #44): o jogador chega com os 3 HDs das alas, insere no terminal e corre até a porta externa.
+        public static void BuildEclusa()
+        {
+            var map = LoadLayout(EclusaLayoutFile);
+            if (map == null) return;
+            BuildFromLayout(map, EclusaScenePath, drivesRequired: 0, (x, y) => "Eclusa", ctx =>
+            {
+                var gm = UnityEngine.Object.FindAnyObjectByType<GameManager>();
+                var so = new SerializedObject(gm);
+                so.FindProperty("priorDrives").intValue = 3;   // chega com os 3 HDs das alas
+                so.ApplyModifiedPropertiesWithoutUndo();
+            });
         }
 
         // Batchmode: -executeMethod SombraDaSanidade.EditorTools.AlfaSceneBuilder.BuildAlaExecutiva
@@ -328,6 +352,7 @@ namespace SombraDaSanidade.EditorTools
             Vector2 monsterSpawn = playerSpawn + Vector2.up * 18f;
             var patrol = new List<Vector2>();
             var exitCells = new List<Vector2Int>();
+            EclusaTerminal terminal = null;
             int breakers = 0;
 
             for (int y = 0; y < map.Height; y++)
@@ -345,6 +370,7 @@ namespace SombraDaSanidade.EditorTools
                         case 't': CreateDecor(items, square, $"Transformer_{x}_{y}", center, "transformer", onFloor: false); break;
                         case 'o': CreateDecor(items, square, $"CableCoil_{x}_{y}", center, "cable_coil", onFloor: true); break;
                         case 'E': exitCells.Add(new Vector2Int(x, y)); break;
+                        case 'G': terminal ??= CreateEclusaTerminal(objectives, square, inFront, center); break;
                         case '@': playerSpawn = center; break;
                         case 'M': monsterSpawn = center; break;
                         case 'm': patrol.Add(center); break;
@@ -359,7 +385,8 @@ namespace SombraDaSanidade.EditorTools
                     }
                 }
             }
-            if (exitCells.Count > 0) CreateExit(objectives, square, exitCells);
+            ExitDoor exit = exitCells.Count > 0 ? CreateExit(objectives, square, exitCells, terminal) : null;
+            if (terminal != null) CreateEscape(terminal, exit);
             CreateClues(items, objectives, map);
 
             var player = PrototypeSceneBuilder.CreatePlayer(square, playerConfig, flashlightConfig, sanityConfig, wallLayer, playerSpawn);
@@ -460,7 +487,7 @@ namespace SombraDaSanidade.EditorTools
                     if (map.IsFloor(x, y - 1))
                         t = c switch
                         {
-                            'S' => "server_bottom", 'K' => "breaker_off", 'T' => "wall_terminal", 'X' => "wall_terminal", 'P' => "wall_face_pipes",
+                            'S' => "server_bottom", 'K' => "breaker_off", 'T' => "wall_terminal", 'X' or 'G' => "wall_terminal", 'P' => "wall_face_pipes",
                             'E' => "door_bottom", 'U' => "substation_off", 'Q' => "wall_face_panel", _ => "wall_face"
                         };
                     else if (map.IsFloor(x, y - 2))
@@ -640,9 +667,67 @@ namespace SombraDaSanidade.EditorTools
             PrototypeSceneBuilder.SetRef(keypad, "screen", led.GetComponent<SpriteRenderer>());
         }
 
+        // Terminal da eclusa (#44): tile de terminal na parede, trigger no chão em frente e 3 gavetas que acendem.
+        private static EclusaTerminal CreateEclusaTerminal(Transform parent, Sprite square, Vector2 floorCell, Vector2 wallCell)
+        {
+            var go = new GameObject("EclusaTerminal");
+            go.transform.SetParent(parent, false);
+            go.transform.position = floorCell;
+            var col = go.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            col.size = new Vector2(1.6f, 1.4f);
+            var terminal = go.AddComponent<EclusaTerminal>();
+            var so = new SerializedObject(terminal);
+            so.FindProperty("config").objectReferenceValue = PrototypeSceneBuilder.GetOrCreateConfig<SombraDaSanidade.Level.EscapeConfig>("EscapeConfig");
+            var slots = so.FindProperty("slots");
+            slots.arraySize = 3;
+            for (int i = 0; i < 3; i++)
+            {
+                var led = PrototypeSceneBuilder.CreateBlock(go.transform, square, $"Slot_{i}",
+                    wallCell + new Vector2((i - 1) * 0.25f, -0.3f), new Vector2(0.14f, 0.1f), new Color(0.25f, 0.25f, 0.25f));
+                led.GetComponent<SpriteRenderer>().sortingOrder = 6;
+                slots.GetArrayElementAtIndex(i).objectReferenceValue = led.GetComponent<SpriteRenderer>();
+            }
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return terminal;
+        }
+
+        // Purga (#44): EscapeSequence com sirene e giroflex no terminal e na porta externa.
+        private static void CreateEscape(EclusaTerminal terminal, ExitDoor exit)
+        {
+            var go = new GameObject("EscapeSequence");
+            var beacons = new List<Light2D> { CreateBeacon(go.transform, "Beacon_Terminal", (Vector2)terminal.transform.position + Vector2.up * 0.6f) };
+            if (exit != null) beacons.Add(CreateBeacon(go.transform, "Beacon_Porta", (Vector2)exit.transform.position + Vector2.up * 0.6f));
+            var escape = go.AddComponent<SombraDaSanidade.Level.EscapeSequence>();
+            var so = new SerializedObject(escape);
+            so.FindProperty("config").objectReferenceValue = PrototypeSceneBuilder.GetOrCreateConfig<SombraDaSanidade.Level.EscapeConfig>("EscapeConfig");
+            so.FindProperty("terminal").objectReferenceValue = terminal;
+            var arr = so.FindProperty("beacons");
+            arr.arraySize = beacons.Count;
+            for (int i = 0; i < beacons.Count; i++) arr.GetArrayElementAtIndex(i).objectReferenceValue = beacons[i];
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // Giroflex: luz pontual em cone estreito que a EscapeSequence gira. Apagada até a purga.
+        private static Light2D CreateBeacon(Transform parent, string name, Vector2 position)
+        {
+            var light = new GameObject(name).AddComponent<Light2D>();
+            light.transform.SetParent(parent, false);
+            light.transform.position = position;
+            light.lightType = Light2D.LightType.Point;
+            light.color = new Color(0.9f, 0.12f, 0.1f);
+            light.intensity = 0f;
+            light.pointLightInnerRadius = 0f;
+            light.pointLightOuterRadius = 9f;
+            light.pointLightInnerAngle = 20f;
+            light.pointLightOuterAngle = 70f;
+            light.enabled = false;
+            return light;
+        }
+
         // Eclusa: as portas são tiles; o trigger fica no chão em frente e uma faixa de luz mostra o estado
-        // (vermelha trancada, verde com os 3 HDs).
-        private static void CreateExit(Transform parent, Sprite square, List<Vector2Int> cells)
+        // (vermelha trancada, verde destravada). Com terminal, é a porta externa da Fuga da Eclusa (#44).
+        private static ExitDoor CreateExit(Transform parent, Sprite square, List<Vector2Int> cells, EclusaTerminal terminal)
         {
             float cx = (float)cells.Average(c => c.x) + 0.5f;
             int wallY = cells[0].y;
@@ -656,6 +741,8 @@ namespace SombraDaSanidade.EditorTools
                 new Vector2(cx, wallY + 0.15f), new Vector2(cells.Count * 0.8f, 0.12f), new Color(0.7f, 0.15f, 0.15f));
             var exit = go.AddComponent<ExitDoor>();
             PrototypeSceneBuilder.SetRef(exit, "doorRenderer", status.GetComponent<SpriteRenderer>());
+            if (terminal != null) PrototypeSceneBuilder.SetRef(exit, "terminal", terminal);
+            return exit;
         }
 
         // Pistas em fósforo provisórias (Revelação pela Loucura) até a Frente 4 ter os puzzles.
@@ -666,9 +753,10 @@ namespace SombraDaSanidade.EditorTools
             var breaker = objectives.Cast<Transform>().FirstOrDefault(t => t.name.StartsWith("Breaker_Medica"));
             if (breaker != null)
                 PrototypeSceneBuilder.CreateClue(items, "Clue_Fusivel", (Vector2)breaker.position + Vector2.down * 1.6f, "FUSÍVEL 3-7-1", 0.05f);
-            var exit = objectives.Find("ExitDoor");
-            if (exit != null)
-                PrototypeSceneBuilder.CreateClue(items, "Clue_Aviso", (Vector2)exit.position + Vector2.down * 3.5f, "ELE SEGUE A LUZ", 0.08f);
+            // No saguão: perto do terminal da eclusa quando há (a porta externa foi para longe, #44).
+            var hub = objectives.Find("EclusaTerminal") ?? objectives.Find("ExitDoor");
+            if (hub != null)
+                PrototypeSceneBuilder.CreateClue(items, "Clue_Aviso", (Vector2)hub.position + Vector2.down * 3.5f, "ELE SEGUE A LUZ", 0.08f);
         }
     }
 }

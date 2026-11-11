@@ -49,20 +49,35 @@ namespace SombraDaSanidade.Monster
             {
                 if (config == null) return 0f;
                 // Com perfil, a velocidade é a da ala: o bônus por HD somaria duas vezes o mesmo aumento (Proposta 1).
+                // Na fúria da Eclusa (#44) vale a velocidade da fúria.
                 var profile = DifficultyProfile.Active;
-                float walk = profile != null ? profile.monsterSpeed : config.baseSpeed * SpeedMultiplier;
-                float speed = Mathf.Min(walk, config.maxSpeed);
+                float walk = IsFurious ? config.furySpeed
+                    : profile != null ? profile.monsterSpeed : config.baseSpeed * SpeedMultiplier;
+                float speed = IsFurious ? walk : Mathf.Min(walk, config.maxSpeed);
                 if (State == MonsterState.Chase)
                     speed = Mathf.Min(speed * config.chaseSpeedMultiplier, Mathf.Max(config.chaseMaxSpeed, config.maxSpeed));
                 return speed * (MonsterSafeMode.Enabled ? config.safeModeSpeedMultiplier : 1f);
             }
         }
 
-        // Distância em que ele escuta qualquer ruído: a da ala ou, sem perfil, a do config.
+        // Fúria da Eclusa (#44): ligada pela purga (Level.EscapeSequence). Velocidade e audição da coluna Eclusa
+        // da Proposta 1 e todos os comportamentos da Executiva.
+        public bool IsFurious { get; private set; }
+
+        public void SetFury(bool on)
+        {
+            if (IsFurious == on) return;
+            IsFurious = on;
+            if (on) SetBehaviours(MonsterWingBehaviours.Executiva);
+            ApplySpeed();
+        }
+
+        // Distância em que ele escuta qualquer ruído: a da fúria, a da ala ou, sem perfil, a do config.
         public float HearingRadius
         {
             get
             {
+                if (config != null && IsFurious) return Mathf.Max(config.hearingRadius, config.furyHearingRadius);
                 var profile = DifficultyProfile.Active;
                 if (profile != null) return profile.monsterHearingRadius;
                 return config != null ? config.hearingRadius : 0f;
@@ -162,6 +177,8 @@ namespace SombraDaSanidade.Monster
             {
                 GameManager.Instance.DriveCollected += OnDriveCollected;
                 GameManager.Instance.ProfileChanged += OnProfileChanged;
+                // Cenas que já começam com HDs (Eclusa, #44) partem da velocidade acumulada.
+                if (GameManager.Instance.TotalDrives > 0) OnDriveCollected(GameManager.Instance.TotalDrives);
             }
 
             if (flashlight == null) flashlight = FindAnyObjectByType<FlashlightController>();
