@@ -56,6 +56,7 @@ Para publicar uma versão nova: gere o build pelo menu **Sombra da Sanidade > Bu
 | [docs/sanidade.md](docs/sanidade.md) | Sanidade: dreno, efeitos, batimento em 3 faixas |
 | [docs/hud.md](docs/hud.md) | HUD diegético: pilha, HDs, relógio no Tab, legendas |
 | [docs/telas-e-rank.md](docs/telas-e-rank.md) | Menu, briefing, vitória com rank S/A/B/C e CONTINUAR |
+| [docs/checkpoint.md](docs/checkpoint.md) | Checkpoint entre alas: o que salva, quando restaura |
 | [docs/narrativa/logs.md](docs/narrativa/logs.md) | Roteiros dos logs da Dra. Vance (rascunho para o grupo) |
 | [docs/arte/guia-de-estilo.md](docs/arte/guia-de-estilo.md) | Direção de arte: paleta, escala, regras de desenho, fichas de personagem |
 | [docs/decisoes/](docs/decisoes/) | Decisões técnicas registradas |
