@@ -57,7 +57,8 @@ namespace SombraDaSanidade.Beta
         public void Apply(string wing)
         {
             if (monster == null) monster = FindAnyObjectByType<MonsterController>();
-            if (monster != null) monster.SetBehaviours(Behaviours(wing));
+            // Na fúria da purga (#44) ele já tem tudo ligado; trocar de ala não desliga.
+            if (monster != null && !monster.IsFurious) monster.SetBehaviours(Behaviours(wing));
         }
 
         public static MonsterBehaviour Behaviours(string wing) => wing switch

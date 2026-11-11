@@ -86,7 +86,7 @@ namespace SombraDaSanidade.Level
                 {
                     lastWing = wing,
                     nextWing = nextWing,
-                    drives = gm.RunDrives,
+                    drives = gm.TotalDrives,
                     elapsedSeconds = gm.ElapsedTime,
                     battery = flashlight != null ? flashlight.Battery : 0f,
                     sanity = sanity != null ? sanity.Value : 0f,

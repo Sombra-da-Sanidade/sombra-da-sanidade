@@ -20,5 +20,14 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/Scenes/Main/Beta.unity
     guid: 781fd657338041238bdb1b1a9e401dae
+  - enabled: 1
+    path: Assets/_Project/Scenes/Wings/AlaEnergia.unity
+    guid: 828dbc7dfe848a74db6d3c8a3bea9dc7
+  - enabled: 1
+    path: Assets/_Project/Scenes/Wings/AlaExecutiva.unity
+    guid: 39374f579508b3447a532309196e5e70
+  - enabled: 1
+    path: Assets/_Project/Scenes/Wings/Eclusa.unity
+    guid: 1820ebc912d02d549a2366b7bc39ec8c
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}

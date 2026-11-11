@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using NavMeshPlus.Components;
 using SombraDaSanidade.Beta;
 using SombraDaSanidade.Interaction;
 using SombraDaSanidade.Monster;
@@ -90,11 +89,7 @@ namespace SombraDaSanidade.EditorTools
             int s = 0;
             foreach (var (from, to) in info.Shortcuts)
             {
-                var go = new GameObject($"MonsterShortcut_{s++}");
-                go.transform.SetParent(beta, false);
-                go.transform.position = (from + to) * 0.5f;
-                go.AddComponent<NavMeshLink>();
-                go.AddComponent<MonsterShortcut>().Setup(from, to);
+                PrototypeSceneBuilder.CreateMonsterShortcut(beta, $"MonsterShortcut_{s++}", from, to);
                 markers.Add(("Atalho do monstro", Marker(beta, "ShortcutEnd", from + Vector2.down * 0.6f)));
             }
 
@@ -123,7 +118,8 @@ namespace SombraDaSanidade.EditorTools
             points.AddRange(Named<AdrenaSynModule>(_ => "Adrena-Syn", 1f));
             points.AddRange(Named<LithiumStabilizer>(_ => "Estabilizador", 1f));
             points.AddRange(Named<AudioLogTerminal>(o => $"Log {Wing(o.name)}", 1f));
-            points.AddRange(Named<ExitDoor>(_ => "Eclusa", 1.5f));
+            points.AddRange(Named<EclusaTerminal>(_ => "Terminal da eclusa", 1f));
+            points.AddRange(Named<ExitDoor>(_ => "Porta externa", 1.5f));
             points.AddRange(markers);
             var monster = Object.FindAnyObjectByType<MonsterController>();
             if (monster != null) points.Add(("Perto do monstro", Marker(beta, "MonsterArea", (Vector2)monster.transform.position + Vector2.down * 4f)));

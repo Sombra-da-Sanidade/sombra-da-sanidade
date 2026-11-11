@@ -95,7 +95,7 @@ namespace SombraDaSanidade.EditorTools
                         names.Length == 2 && names.Contains(Lens) && names.Contains(Resonator));
                     Check("Ressonador vale de novo (pistas abaixo de 50)", Mathf.Approximately(sanity.RevealCluesBelow, 50f));
                     Check("Mortes, EMPs, HDs e falhas das alas anteriores contam",
-                        gm.Deaths == 2 && gm.RunEmps == 3 && gm.RunDrives == 1 && gm.CountSkillCheckFailures() >= 4);
+                        gm.Deaths == 2 && gm.RunEmps == 3 && gm.PriorDrives == 1 && gm.CountSkillCheckFailures() >= 4);
                     Check($"Tempo da partida soma as alas anteriores ({gm.RunTime:0.0} s)", gm.RunTime >= 100f && gm.RunTime < 110f);
 
                     flashlight.TrySpend(20f);

@@ -111,7 +111,8 @@ namespace SombraDaSanidade.Narrative
 
         private void OnDriveCollected(int count)
         {
-            int index = count - 1;
+            // Pela partida inteira: na Ala de Energia o primeiro HD da cena é o HD-02 (VANCE-02).
+            int index = (GameManager.Instance != null ? GameManager.Instance.TotalDrives : count) - 1;
             if (index < 0 || index >= driveLogs.Length || driveLogs[index] == null) return;
             // O log do HD tem prioridade sobre um terminal; dois HDs seguidos entram na fila.
             if (IsPlaying && Source != null) Stop();

@@ -7,19 +7,39 @@ namespace SombraDaSanidade.Core
 {
     public enum GameState { Playing, GameOver, Victory }
 
-    public enum DeathCause { Monster, Sanity }
+    public enum DeathCause { Monster, Sanity, Purge }
 
     // Estado da partida, HDs coletados e condições de vitória/derrota (GDD 4.4).
     // Um por cena. As telas de fim ficam em UI.ResultScreen (issue #64).
+    // Ordem cedo: o perfil da ala (#30) e os HDs anteriores (#45) ficam prontos antes do Awake dos outros sistemas.
+    [DefaultExecutionOrder(-400)]
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance { get; private set; }
 
         [SerializeField] private int drivesRequired = 3;
 
+        [Tooltip("Dificuldade desta ala (Proposta 1). Vazio: os sistemas usam os próprios configs.")]
+        [SerializeField] private DifficultyProfile difficulty;
+
+        public DifficultyProfile ActiveProfile => difficulty;
+
+        public event Action<DifficultyProfile> ProfileChanged;
+
+        [Tooltip("HDs entregues em alas anteriores quando não há checkpoint (cena aberta direto). " +
+                 "Com um checkpoint que aponta para esta ala, vale o número salvo.")]
+        [SerializeField] private int priorDrives;
+
         public GameState State { get; private set; } = GameState.Playing;
         public bool IsPlaying => State == GameState.Playing;
+        // HDs desta ala (porta, HUD e velocidade do monstro, que já sobe de ala em ala pelo perfil).
         public int DrivesCollected { get; private set; }
+        // HDs entregues em alas anteriores (checkpoint #45).
+        public int PriorDrives { get; private set; }
+        // HDs da partida inteira: escolhe o log da Dra. Vance, a escolha de upgrade e o skill check (HD-01, 02, 03).
+        public int TotalDrives => PriorDrives + DrivesCollected;
+        // HDs da partida ao fim desta ala (HUD e tela de resultado mostram a partida inteira).
+        public int TotalDrivesRequired => PriorDrives + drivesRequired;
         public int DrivesRequired => drivesRequired;
         public bool HasAllDrives => DrivesCollected >= drivesRequired;
         public DeathCause LastDeathCause { get; private set; }
@@ -31,7 +51,6 @@ namespace SombraDaSanidade.Core
         public int Deaths => RunStats.Deaths;
         public float RunTime => RunStats.CarriedSeconds + ElapsedTime;
         public int RunEmps => RunStats.CarriedEmps + EmpsUsed;
-        public int RunDrives => RunStats.CarriedDrives + DrivesCollected;
         public float SanitySum => RunStats.CarriedSanitySum + sanitySum;
         public float SanitySeconds => RunStats.CarriedSanitySeconds + sanityTime;
         public float AverageSanity => SanitySeconds > 0f ? SanitySum / SanitySeconds : 1f;   // 0 a 1
@@ -87,6 +106,16 @@ namespace SombraDaSanidade.Core
             }
             Instance = this;
             Time.timeScale = 1f;
+            PriorDrives = LoadPriorDrives();
+        }
+
+        private int LoadPriorDrives()
+        {
+            // A ala vem do perfil ou, sem perfil (Ala Médica), do WingCheckpoint da cena.
+            string wing = difficulty != null ? difficulty.wing : FindAnyObjectByType<Level.WingCheckpoint>()?.Wing;
+            if (!string.IsNullOrEmpty(wing) && Checkpoint.TryLoad(out var data) && data.nextWing == wing)
+                return Mathf.Max(0, data.drives);
+            return Mathf.Max(0, priorDrives);
         }
 
         private void Start()
@@ -125,6 +154,13 @@ namespace SombraDaSanidade.Core
             if (kb != null && kb.rKey.wasPressedThisFrame) Restart();
         }
 
+        public void SetProfile(DifficultyProfile profile)
+        {
+            if (profile == difficulty) return;
+            difficulty = profile;
+            ProfileChanged?.Invoke(profile);
+        }
+
         public void CollectDrive()
         {
             if (!IsPlaying || HasAllDrives) return;
@@ -155,7 +191,7 @@ namespace SombraDaSanidade.Core
         {
             var config = RankConfig.Load();
             // Tempo ideal pelos HDs da partida inteira: as alas anteriores também contam.
-            RankScore = config.Score(RunTime, RunStats.CarriedDrives + drivesRequired, AverageSanity, RunEmps, Deaths);
+            RankScore = config.Score(RunTime, TotalDrivesRequired, AverageSanity, RunEmps, Deaths);
             FinalRank = config.RankFor(RankScore);
             string scene = SceneManager.GetActiveScene().name;
             var best = BestRank(scene);
@@ -193,9 +229,12 @@ namespace SombraDaSanidade.Core
             else
             {
                 title = "FIM DA LINHA";
-                body = LastDeathCause == DeathCause.Monster
-                    ? "O Espécime Vazio te alcançou."
-                    : "Sua mente colapsou no escuro.";
+                body = LastDeathCause switch
+                {
+                    DeathCause.Monster => "O Espécime Vazio te alcançou.",
+                    DeathCause.Purge => "A purga da eclusa te alcançou.",
+                    _ => "Sua mente colapsou no escuro."
+                };
             }
 
             float w = Screen.width;

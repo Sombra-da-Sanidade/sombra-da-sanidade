@@ -58,6 +58,7 @@ Para publicar uma versão nova: gere o build pelo menu **Sombra da Sanidade > Bu
 | [docs/telas-e-rank.md](docs/telas-e-rank.md) | Menu, briefing, vitória com rank S/A/B/C e CONTINUAR |
 | [docs/checkpoint.md](docs/checkpoint.md) | Checkpoint entre alas: o que salva, quando restaura |
 | [docs/narrativa/logs.md](docs/narrativa/logs.md) | Roteiros dos logs da Dra. Vance (rascunho para o grupo) |
+| [docs/dificuldade.md](docs/dificuldade.md) | `DifficultyProfile`: valores por ala e quem lê cada um |
 | [docs/arte/guia-de-estilo.md](docs/arte/guia-de-estilo.md) | Direção de arte: paleta, escala, regras de desenho, fichas de personagem |
 | [docs/decisoes/](docs/decisoes/) | Decisões técnicas registradas |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Fluxo de trabalho, branches, commits e cenas |

@@ -156,7 +156,7 @@ namespace SombraDaSanidade.UI
 
         private void OnDriveCollected(int count)
         {
-            newestDrive = count - 1;
+            newestDrive = (GameManager.Instance != null ? GameManager.Instance.PriorDrives : 0) + count - 1;
             drivesVisibleUntil = Time.time + Config.driveShowSeconds;
         }
 
@@ -345,9 +345,9 @@ namespace SombraDaSanidade.UI
             float alpha = watch ? 1f : Fade(drivesVisibleUntil, 0.8f);
             if (alpha <= 0f) return;
 
-            for (int i = 0; i < gm.DrivesRequired; i++)
+            for (int i = 0; i < gm.TotalDrivesRequired; i++)
             {
-                bool has = i < gm.DrivesCollected;
+                bool has = i < gm.TotalDrives;
                 bool blink = !watch && i == newestDrive && Mathf.Repeat(Time.time * 4f, 1f) < 0.5f;
                 int dx = x + i * 8;
                 Box(dx, y, 6, 8, has ? Concreto4 : Concreto2, alpha);

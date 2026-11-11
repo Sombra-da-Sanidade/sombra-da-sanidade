@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d1a1b3275f27144d9a352534d31b9d6, type: 3}
+  m_Name: EscapeConfig
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Level.EscapeConfig
+  insertHoldSeconds: 3
+  activationNoiseRadius: 40
+  purgeSeconds: 150
+  finalPhaseFrom: 0.8
+  sirenPeriodStart: 2.4
+  sirenPeriodEnd: 0.8
+  sirenVolumeStart: 0.35
+  sirenVolumeEnd: 0.8
+  emergencyColor: {r: 0.9, g: 0.12, b: 0.1, a: 1}
+  beaconIntensityStart: 0.6
+  beaconIntensityEnd: 1.2
+  beaconSpinStart: 0.5
+  beaconSpinEnd: 1.6
+  globalPulseIntensity: 0.18
+  strobeRate: 4

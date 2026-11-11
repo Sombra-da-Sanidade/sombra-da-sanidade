@@ -14,7 +14,6 @@ namespace SombraDaSanidade.Core
         public static int CarriedEmps { get; private set; }
         public static float CarriedSanitySum { get; private set; }
         public static float CarriedSanitySeconds { get; private set; }
-        public static int CarriedDrives { get; private set; }
         public static int CarriedSkillCheckFailures { get; private set; }
 
         // savedAtUtc do checkpoint já carregado: ao reiniciar a ala depois de um Game Over, o estado do Thomas
@@ -28,7 +27,6 @@ namespace SombraDaSanidade.Core
             CarriedEmps = 0;
             CarriedSanitySum = 0f;
             CarriedSanitySeconds = 0f;
-            CarriedDrives = 0;
             CarriedSkillCheckFailures = 0;
             LoadedCheckpoint = null;
         }
@@ -45,7 +43,6 @@ namespace SombraDaSanidade.Core
             CarriedEmps = data.emps;
             CarriedSanitySum = data.sanitySum;
             CarriedSanitySeconds = data.sanitySeconds;
-            CarriedDrives = data.drives;
             CarriedSkillCheckFailures = data.skillCheckFailures;
         }
 
