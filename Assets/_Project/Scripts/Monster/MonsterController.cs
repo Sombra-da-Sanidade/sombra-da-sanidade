@@ -48,7 +48,12 @@ namespace SombraDaSanidade.Monster
             get
             {
                 if (config == null) return 0f;
-                float speed = IsFurious ? config.furySpeed : Mathf.Min(config.baseSpeed * SpeedMultiplier, config.maxSpeed);
+                // Com perfil, a velocidade é a da ala: o bônus por HD somaria duas vezes o mesmo aumento (Proposta 1).
+                // Na fúria da Eclusa (#44) vale a velocidade da fúria.
+                var profile = DifficultyProfile.Active;
+                float walk = IsFurious ? config.furySpeed
+                    : profile != null ? profile.monsterSpeed : config.baseSpeed * SpeedMultiplier;
+                float speed = IsFurious ? walk : Mathf.Min(walk, config.maxSpeed);
                 if (State == MonsterState.Chase)
                     speed = Mathf.Min(speed * config.chaseSpeedMultiplier, Mathf.Max(config.chaseMaxSpeed, config.maxSpeed));
                 return speed * (MonsterSafeMode.Enabled ? config.safeModeSpeedMultiplier : 1f);
@@ -65,6 +70,18 @@ namespace SombraDaSanidade.Monster
             IsFurious = on;
             if (on) SetBehaviours(MonsterWingBehaviours.Executiva);
             ApplySpeed();
+        }
+
+        // Distância em que ele escuta qualquer ruído: a da fúria, a da ala ou, sem perfil, a do config.
+        public float HearingRadius
+        {
+            get
+            {
+                if (config != null && IsFurious) return Mathf.Max(config.hearingRadius, config.furyHearingRadius);
+                var profile = DifficultyProfile.Active;
+                if (profile != null) return profile.monsterHearingRadius;
+                return config != null ? config.hearingRadius : 0f;
+            }
         }
 
         // Pegou o jogador e está tocando a cena de morte (MonsterKillScene). A IA fica parada até o Game Over.
@@ -159,8 +176,9 @@ namespace SombraDaSanidade.Monster
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.DriveCollected += OnDriveCollected;
+                GameManager.Instance.ProfileChanged += OnProfileChanged;
                 // Cenas que já começam com HDs (Eclusa, #44) partem da velocidade acumulada.
-                if (GameManager.Instance.DrivesCollected > 0) OnDriveCollected(GameManager.Instance.DrivesCollected);
+                if (GameManager.Instance.TotalDrives > 0) OnDriveCollected(GameManager.Instance.TotalDrives);
             }
 
             if (flashlight == null) flashlight = FindAnyObjectByType<FlashlightController>();
@@ -168,7 +186,8 @@ namespace SombraDaSanidade.Monster
             if (sanity == null) sanity = FindAnyObjectByType<SanityController>();
 
             home = transform.position;
-            Behaviours = config.behaviours;
+            var profile = DifficultyProfile.Active;
+            Behaviours = profile != null ? profile.monsterBehaviours : config.behaviours;
             BehavioursChanged?.Invoke(Behaviours);
             if (NavMesh.SamplePosition(transform.position, out var hit, 3f, NavMesh.AllAreas))
             {
@@ -189,7 +208,15 @@ namespace SombraDaSanidade.Monster
 
         private void OnDestroy()
         {
-            if (GameManager.Instance != null) GameManager.Instance.DriveCollected -= OnDriveCollected;
+            if (GameManager.Instance == null) return;
+            GameManager.Instance.DriveCollected -= OnDriveCollected;
+            GameManager.Instance.ProfileChanged -= OnProfileChanged;
+        }
+
+        private void OnProfileChanged(DifficultyProfile profile)
+        {
+            ApplySpeed();
+            SetBehaviours(profile != null ? profile.monsterBehaviours : config.behaviours);
         }
 
         private void Update()
@@ -560,9 +587,7 @@ namespace SombraDaSanidade.Monster
 
         private void OnNoise(Vector2 position, float radius)
         {
-            float hearing = config == null ? 0f
-                : IsFurious ? Mathf.Max(config.hearingRadius, config.furyHearingRadius) : config.hearingRadius;
-            float hear = Mathf.Max(radius, hearing);
+            float hear = Mathf.Max(radius, HearingRadius);
             if (((Vector2)transform.position - position).sqrMagnitude <= hear * hear)
                 Alert(position);
             else

@@ -108,7 +108,7 @@ namespace SombraDaSanidade.Interaction
         {
             if (target == null || !target.CanSkillCheck || target.SkillCheckConfig == null) return false;
             var config = target.SkillCheckConfig;
-            int drives = GameManager.Instance != null ? GameManager.Instance.DrivesCollected : 0;
+            int drives = GameManager.Instance != null ? GameManager.Instance.TotalDrives : 0;
             bool monsterNear = sanity != null && sanity.IsMonsterNear;
             float factor = monsterNear ? 1f - config.skillCheckMonsterNearShrink : 1f;
             ZoneSize = ZoneSizeFor(config, drives, monsterNear);

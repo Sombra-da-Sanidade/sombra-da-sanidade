@@ -81,7 +81,7 @@ namespace SombraDaSanidade.EditorTools
             for (int x = 0; x < map.Width; x++)
                 for (int y = 0; y < map.Height; y++)
                 {
-                    if (map[x, y] == 'U') terminal = new Vector2(x, y);
+                    if (map[x, y] == 'G') terminal = new Vector2(x, y);
                     if (map[x, y] == 'E') door = new Vector2(x, y);
                 }
             return Vector2.Distance(terminal, door) >= BetaMapGenerator.MinDoorDistance - 8f;
@@ -96,7 +96,7 @@ namespace SombraDaSanidade.EditorTools
                 var map = BetaMapGenerator.Generate(seed, out var info);
                 bool valid = map != null && BetaMapGenerator.Count(map, 'S') == 3 && BetaMapGenerator.Count(map, 'K') >= 3
                     && BetaMapGenerator.Count(map, 'A') >= 6 && BetaMapGenerator.Count(map, 'T') >= 3
-                    && BetaMapGenerator.Count(map, 'E') == 4 && BetaMapGenerator.Count(map, 'U') == 1 && BetaMapGenerator.Count(map, '@') == 1
+                    && BetaMapGenerator.Count(map, 'E') == 4 && BetaMapGenerator.Count(map, 'G') == 1 && BetaMapGenerator.Count(map, '@') == 1
                     && DoorFarFromTerminal(map)
                     && BetaMapGenerator.Count(map, 'M') == 1 && info.Shortcuts.Count == 1;
                 if (valid) ok++;

@@ -32,9 +32,9 @@ A fúria fica no `MonsterConfig` (`furySpeed = 4.6`, `furyHearingRadius = 9`).
 
 ## Cenas
 
-- **`Scenes/Wings/Eclusa.unity`**: gerada de `art-src/Maps/eclusa.txt` por **Sombra da Sanidade > Gerar cena Eclusa (tiles)** (batchmode: `-executeMethod SombraDaSanidade.EditorTools.AlfaSceneBuilder.BuildEclusa`). O jogador começa com os 3 HDs (`GameManager.startingDrives`). Cofre (início e terminal) embaixo a oeste, porta externa em cima a oeste. Caminho curto (~25 s correndo) pela Câmara central, onde o monstro está; caminho longo e seguro (~45 s) pelo sul, leste e norte. Armários com a tabela da Eclusa (sem bateria).
+- **`Scenes/Wings/Eclusa.unity`**: gerada de `art-src/Maps/eclusa.txt` por **Sombra da Sanidade > Gerar cena Eclusa (tiles)** (batchmode: `-executeMethod SombraDaSanidade.EditorTools.AlfaSceneBuilder.BuildEclusa`). O jogador começa com os 3 HDs (`GameManager.priorDrives = 3`, com `drivesRequired = 0`). Cofre (início e terminal) embaixo a oeste, porta externa em cima a oeste. Caminho curto (~25 s correndo) pela Câmara central, onde o monstro está; caminho longo e seguro (~45 s) pelo sul, leste e norte. Armários com a tabela da Eclusa (sem bateria).
 - **Beta e Alfa**: o terminal fica no saguão (onde era a eclusa) e a porta externa vai para a sala mais longe (Beta: pelo menos 25 tiles do saguão; Alfa: Executiva).
-- Legenda nova nas plantas: `U` terminal da eclusa (na face da parede, como o `T`). `E` continua sendo a porta, agora a externa.
+- Legenda nova nas plantas: `G` terminal da eclusa (`U` é a subestação da Energia) (na face da parede, como o `T`). `E` continua sendo a porta, agora a externa.
 
 ## Painel de teste (F1, Beta)
 

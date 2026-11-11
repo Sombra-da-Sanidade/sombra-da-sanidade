@@ -2,7 +2,7 @@
 # Gerado por AlfaSceneBuilder (Unity) a partir deste arquivo. Legenda:
 #  # parede/teto   . chao   , corredor (grade)   h faixa de perigo   w poca   p papeis   b sangue
 #  S servidor de HD (na face da parede; o HD fica no chao logo abaixo)   K disjuntor   T terminal   P canos
-#  E eclusa (porta externa, saida)   U terminal da eclusa (3 HDs, inicia a purga)   L lampada de teto   @ jogador   M monstro   m ponto de patrulha   i estabilizador
+#  E eclusa (porta externa, saida)   G terminal da eclusa (3 HDs, inicia a purga)   L lampada de teto   @ jogador   M monstro   m ponto de patrulha   i estabilizador
 ############################################
 ############################################
 ############################################
@@ -23,7 +23,7 @@
 ##...w.......##################...........##
 ##...........##################.......w...##
 ##.im........##################..m........##
-##...........###T##P#U#####P###...........##
+##...........###T##P#G#####P###...........##
 ########,,,####.....hhhh.....####,,,########
 ########,,,####.....hhhh.....####,,,########
 ########,,,####..m........m..####,,,########

@@ -58,7 +58,7 @@ Não estão no GDD (ajustar no playtest): grito de 0,8 s (`detectionDelay`), mem
 O monstro ganha comportamentos por ala, como no Alien: Isolation. Eles destravam por progresso e **nunca** por número de mortes do jogador (Proposta 8).
 
 - **Lista:** `MonsterBehaviour`, em flags. O conjunto padrão fica em `MonsterConfig.behaviours`, e o padrão é o da Ala Médica.
-- **Troca em jogo:** `MonsterController.SetBehaviours(...)`. Quando o `DifficultyProfile` (#30) existir, ele chama isso ao entrar em cada ala. `Has(...)` diz se um comportamento está ligado.
+- **Troca em jogo:** `MonsterController.SetBehaviours(...)` (a Beta usa ao trocar de ala). Nas cenas de ala, o `DifficultyProfile` (#30) já define `monsterBehaviours` na cópia do config. `Has(...)` diz se um comportamento está ligado.
 
 | Ala | Preset (`MonsterWingBehaviours`) | Comportamentos |
 |---|---|---|
@@ -66,7 +66,7 @@ O monstro ganha comportamentos por ala, como no Alien: Isolation. Eles destravam
 | Energia | `Energia` | + **Checar disjuntores** (`BreakerCheck`) + **Atalhos** (`Shortcuts`) |
 | Executiva | `Executiva` | + **Memória curta** (`NoiseMemory`) |
 
-Cada ala soma os comportamentos da anterior. O `DifficultyProfile` (#30) só precisa chamar `monster.SetBehaviours(MonsterWingBehaviours.Energia)` (etc.) ao entrar na ala.
+Cada ala soma os comportamentos da anterior. O asset `Difficulty_<ala>` guarda o preset da ala (`DifficultyProfiles` no Editor cria os quatro).
 
 **Busca (`Search`):** depois de escutar no ponto do ruído, ou onde perdeu o jogador, ele checa até 3 pontos de patrulha a até 10 m dali antes de voltar à rota.
 - **Ordem subótima:** sorteia entre os 3 pontos mais próximos ainda não vistos, em vez de ir sempre ao mais perto.
@@ -88,7 +88,10 @@ Números em `MonsterConfig` (`searchPoints`, `searchRadius`, `searchCandidates`,
 
 Números em `MonsterConfig` (`breakerCheck*`, `noiseMemory*`).
 
-**Ainda depende do #30:** a velocidade e o raio auditivo por ala (tabela da Proposta 1 do v1.1). O `DifficultyProfile` vai ajustar esses números e chamar `SetBehaviours` na troca de ala.
+**Perfil por ala (#30):** cada cena de ala aponta um `Core/DifficultyProfile` no `GameManager` (assets em `ScriptableObjects/Config/Difficulty<Ala>.asset`, valores da Proposta 1 do v1.1). Detalhes em [dificuldade.md](dificuldade.md).
+- O monstro lê velocidade, raio auditivo e comportamentos de `DifficultyProfile.Active`. Os assets de config não mudam.
+- Com perfil, o bônus de +10% por HD não vale: a velocidade da tabela já inclui o aumento de ala em ala.
+- Energia e Executiva usam o perfil. Ligar a Médica (raio 5) muda o balanceamento dela e fica para quando ela for revista.
 
 ## Fúria da Eclusa (#44)
 

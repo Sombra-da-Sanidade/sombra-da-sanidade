@@ -59,8 +59,8 @@ namespace SombraDaSanidade.UI
                 PixelHud.Text("ECLUSA ABERTA. HDS ENTREGUES À SUPERFÍCIE.", x + 52, y + 36, PixelHud.Fosforo3);
             }
 
-            for (int i = 0; i < gm.DrivesRequired; i++)
-                PixelHud.Sprite("screens", i < gm.DrivesCollected ? "hd_slot_full" : "hd_slot_empty", x + 14 + i * 18, y + 56);
+            for (int i = 0; i < gm.TotalDrivesRequired; i++)
+                PixelHud.Sprite("screens", i < gm.TotalDrives ? "hd_slot_full" : "hd_slot_empty", x + 14 + i * 18, y + 56);
 
             if (cachedFailures < 0)
             {
@@ -70,7 +70,7 @@ namespace SombraDaSanidade.UI
             }
             string time = FormatTime(gm.ElapsedTime);
             Stat("TEMPO", time, x + 14, y + 82, x + 180);
-            Stat("HDS", $"{gm.DrivesCollected}/{gm.DrivesRequired}", x + 14, y + 93, x + 180);
+            Stat("HDS", $"{gm.TotalDrives}/{gm.TotalDrivesRequired}", x + 14, y + 93, x + 180);
             Stat("FALHAS NO MULTÍMETRO", cachedFailures.ToString(), x + 14, y + 104, x + 180);
         }
 

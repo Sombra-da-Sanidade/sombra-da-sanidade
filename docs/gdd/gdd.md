@@ -114,4 +114,5 @@ Marcos: Protótipo (semana 4), Vertical slice com Ala Médica (semana 8), Versã
 | 1.0.3 | 05/11/2026 | Upgrade da Lux-90 (1 de 2) ao ejetar cada HD, Proposta 2 pendente do v1.1 (#31) |
 | 1.0.4 | 06/11/2026 | HUD e telas em pixel art (multímetro, prompt sem número, pausa com Esc), #63 e #64 |
 | 1.0.5 | 09/11/2026 | Ala Médica do vertical slice: 1 min sem monstro e primeiro encontro roteirizado (Proposta 4), checkpoint JSON com "Progresso salvo" ao concluir a ala (Proposta 2, #45) |
-| 1.0.6 | 09/11/2026 | Fuga da Eclusa: terminal recebe os 3 HDs, purga de 150 s comunicada por sirene e luz (sem número), monstro em fúria (4.6, Proposta 1), Game Over próprio da purga e cena `Wings/Eclusa` (#44). Ver [eclusa.md](../eclusa.md) |
+| 1.0.6 | 09/11/2026 | Ala Executiva (#43): HD-03 com trava de senha, dígitos em pistas de fósforo (sanidade < 35) e Módulo Neural (-15 de sanidade, revela as pistas por 20 s); `DifficultyProfile` por ala com a tabela da Proposta 1 (#30) |
+| 1.0.7 | 09/11/2026 | Fuga da Eclusa: terminal recebe os 3 HDs, purga de 150 s comunicada por sirene e luz (sem número), monstro em fúria (4.6, Proposta 1), Game Over próprio da purga e cena `Wings/Eclusa` (#44). Ver [eclusa.md](../eclusa.md) |

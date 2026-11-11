@@ -73,7 +73,7 @@ namespace SombraDaSanidade.EditorTools
                         gm && player && monster && door && escape && terminal);
                     if (failed) { Finish(); return; }
                     if (TensionDirector.Instance != null) TensionDirector.Instance.enabled = false;
-                    Check($"Começa com os 3 HDs ({gm.DrivesCollected}/{gm.DrivesRequired})", gm.HasAllDrives && gm.DrivesRequired == 3);
+                    Check($"Começa com os 3 HDs ({gm.TotalDrives}/{gm.TotalDrivesRequired})", gm.HasAllDrives && gm.TotalDrives == 3);
                     Check("Porta externa ligada ao terminal", door.Terminal == terminal);
                     Check("Porta trancada antes do terminal", !door.IsUnlocked);
                     Check("Purga parada antes do terminal", !escape.Active && !monster.IsFurious);

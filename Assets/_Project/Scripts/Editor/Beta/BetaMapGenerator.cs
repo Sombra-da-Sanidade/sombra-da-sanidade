@@ -149,7 +149,7 @@ namespace SombraDaSanidade.EditorTools
             }
             // Fuga da Eclusa (#44): no saguão fica o terminal (U) que recebe os 3 HDs; a porta externa (E) vai para
             // a sala mais longe dele, para a purga virar uma corrida de verdade.
-            c[ex + 1, ey] = 'U';
+            c[ex + 1, ey] = 'G';
             c[HubRect.x + HubRect.width / 2, HubRect.y + 1] = '@';
             c[ex + 1, ey - 3] = 'L';
 
@@ -446,7 +446,7 @@ namespace SombraDaSanidade.EditorTools
             if (!Find(c, 'i').Any() || !Find(c, 'a').Any()) return "faltam itens";
 
             // Objetos de parede: o chão em frente precisa ser alcançável. Objetos de chão: a própria célula.
-            if (Find(c, 'U').Count != 1) return "sem terminal da eclusa";
+            if (Find(c, 'G').Count != 1) return "sem terminal da eclusa";
             if (Find(c, 'E').Count != 4) return "sem porta externa";
             foreach (char w in "SKTEU")
                 foreach (var p in Find(c, w))
