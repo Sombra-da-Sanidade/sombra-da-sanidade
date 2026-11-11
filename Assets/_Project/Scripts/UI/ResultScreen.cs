@@ -1,5 +1,4 @@
 using SombraDaSanidade.Core;
-using SombraDaSanidade.Interaction;
 using UnityEngine;
 
 namespace SombraDaSanidade.UI
@@ -62,12 +61,7 @@ namespace SombraDaSanidade.UI
             for (int i = 0; i < gm.DrivesRequired; i++)
                 PixelHud.Sprite("screens", i < gm.DrivesCollected ? "hd_slot_full" : "hd_slot_empty", x + 14 + i * 18, y + 56);
 
-            if (cachedFailures < 0)
-            {
-                cachedFailures = 0;
-                foreach (var server in Object.FindObjectsByType<DriveServer>(FindObjectsSortMode.None))
-                    cachedFailures += server.SkillCheckFailures;
-            }
+            if (cachedFailures < 0) cachedFailures = gm.CountSkillCheckFailures();
             // Avaliação do auditor (#32, Proposta 3): selo do rank e o melhor já tirado nesta cena.
             int rankX = x + w - 46;
             PixelHud.TextCentered("RANK", rankX + 16, y + 44, PixelHud.Fosforo3);
@@ -77,11 +71,11 @@ namespace SombraDaSanidade.UI
             else if (best != null) PixelHud.Text("MELHOR RANK: " + best.Value, x + 14, y + 76, PixelHud.Fosforo3);
 
             int left = x + 14, leftEnd = x + 136, right = x + 150, rightEnd = x + w - 14;
-            Stat("TEMPO", FormatTime(gm.ElapsedTime), left, y + 88, leftEnd);
+            Stat("TEMPO", FormatTime(gm.RunTime), left, y + 88, leftEnd);
             Stat("HDS", $"{gm.DrivesCollected}/{gm.DrivesRequired}", left, y + 99, leftEnd);
             Stat("FALHAS MULTÍMETRO", cachedFailures.ToString(), left, y + 110, leftEnd);
             Stat("SANIDADE MÉDIA", Mathf.RoundToInt(gm.AverageSanity * 100f) + "%", right, y + 88, rightEnd);
-            Stat("EMPS", gm.EmpsUsed.ToString(), right, y + 99, rightEnd);
+            Stat("EMPS", gm.RunEmps.ToString(), right, y + 99, rightEnd);
             Stat("MORTES", gm.Deaths.ToString(), right, y + 110, rightEnd);
         }
 
