@@ -30646,7 +30646,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Core.GameManager
   drivesRequired: 1
-  profile: {fileID: 11400000, guid: 4855c476904e7bd4baf06297417b8f59, type: 2}
+  difficulty: {fileID: 11400000, guid: 38fe603f27894eb38917fbaaaea70dbe, type: 2}
   priorDrives: 1
 --- !u!4 &1562507947
 Transform:

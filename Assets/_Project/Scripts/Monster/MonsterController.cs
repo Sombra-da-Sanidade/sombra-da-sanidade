@@ -48,10 +48,24 @@ namespace SombraDaSanidade.Monster
             get
             {
                 if (config == null) return 0f;
-                float speed = Mathf.Min(config.baseSpeed * SpeedMultiplier, config.maxSpeed);
+                // Com perfil, a velocidade é a da ala: o bônus por HD somaria duas vezes o mesmo aumento (Proposta 1).
+                var profile = DifficultyProfile.Active;
+                float walk = profile != null ? profile.monsterSpeed : config.baseSpeed * SpeedMultiplier;
+                float speed = Mathf.Min(walk, config.maxSpeed);
                 if (State == MonsterState.Chase)
                     speed = Mathf.Min(speed * config.chaseSpeedMultiplier, Mathf.Max(config.chaseMaxSpeed, config.maxSpeed));
                 return speed * (MonsterSafeMode.Enabled ? config.safeModeSpeedMultiplier : 1f);
+            }
+        }
+
+        // Distância em que ele escuta qualquer ruído: a da ala ou, sem perfil, a do config.
+        public float HearingRadius
+        {
+            get
+            {
+                var profile = DifficultyProfile.Active;
+                if (profile != null) return profile.monsterHearingRadius;
+                return config != null ? config.hearingRadius : 0f;
             }
         }
 
@@ -144,14 +158,19 @@ namespace SombraDaSanidade.Monster
         // Start, não OnEnable: garante que o Awake do GameManager e o bake do NavMesh já rodaram.
         private void Start()
         {
-            if (GameManager.Instance != null) GameManager.Instance.DriveCollected += OnDriveCollected;
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.DriveCollected += OnDriveCollected;
+                GameManager.Instance.ProfileChanged += OnProfileChanged;
+            }
 
             if (flashlight == null) flashlight = FindAnyObjectByType<FlashlightController>();
             if (player == null && flashlight != null) player = flashlight.transform;
             if (sanity == null) sanity = FindAnyObjectByType<SanityController>();
 
             home = transform.position;
-            Behaviours = config.behaviours;
+            var profile = DifficultyProfile.Active;
+            Behaviours = profile != null ? profile.monsterBehaviours : config.behaviours;
             BehavioursChanged?.Invoke(Behaviours);
             if (NavMesh.SamplePosition(transform.position, out var hit, 3f, NavMesh.AllAreas))
             {
@@ -172,7 +191,15 @@ namespace SombraDaSanidade.Monster
 
         private void OnDestroy()
         {
-            if (GameManager.Instance != null) GameManager.Instance.DriveCollected -= OnDriveCollected;
+            if (GameManager.Instance == null) return;
+            GameManager.Instance.DriveCollected -= OnDriveCollected;
+            GameManager.Instance.ProfileChanged -= OnProfileChanged;
+        }
+
+        private void OnProfileChanged(DifficultyProfile profile)
+        {
+            ApplySpeed();
+            SetBehaviours(profile != null ? profile.monsterBehaviours : config.behaviours);
         }
 
         private void Update()
@@ -286,12 +313,6 @@ namespace SombraDaSanidade.Monster
             routeIndex = 0;
             routeStarted = false;
             if (State != MonsterState.Patrol) SetState(MonsterState.Patrol);
-        }
-
-        // Perfil da ala (#30): o GameManager troca o config por uma cópia ajustada antes do Awake.
-        public void UseConfig(MonsterConfig tuned)
-        {
-            if (tuned != null) config = tuned;
         }
 
         public void SetSpeedMultiplier(float multiplier)
@@ -549,7 +570,7 @@ namespace SombraDaSanidade.Monster
 
         private void OnNoise(Vector2 position, float radius)
         {
-            float hear = Mathf.Max(radius, config != null ? config.hearingRadius : 0f);
+            float hear = Mathf.Max(radius, HearingRadius);
             if (((Vector2)transform.position - position).sqrMagnitude <= hear * hear)
                 Alert(position);
             else

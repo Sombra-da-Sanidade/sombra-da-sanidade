@@ -87,7 +87,7 @@ namespace SombraDaSanidade.EditorTools
             var profile = DifficultyProfiles.GetOrCreate("Energia");
             var gm = UnityEngine.Object.FindAnyObjectByType<GameManager>();
             var gmSo = new SerializedObject(gm);
-            gmSo.FindProperty("profile").objectReferenceValue = profile;
+            gmSo.FindProperty("difficulty").objectReferenceValue = profile;
             gmSo.FindProperty("priorDrives").intValue = 1;   // aberta direto, sem checkpoint: a Médica já deu o HD-01
             gmSo.ApplyModifiedPropertiesWithoutUndo();
 

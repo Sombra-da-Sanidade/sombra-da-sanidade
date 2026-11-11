@@ -139,17 +139,15 @@ namespace SombraDaSanidade.EditorTools
             var p = gm.ActiveProfile;
             Check("GameManager com o DifficultyProfile da Energia", p != null && p.wing == "Energia");
             if (p == null) return;
-            var m = monster.Config;
-            Check($"Monstro: velocidade 3.85 e raio auditivo 6 (veio {m.baseSpeed} / {m.hearingRadius})",
-                Mathf.Approximately(m.baseSpeed, 3.85f) && Mathf.Approximately(m.hearingRadius, 6f));
+            // O perfil é lido direto pelos sistemas (DifficultyProfile.Active); os configs compartilhados não mudam.
+            Check($"Monstro: velocidade 3.85 e raio auditivo 6 (veio {monster.CurrentSpeed} / {monster.HearingRadius})",
+                Mathf.Approximately(monster.CurrentSpeed, 3.85f) && Mathf.Approximately(monster.HearingRadius, 6f));
             Check("Monstro: checa disjuntores e usa atalhos", monster.Has(MonsterBehaviour.BreakerCheck) && monster.Has(MonsterBehaviour.Shortcuts));
-            var s = sanity.Config;
-            Check($"Sanidade: dreno 1.5/s no escuro e alucinação a cada 20-30 s (veio {s.darknessDrain}, {s.hallucinationMinInterval}-{s.hallucinationMaxInterval})",
-                Mathf.Approximately(s.darknessDrain, 1.5f) && Mathf.Approximately(s.hallucinationMinInterval, 20f)
-                && Mathf.Approximately(s.hallucinationMaxInterval, 30f));
-            Check("Perfil vale em cópias: os assets compartilhados não mudam",
-                !AssetDatabase.Contains(m) && !AssetDatabase.Contains(s)
-                && !Mathf.Approximately(AssetDatabase.LoadAssetAtPath<MonsterConfig>("Assets/_Project/ScriptableObjects/Config/MonsterConfig.asset").baseSpeed, 3.85f));
+            Check($"Sanidade: dreno 1.5/s no escuro e alucinação a cada 20-30 s (veio {sanity.DarknessDrain}, {p.hallucinationInterval.x}-{p.hallucinationInterval.y})",
+                Mathf.Approximately(sanity.DarknessDrain, 1.5f) && p.hallucinations
+                && Mathf.Approximately(p.hallucinationInterval.x, 20f) && Mathf.Approximately(p.hallucinationInterval.y, 30f));
+            Check("Assets compartilhados não mudam com o perfil",
+                !Mathf.Approximately(AssetDatabase.LoadAssetAtPath<MonsterConfig>("Assets/_Project/ScriptableObjects/Config/MonsterConfig.asset").baseSpeed, 3.85f));
 
             var table = PrototypeSceneBuilder.LoadLootTable("Energia");
             float total = table.nothingWeight + table.batteryWeight + table.sedativeWeight + table.adrenaSynWeight;

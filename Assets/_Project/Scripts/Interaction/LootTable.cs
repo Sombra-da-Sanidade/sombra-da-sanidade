@@ -5,7 +5,7 @@ namespace SombraDaSanidade.Interaction
     // Tabela de loot dos armários de uma ala (extra #46, pesquisa: Left 4 Dead, "structured unpredictability"
     // em docs/pesquisa/ritmo-e-tensao.md). As possibilidades são desenhadas aqui e sorteadas em tempo de execução.
     // Um asset por ala em ScriptableObjects/Config/Loot/. Pesos relativos: não precisam somar 1.
-    // A chance de bateria da ala está no DifficultyProfile (#30, batteryChance); o teste da ala confere que a tabela bate.
+    // O DifficultyProfile da ala (#30) referencia a tabela; armários sem tabela própria usam a do perfil ativo.
     [CreateAssetMenu(fileName = "LootTable", menuName = "Sombra da Sanidade/Config/Tabela de loot")]
     public class LootTable : ScriptableObject
     {

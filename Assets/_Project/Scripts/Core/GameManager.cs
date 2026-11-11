@@ -11,7 +11,7 @@ namespace SombraDaSanidade.Core
 
     // Estado da partida, HDs coletados e condições de vitória/derrota (GDD 4.4).
     // Um por cena. As telas de fim ficam em UI.ResultScreen (issue #64).
-    // Ordem cedo: o perfil da ala (#30) troca os configs do monstro e da sanidade antes do Awake deles.
+    // Ordem cedo: o perfil da ala (#30) e os HDs anteriores (#45) ficam prontos antes do Awake dos outros sistemas.
     [DefaultExecutionOrder(-400)]
     public class GameManager : MonoBehaviour
     {
@@ -19,8 +19,12 @@ namespace SombraDaSanidade.Core
 
         [SerializeField] private int drivesRequired = 3;
 
-        [Tooltip("Dificuldade da ala (Proposta 1 do v1.1, #30). Vazio: os configs dos assets valem como estão.")]
-        [SerializeField] private DifficultyProfile profile;
+        [Tooltip("Dificuldade desta ala (Proposta 1). Vazio: os sistemas usam os próprios configs.")]
+        [SerializeField] private DifficultyProfile difficulty;
+
+        public DifficultyProfile ActiveProfile => difficulty;
+
+        public event Action<DifficultyProfile> ProfileChanged;
 
         [Tooltip("HDs entregues em alas anteriores quando não há checkpoint (cena aberta direto). " +
                  "Com um checkpoint que aponta para esta ala, vale o número salvo.")]
@@ -34,7 +38,6 @@ namespace SombraDaSanidade.Core
         public int PriorDrives { get; private set; }
         // HDs da partida inteira: escolhe o log da Dra. Vance, a escolha de upgrade e o skill check (HD-01, 02, 03).
         public int TotalDrives => PriorDrives + DrivesCollected;
-        public DifficultyProfile ActiveProfile => profile;
         public int DrivesRequired => drivesRequired;
         public bool HasAllDrives => DrivesCollected >= drivesRequired;
         public DeathCause LastDeathCause { get; private set; }
@@ -57,41 +60,18 @@ namespace SombraDaSanidade.Core
             Instance = this;
             Time.timeScale = 1f;
             PriorDrives = LoadPriorDrives();
-            ApplyProfile();
         }
 
         private int LoadPriorDrives()
         {
-            if (profile != null && Checkpoint.TryLoad(out var data) && data.nextWing == profile.wing)
+            if (difficulty != null && Checkpoint.TryLoad(out var data) && data.nextWing == difficulty.wing)
                 return Mathf.Max(0, data.drives);
             return Mathf.Max(0, priorDrives);
         }
 
-        // Cópias dos configs com os valores da ala: os assets compartilhados não mudam (nem no Editor).
-        private void ApplyProfile()
-        {
-            if (profile == null) return;
-            foreach (var monster in FindObjectsByType<Monster.MonsterController>(FindObjectsInactive.Include))
-            {
-                var copy = profile.ApplyTo(monster.Config);
-                if (copy != null) profileCopies.Add(copy);
-                monster.UseConfig(copy);
-            }
-            foreach (var sanity in FindObjectsByType<Sanity.SanityController>(FindObjectsInactive.Include))
-            {
-                var copy = profile.ApplyTo(sanity.Config);
-                if (copy != null) profileCopies.Add(copy);
-                sanity.UseConfig(copy);
-            }
-        }
-
-        private readonly System.Collections.Generic.List<ScriptableObject> profileCopies = new System.Collections.Generic.List<ScriptableObject>();
-
         private void OnDestroy()
         {
             if (Instance == this) Instance = null;
-            foreach (var copy in profileCopies) if (copy != null) Destroy(copy);
-            profileCopies.Clear();
         }
 
         private void Update()
@@ -104,6 +84,13 @@ namespace SombraDaSanidade.Core
 
             var kb = Keyboard.current;
             if (kb != null && kb.rKey.wasPressedThisFrame) Restart();
+        }
+
+        public void SetProfile(DifficultyProfile profile)
+        {
+            if (profile == difficulty) return;
+            difficulty = profile;
+            ProfileChanged?.Invoke(profile);
         }
 
         public void CollectDrive()
