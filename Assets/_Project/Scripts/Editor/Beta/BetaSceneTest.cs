@@ -74,6 +74,19 @@ namespace SombraDaSanidade.EditorTools
             EditorApplication.EnterPlaymode();
         }
 
+        // Fuga da Eclusa (#44): a porta externa fica longe do terminal do saguão, para a purga ser uma corrida.
+        private static bool DoorFarFromTerminal(AlfaSceneBuilder.Layout map)
+        {
+            Vector2 terminal = default, door = default;
+            for (int x = 0; x < map.Width; x++)
+                for (int y = 0; y < map.Height; y++)
+                {
+                    if (map[x, y] == 'G') terminal = new Vector2(x, y);
+                    if (map[x, y] == 'E') door = new Vector2(x, y);
+                }
+            return Vector2.Distance(terminal, door) >= BetaMapGenerator.MinDoorDistance - 8f;
+        }
+
         private static void CheckGenerator()
         {
             int ok = 0;
@@ -83,7 +96,8 @@ namespace SombraDaSanidade.EditorTools
                 var map = BetaMapGenerator.Generate(seed, out var info);
                 bool valid = map != null && BetaMapGenerator.Count(map, 'S') == 3 && BetaMapGenerator.Count(map, 'K') >= 3
                     && BetaMapGenerator.Count(map, 'A') >= 6 && BetaMapGenerator.Count(map, 'T') >= 3
-                    && BetaMapGenerator.Count(map, 'E') == 4 && BetaMapGenerator.Count(map, '@') == 1
+                    && BetaMapGenerator.Count(map, 'E') == 4 && BetaMapGenerator.Count(map, 'G') == 1 && BetaMapGenerator.Count(map, '@') == 1
+                    && DoorFarFromTerminal(map)
                     && BetaMapGenerator.Count(map, 'M') == 1 && info.Shortcuts.Count == 1;
                 if (valid) ok++;
                 else first ??= $"seed {seed}";
@@ -121,8 +135,11 @@ namespace SombraDaSanidade.EditorTools
                         Object.FindAnyObjectByType<AdrenaSynModule>() && Object.FindAnyObjectByType<LithiumStabilizer>());
                     var logs = Object.FindObjectsByType<AudioLogTerminal>(FindObjectsSortMode.None);
                     Check($"3+ terminais com log ({logs.Length})", logs.Length >= 3 && logs.All(l => l.Log != null));
+                    var exitDoor = Object.FindAnyObjectByType<ExitDoor>();
+                    Check("Porta externa ligada ao terminal da eclusa e purga na cena (#44)",
+                        exitDoor && exitDoor.Terminal && Object.FindAnyObjectByType<SombraDaSanidade.Level.EscapeSequence>());
                     Check("Eclusa, pista em fósforo e atalho do monstro",
-                        Object.FindAnyObjectByType<ExitDoor>() && Object.FindAnyObjectByType<SanityClue>() && Object.FindAnyObjectByType<MonsterShortcut>());
+                        exitDoor &&Object.FindAnyObjectByType<SanityClue>() && Object.FindAnyObjectByType<MonsterShortcut>());
 
                     // Sprite novo do armário: abre e troca para o aberto.
                     var locker = lockers[0];

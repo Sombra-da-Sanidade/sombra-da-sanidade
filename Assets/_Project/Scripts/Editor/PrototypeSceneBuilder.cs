@@ -537,6 +537,18 @@ namespace SombraDaSanidade.EditorTools
         internal static LootTable LoadLootTable(string wing) =>
             AssetDatabase.LoadAssetAtPath<LootTable>($"{ConfigDir}/Loot/LootTable_{wing}.asset");
 
+        // Atalho só do monstro (#37): NavMeshLink entre dois pontos de chão (mundo). Liga quando a ala dá Shortcuts.
+        internal static MonsterShortcut CreateMonsterShortcut(Transform parent, string name, Vector2 from, Vector2 to)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+            go.transform.position = (from + to) * 0.5f;
+            go.AddComponent<NavMeshLink>();
+            var shortcut = go.AddComponent<MonsterShortcut>();
+            shortcut.Setup(from, to);
+            return shortcut;
+        }
+
         // TextMesh usa material próprio (sem luz 2D): brilha no escuro como tinta de fósforo.
         internal static void CreateClue(Transform parent, string name, Vector2 position, string text, float characterSize)
         {

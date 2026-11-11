@@ -17,6 +17,10 @@ namespace SombraDaSanidade.Sanity
         public float monsterProximityRadius = 5f;
         [Tooltip("Custo imediato do Módulo Adrena-Syn (GDD: -20).")]
         public float adrenaSynCost = 20f;
+        [Tooltip("Custo imediato do Módulo Neural (Ala Executiva, GDD 7). Não está no GDD: ajustar no playtest.")]
+        public float neuralModuleCost = 15f;
+        [Tooltip("Segundos em que o Módulo Neural revela as pistas com qualquer sanidade. Não está no GDD.")]
+        public float neuralModuleRevealSeconds = 20f;
 
         [Header("Fontes")]
         [Tooltip("Sob Zona Segura (GDD: +2%/s).")]

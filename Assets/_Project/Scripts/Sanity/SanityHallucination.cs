@@ -73,17 +73,19 @@ namespace SombraDaSanidade.Sanity
             if (IsShowing) UpdatePhantom();
 
             var config = sanity.Config;
-            if (sanity.Value >= config.hallucinationsBelow || sanity.State == SanityState.Dead)
+            var profile = DifficultyProfile.Active;
+            if (sanity.Value >= config.hallucinationsBelow || sanity.State == SanityState.Dead
+                || (profile != null && !profile.hallucinations))
             {
                 nextTimer = -1f; // desarma: ao cair de novo, espera um intervalo inteiro
                 return;
             }
 
-            if (nextTimer < 0f) nextTimer = NextInterval(config);
+            if (nextTimer < 0f) nextTimer = NextInterval(config, profile);
             nextTimer -= Time.deltaTime;
             if (nextTimer > 0f || IsShowing) return;
 
-            nextTimer = NextInterval(config);
+            nextTimer = NextInterval(config, profile);
             TrySpawn();
         }
 
@@ -152,7 +154,9 @@ namespace SombraDaSanidade.Sanity
             phantom.color = new Color(phantomColor.r, phantomColor.g, phantomColor.b, phantomColor.a * a);
         }
 
-        private static float NextInterval(SanityConfig config) =>
-            Random.Range(config.hallucinationMinInterval, config.hallucinationMaxInterval);
+        private static float NextInterval(SanityConfig config, DifficultyProfile profile) =>
+            profile != null
+                ? Random.Range(profile.hallucinationInterval.x, profile.hallucinationInterval.y)
+                : Random.Range(config.hallucinationMinInterval, config.hallucinationMaxInterval);
     }
 }

@@ -45,7 +45,7 @@ namespace SombraDaSanidade.Level
                 {
                     lastWing = wing,
                     nextWing = nextWing,
-                    drives = gm.DrivesCollected,
+                    drives = gm.TotalDrives,
                     elapsedSeconds = gm.ElapsedTime
                 });
                 Saved = true;

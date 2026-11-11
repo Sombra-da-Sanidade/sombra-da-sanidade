@@ -59,8 +59,8 @@ namespace SombraDaSanidade.UI
                 PixelHud.Text("ECLUSA ABERTA. HDS ENTREGUES À SUPERFÍCIE.", x + 52, y + 36, PixelHud.Fosforo3);
             }
 
-            for (int i = 0; i < gm.DrivesRequired; i++)
-                PixelHud.Sprite("screens", i < gm.DrivesCollected ? "hd_slot_full" : "hd_slot_empty", x + 14 + i * 18, y + 56);
+            for (int i = 0; i < gm.TotalDrivesRequired; i++)
+                PixelHud.Sprite("screens", i < gm.TotalDrives ? "hd_slot_full" : "hd_slot_empty", x + 14 + i * 18, y + 56);
 
             if (cachedFailures < 0)
             {
@@ -78,7 +78,7 @@ namespace SombraDaSanidade.UI
 
             int left = x + 14, leftEnd = x + 136, right = x + 150, rightEnd = x + w - 14;
             Stat("TEMPO", FormatTime(gm.ElapsedTime), left, y + 88, leftEnd);
-            Stat("HDS", $"{gm.DrivesCollected}/{gm.DrivesRequired}", left, y + 99, leftEnd);
+            Stat("HDS", $"{gm.TotalDrives}/{gm.TotalDrivesRequired}", left, y + 99, leftEnd);
             Stat("FALHAS MULTÍMETRO", cachedFailures.ToString(), left, y + 110, leftEnd);
             Stat("SANIDADE MÉDIA", Mathf.RoundToInt(gm.AverageSanity * 100f) + "%", right, y + 88, rightEnd);
             Stat("EMPS", gm.EmpsUsed.ToString(), right, y + 99, rightEnd);
@@ -88,12 +88,17 @@ namespace SombraDaSanidade.UI
         private static void DrawGameOver(GameManager gm, int x, int y, int w, int h)
         {
             bool mind = gm.LastDeathCause == DeathCause.Sanity;
+            bool purge = gm.LastDeathCause == DeathCause.Purge;
             PixelHud.Dim(PixelHud.Emergencia1, 1f);
-            PixelHud.Dim(PixelHud.Vazio, 0.75f);
+            PixelHud.Dim(PixelHud.Vazio, purge ? 0.55f : 0.75f);
             int cx = PixelHud.Width / 2;
+            // Purga (#44): ainda sem selo próprio; usa o das garras até a arte chegar.
             PixelHud.Sprite("screens", mind ? "stamp_dead_mind" : "stamp_dead_monster", cx - 24, y + 4, 1f, 3);
             PixelHud.TextCentered("FIM DA LINHA", cx, y + 64, mind ? PixelHud.Hipnos2 : PixelHud.Emergencia4, 1f, 2);
-            PixelHud.TextCentered(mind ? "SUA MENTE COLAPSOU NO ESCURO." : "O ESPÉCIME VAZIO TE ALCANÇOU.", cx, y + 84, PixelHud.Concreto7);
+            string cause = mind ? "SUA MENTE COLAPSOU NO ESCURO."
+                : purge ? "A PURGA DA ECLUSA TE ALCANÇOU."
+                : "O ESPÉCIME VAZIO TE ALCANÇOU.";
+            PixelHud.TextCentered(cause, cx, y + 84, PixelHud.Concreto7);
             cachedFailures = -1;
         }
 
