@@ -16,13 +16,17 @@ namespace SombraDaSanidade.Interaction
         [SerializeField] private SpriteRenderer indicator;
         [SerializeField] private Color loadedColor = new Color(0.3f, 1f, 0.45f);
         [SerializeField] private Color emptyColor = new Color(0.25f, 0.25f, 0.25f);
+        [Tooltip("Subestação que alimenta o servidor (Ala de Energia, #42). Vazio: sempre ligado.")]
+        [SerializeField] private Substation requiredPower;
+        [SerializeField] private Color unpoweredColor = new Color(0.55f, 0.12f, 0.1f);
 
         [Tooltip("Começa travado por senha (Ala Executiva, HD-03): só ejeta depois do KeypadLock liberar.")]
         [SerializeField] private bool locked;
         [SerializeField] private Color lockedColor = new Color(0.87f, 0.25f, 0.22f);
 
         public string Prompt => "Ejetar HD";
-        public bool CanInteract => !ejected && !locked && config != null;
+        public bool CanInteract => !ejected && !locked && config != null && IsPowered;
+        public bool IsPowered => requiredPower == null || requiredPower.IsPowered;
         public bool IsLocked => locked;
 
         // Senha certa no terminal ao lado (KeypadLock).
@@ -30,7 +34,7 @@ namespace SombraDaSanidade.Interaction
         {
             if (!locked) return;
             locked = false;
-            if (indicator != null && !ejected) indicator.color = loadedColor;
+            RefreshIndicator();
         }
         public float HoldDuration => config.ejectDuration;
 
@@ -54,8 +58,21 @@ namespace SombraDaSanidade.Interaction
 
         private void Start()
         {
-            if (indicator != null) indicator.color = locked ? lockedColor : loadedColor;
+            RefreshIndicator();
+            if (requiredPower != null) requiredPower.Powered += RefreshIndicator;
             EnsurePlayerComponents();
+        }
+
+        private void OnDestroy()
+        {
+            if (requiredPower != null) requiredPower.Powered -= RefreshIndicator;
+        }
+
+        // LED: vermelho escuro sem energia, vermelho travado por senha, verde com o HD, apagado depois de ejetar.
+        private void RefreshIndicator()
+        {
+            if (indicator == null) return;
+            indicator.color = ejected ? emptyColor : !IsPowered ? unpoweredColor : locked ? lockedColor : loadedColor;
         }
 
         // Cenas geradas antes do #33 não têm o SkillCheck no jogador: cria aqui.
@@ -109,7 +126,7 @@ namespace SombraDaSanidade.Interaction
         {
             if (config.upgradeTree == null) return;
             var terminal = FindAnyObjectByType<UI.UpgradeTerminal>();
-            int drive = GameManager.Instance != null ? GameManager.Instance.DrivesCollected : 1;
+            int drive = GameManager.Instance != null ? GameManager.Instance.TotalDrives : 1;
             if (terminal != null) terminal.Open(config.upgradeTree, drive);
         }
     }

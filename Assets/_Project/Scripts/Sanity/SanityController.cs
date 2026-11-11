@@ -34,12 +34,19 @@ namespace SombraDaSanidade.Sanity
         public float RevealCluesBelow => IsRevealForced ? float.PositiveInfinity
             : revealOverride >= 0f ? revealOverride : config.revealCluesBelow;
         public bool IsRevealForced => Time.time < forcedRevealUntil;
-        // Dreno no escuro da ala (DifficultyProfile, Proposta 1 do v1.1). Sem perfil, o do SanityConfig.
-        public float DarknessDrain => darknessDrainOverride >= 0f ? darknessDrainOverride : config.darknessDrain;
 
         private float revealOverride = -1f;
-        private float darknessDrainOverride = -1f;
         private float forcedRevealUntil = -1f;
+
+        // Dreno no escuro: o da ala ou, sem perfil, o do config.
+        public float DarknessDrain
+        {
+            get
+            {
+                var profile = DifficultyProfile.Active;
+                return profile != null ? profile.darknessDrain : config.darknessDrain;
+            }
+        }
 
         public event Action<float> ValueChanged;
         public event Action<SanityState> StateChanged;
@@ -121,11 +128,6 @@ namespace SombraDaSanidade.Sanity
         public void ForceRevealClues(float seconds)
         {
             forcedRevealUntil = Mathf.Max(forcedRevealUntil, Time.time + seconds);
-        }
-
-        public void SetDarknessDrain(float perSecond)
-        {
-            darknessDrainOverride = perSecond;
         }
 
         // Chamado pelo trigger da Zona Segura ao entrar/sair. Contador para suportar zonas sobrepostas.

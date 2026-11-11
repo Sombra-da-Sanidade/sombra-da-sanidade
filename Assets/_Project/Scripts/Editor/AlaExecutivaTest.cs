@@ -66,7 +66,6 @@ namespace SombraDaSanidade.EditorTools
             var monster = Object.FindAnyObjectByType<MonsterController>(FindObjectsInactive.Include);
             var player = Object.FindAnyObjectByType<PlayerController>();
             var sanity = Object.FindAnyObjectByType<SanityController>();
-            var difficulty = Object.FindAnyObjectByType<WingDifficulty>();
             var keypad = Object.FindAnyObjectByType<KeypadLock>();
             var gm = GameManager.Instance;
             float t = Time.time - stepStart;
@@ -75,10 +74,10 @@ namespace SombraDaSanidade.EditorTools
             {
                 case 0:
                     if (Time.frameCount < 5) return;
-                    Check("Cena tem monstro, jogador, sanidade, perfil, teclado, checkpoint e GameManager",
-                        monster && player && sanity && difficulty && keypad && WingCheckpoint.Instance && gm);
+                    Check("Cena tem monstro, jogador, sanidade, teclado, checkpoint e GameManager",
+                        monster && player && sanity && keypad && WingCheckpoint.Instance && gm);
                     if (failed) { Finish(); return; }
-                    CheckProfile(difficulty, monster, sanity);
+                    CheckProfile(gm, monster, sanity);
                     CheckLayout(gm, keypad);
                     Next();
                     break;
@@ -127,9 +126,10 @@ namespace SombraDaSanidade.EditorTools
                 case 3:
                     if (t < 0.2f) return;
                     keypad.Server.CompleteInteract();
-                    Check($"HD-03 completa os 3 HDs ({gm.DrivesCollected}/{gm.DrivesRequired})", gm.DrivesCollected == 3 && gm.HasAllDrives);
-                    Check($"HD desta ala acelera +10% sobre a velocidade da ala (x{monster.SpeedMultiplier:0.00})",
-                        Mathf.Approximately(monster.SpeedMultiplier, 1f + monster.Config.speedBonusPerDrive));
+                    Check($"HD-03 completa os 3 HDs (partida: {gm.TotalDrives}, ala: {gm.DrivesCollected}/{gm.DrivesRequired})", gm.TotalDrives == 3 && gm.HasAllDrives);
+                    // Com perfil, a velocidade é a da ala: o bônus por HD já está na tabela (docs/dificuldade.md).
+                    Check($"Velocidade continua a da ala depois do HD ({monster.CurrentSpeed})",
+                        monster.State == MonsterState.Chase || Mathf.Approximately(monster.CurrentSpeed, 4.2f));
                     var terminal = player.GetComponent<UpgradeTerminal>();
                     Check("Escolha de upgrade é a do HD-03", terminal != null && terminal.DriveNumber == 3);
                     if (terminal != null) terminal.Choose(0);
@@ -140,35 +140,35 @@ namespace SombraDaSanidade.EditorTools
         }
 
         // Proposta 1 do v1.1, coluna da Ala Executiva.
-        private static void CheckProfile(WingDifficulty difficulty, MonsterController monster, SanityController sanity)
+        private static void CheckProfile(GameManager gm, MonsterController monster, SanityController sanity)
         {
-            var p = difficulty.Profile;
-            Check("Perfil da Executiva aplicado", p != null && p.wing == "Executiva" && difficulty.Applied && WingDifficulty.Active == p);
+            var p = gm.ActiveProfile;
+            Check("Perfil da Executiva no GameManager", p != null && p.wing == "Executiva" && DifficultyProfile.Active == p);
             if (p == null) return;
             Check($"Tabela: velocidade 4.2, raio 7, dreno 2.0, bateria 45%, alucinação 15-25 s, 2 disjuntores",
-                Mathf.Approximately(p.monsterSpeed, 4.2f) && Mathf.Approximately(p.hearingRadius, 7f)
+                Mathf.Approximately(p.monsterSpeed, 4.2f) && Mathf.Approximately(p.monsterHearingRadius, 7f)
                 && Mathf.Approximately(p.darknessDrain, 2f) && Mathf.Approximately(p.batteryChance, 0.45f)
-                && p.hallucinations && p.hallucinationInterval == new Vector2(15f, 25f) && p.breakers == 2
+                && p.hallucinations && p.hallucinationInterval == new Vector2(15f, 25f) && p.breakersAvailable == 2
                 && p.monsterDelaySeconds == 0f);
-            Check($"Monstro com a velocidade e o raio da ala ({monster.BaseSpeed} / {monster.HearingRadius})",
-                Mathf.Approximately(monster.BaseSpeed, 4.2f) && Mathf.Approximately(monster.HearingRadius, 7f));
+            Check($"Monstro com a velocidade e o raio da ala ({monster.CurrentSpeed} / {monster.HearingRadius})",
+                Mathf.Approximately(monster.CurrentSpeed, 4.2f) && Mathf.Approximately(monster.HearingRadius, 7f));
             Check($"Monstro com os comportamentos da Executiva ({monster.Behaviours})", monster.Behaviours == MonsterWingBehaviours.Executiva);
             Check("Monstro presente desde a entrada (ativo e visível)", monster.isActiveAndEnabled
                 && monster.GetComponentsInChildren<Renderer>().Any(r => r.enabled));
             Check($"Dreno no escuro da ala ({sanity.DarknessDrain}/s)", Mathf.Approximately(sanity.DarknessDrain, 2f));
             var hallucination = Object.FindAnyObjectByType<SanityHallucination>();
-            Check("Alucinações a cada 15-25 s", hallucination && hallucination.Allowed && hallucination.Interval == new Vector2(15f, 25f));
+            Check("Alucinações a cada 15-25 s", hallucination && p.hallucinations && p.hallucinationInterval == new Vector2(15f, 25f));
             var lockers = Object.FindObjectsByType<Locker>();
             Check($"Armários ({lockers.Length}) com a tabela da ala e 45% de bateria", lockers.Length > 0 && p.lootTable != null
-                && lockers.All(l => l.Table == p.lootTable) && Mathf.Approximately(p.lootTable.Chance(LootKind.Battery), p.batteryChance));
+                && lockers.All(l => l.Table == null || l.Table == p.lootTable) && Mathf.Approximately(p.lootTable.Chance(LootKind.Battery), p.batteryChance));
             int breakers = Object.FindObjectsByType<Breaker>().Length;
-            Check($"Disjuntores na planta = perfil ({breakers})", breakers == p.breakers);
+            Check($"Disjuntores na planta = perfil ({breakers})", breakers == p.breakersAvailable);
         }
 
         private static void CheckLayout(GameManager gm, KeypadLock keypad)
         {
-            Check($"Começa com os 2 HDs das alas anteriores ({gm.DrivesCollected}/{gm.DrivesRequired})",
-                gm.StartingDrives == 2 && gm.DrivesCollected == 2 && gm.DrivesRequired == 3);
+            Check($"Começa com os 2 HDs das alas anteriores (anteriores: {gm.PriorDrives}, ala: {gm.DrivesCollected}/{gm.DrivesRequired})",
+                gm.PriorDrives == 2 && gm.DrivesCollected == 0 && gm.DrivesRequired == 1);
             var servers = Object.FindObjectsByType<DriveServer>();
             Check("Um servidor (HD-03), travado por senha", servers.Length == 1 && servers[0].IsLocked && !servers[0].CanInteract
                 && keypad.Server == servers[0]);

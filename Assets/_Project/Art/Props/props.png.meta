@@ -114,7 +114,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
+        y: 24
         width: 16
         height: 24
       alignment: 7
@@ -136,7 +136,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 16
-        y: 0
+        y: 24
         width: 16
         height: 24
       alignment: 7
@@ -158,7 +158,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 0
+        y: 24
         width: 16
         height: 24
       alignment: 7
@@ -180,7 +180,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 48
-        y: 0
+        y: 24
         width: 16
         height: 24
       alignment: 7
@@ -202,7 +202,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 64
-        y: 0
+        y: 24
         width: 16
         height: 24
       alignment: 7
@@ -224,7 +224,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 80
-        y: 0
+        y: 24
         width: 16
         height: 24
       alignment: 7
@@ -242,10 +242,54 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
+      name: transformer
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 16
+        height: 24
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6190ee14ea84b9e8fcd5ab6efd816a77
+      internalID: -543187092
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cable_coil
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 0
+        width: 16
+        height: 24
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6713592cc163c86b74f92cdcd2b5c7b2
+      internalID: 1244267956
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
       name: neural_module
       rect:
         serializedVersion: 2
-        x: 96
+        x: 32
         y: 0
         width: 16
         height: 24
@@ -267,7 +311,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 465361d3f38761a49af1857814d56454
+    spriteID: e16d96fd15f49764286918fecdd82164
     internalID: 0
     vertices: []
     indices: 
@@ -278,12 +322,14 @@ TextureImporter:
       entries: []
     nameFileIdTable:
       adrena_syn: 1563484687
+      cable_coil: 1244267956
       locker_closed: -2086721714
       locker_open: 790179679
       log_terminal_off: -1485023004
       log_terminal_on: -1201670257
       neural_module: -324854631
       stabilizer: 705051789
+      transformer: -543187092
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

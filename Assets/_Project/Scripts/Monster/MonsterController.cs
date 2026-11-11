@@ -48,10 +48,24 @@ namespace SombraDaSanidade.Monster
             get
             {
                 if (config == null) return 0f;
-                float speed = Mathf.Min(BaseSpeed * SpeedMultiplier, config.maxSpeed);
+                // Com perfil, a velocidade é a da ala: o bônus por HD somaria duas vezes o mesmo aumento (Proposta 1).
+                var profile = DifficultyProfile.Active;
+                float walk = profile != null ? profile.monsterSpeed : config.baseSpeed * SpeedMultiplier;
+                float speed = Mathf.Min(walk, config.maxSpeed);
                 if (State == MonsterState.Chase)
                     speed = Mathf.Min(speed * config.chaseSpeedMultiplier, Mathf.Max(config.chaseMaxSpeed, config.maxSpeed));
                 return speed * (MonsterSafeMode.Enabled ? config.safeModeSpeedMultiplier : 1f);
+            }
+        }
+
+        // Distância em que ele escuta qualquer ruído: a da ala ou, sem perfil, a do config.
+        public float HearingRadius
+        {
+            get
+            {
+                var profile = DifficultyProfile.Active;
+                if (profile != null) return profile.monsterHearingRadius;
+                return config != null ? config.hearingRadius : 0f;
             }
         }
 
@@ -144,14 +158,19 @@ namespace SombraDaSanidade.Monster
         // Start, não OnEnable: garante que o Awake do GameManager e o bake do NavMesh já rodaram.
         private void Start()
         {
-            if (GameManager.Instance != null) GameManager.Instance.DriveCollected += OnDriveCollected;
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.DriveCollected += OnDriveCollected;
+                GameManager.Instance.ProfileChanged += OnProfileChanged;
+            }
 
             if (flashlight == null) flashlight = FindAnyObjectByType<FlashlightController>();
             if (player == null && flashlight != null) player = flashlight.transform;
             if (sanity == null) sanity = FindAnyObjectByType<SanityController>();
 
             home = transform.position;
-            Behaviours = config.behaviours;
+            var profile = DifficultyProfile.Active;
+            Behaviours = profile != null ? profile.monsterBehaviours : config.behaviours;
             BehavioursChanged?.Invoke(Behaviours);
             if (NavMesh.SamplePosition(transform.position, out var hit, 3f, NavMesh.AllAreas))
             {
@@ -172,7 +191,15 @@ namespace SombraDaSanidade.Monster
 
         private void OnDestroy()
         {
-            if (GameManager.Instance != null) GameManager.Instance.DriveCollected -= OnDriveCollected;
+            if (GameManager.Instance == null) return;
+            GameManager.Instance.DriveCollected -= OnDriveCollected;
+            GameManager.Instance.ProfileChanged -= OnProfileChanged;
+        }
+
+        private void OnProfileChanged(DifficultyProfile profile)
+        {
+            ApplySpeed();
+            SetBehaviours(profile != null ? profile.monsterBehaviours : config.behaviours);
         }
 
         private void Update()
@@ -293,22 +320,6 @@ namespace SombraDaSanidade.Monster
             SpeedMultiplier = multiplier;
             ApplySpeed();
         }
-
-        // Velocidade e raio auditivo da ala (DifficultyProfile, #30 / Proposta 1 do v1.1). Sem perfil, valem os
-        // do MonsterConfig. O bônus por HD (GDD regra 4) multiplica a velocidade da ala.
-        public float BaseSpeed => baseSpeedOverride > 0f ? baseSpeedOverride : config != null ? config.baseSpeed : 0f;
-        public float HearingRadius => hearingOverride > 0f ? hearingOverride : config != null ? config.hearingRadius : 0f;
-
-        private float baseSpeedOverride = -1f;
-        private float hearingOverride = -1f;
-
-        public void SetBaseSpeed(float speed)
-        {
-            baseSpeedOverride = speed;
-            ApplySpeed();
-        }
-
-        public void SetHearingRadius(float radius) => hearingOverride = radius;
 
         // ---------- Estados ----------
 
@@ -624,9 +635,7 @@ namespace SombraDaSanidade.Monster
 
         private void OnDriveCollected(int total)
         {
-            // Só os HDs desta ala: a velocidade da ala (BaseSpeed) já conta os das alas anteriores.
-            int here = total - (GameManager.Instance != null ? GameManager.Instance.StartingDrives : 0);
-            if (config != null) SetSpeedMultiplier(1f + config.speedBonusPerDrive * Mathf.Max(0, here));
+            if (config != null) SetSpeedMultiplier(1f + config.speedBonusPerDrive * total);
         }
 
         // ---------- Movimento ----------

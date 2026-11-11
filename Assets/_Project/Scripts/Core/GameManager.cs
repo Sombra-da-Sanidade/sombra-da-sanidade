@@ -11,18 +11,33 @@ namespace SombraDaSanidade.Core
 
     // Estado da partida, HDs coletados e condições de vitória/derrota (GDD 4.4).
     // Um por cena. As telas de fim ficam em UI.ResultScreen (issue #64).
+    // Ordem cedo: o perfil da ala (#30) e os HDs anteriores (#45) ficam prontos antes do Awake dos outros sistemas.
+    [DefaultExecutionOrder(-400)]
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance { get; private set; }
 
         [SerializeField] private int drivesRequired = 3;
-        [Tooltip("HDs entregues nas alas anteriores (cena de ala: Executiva começa com 2 de 3).")]
-        [SerializeField] private int startingDrives;
+
+        [Tooltip("Dificuldade desta ala (Proposta 1). Vazio: os sistemas usam os próprios configs.")]
+        [SerializeField] private DifficultyProfile difficulty;
+
+        public DifficultyProfile ActiveProfile => difficulty;
+
+        public event Action<DifficultyProfile> ProfileChanged;
+
+        [Tooltip("HDs entregues em alas anteriores quando não há checkpoint (cena aberta direto). " +
+                 "Com um checkpoint que aponta para esta ala, vale o número salvo.")]
+        [SerializeField] private int priorDrives;
 
         public GameState State { get; private set; } = GameState.Playing;
-        public int StartingDrives => startingDrives;
         public bool IsPlaying => State == GameState.Playing;
+        // HDs desta ala (porta, HUD e velocidade do monstro, que já sobe de ala em ala pelo perfil).
         public int DrivesCollected { get; private set; }
+        // HDs entregues em alas anteriores (checkpoint #45).
+        public int PriorDrives { get; private set; }
+        // HDs da partida inteira: escolhe o log da Dra. Vance, a escolha de upgrade e o skill check (HD-01, 02, 03).
+        public int TotalDrives => PriorDrives + DrivesCollected;
         public int DrivesRequired => drivesRequired;
         public bool HasAllDrives => DrivesCollected >= drivesRequired;
         public DeathCause LastDeathCause { get; private set; }
@@ -44,8 +59,14 @@ namespace SombraDaSanidade.Core
             }
             Instance = this;
             Time.timeScale = 1f;
-            startingDrives = Mathf.Clamp(startingDrives, 0, Mathf.Max(0, drivesRequired - 1));
-            DrivesCollected = startingDrives;
+            PriorDrives = LoadPriorDrives();
+        }
+
+        private int LoadPriorDrives()
+        {
+            if (difficulty != null && Checkpoint.TryLoad(out var data) && data.nextWing == difficulty.wing)
+                return Mathf.Max(0, data.drives);
+            return Mathf.Max(0, priorDrives);
         }
 
         private void OnDestroy()
@@ -63,6 +84,13 @@ namespace SombraDaSanidade.Core
 
             var kb = Keyboard.current;
             if (kb != null && kb.rKey.wasPressedThisFrame) Restart();
+        }
+
+        public void SetProfile(DifficultyProfile profile)
+        {
+            if (profile == difficulty) return;
+            difficulty = profile;
+            ProfileChanged?.Invoke(profile);
         }
 
         public void CollectDrive()
