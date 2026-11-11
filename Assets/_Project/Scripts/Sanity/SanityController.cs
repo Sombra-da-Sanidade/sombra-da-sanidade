@@ -34,6 +34,16 @@ namespace SombraDaSanidade.Sanity
 
         private float revealOverride = -1f;
 
+        // Dreno no escuro: o da ala ou, sem perfil, o do config.
+        public float DarknessDrain
+        {
+            get
+            {
+                var profile = DifficultyProfile.Active;
+                return profile != null ? profile.darknessDrain : config.darknessDrain;
+            }
+        }
+
         public event Action<float> ValueChanged;
         public event Action<SanityState> StateChanged;
 
@@ -83,7 +93,7 @@ namespace SombraDaSanidade.Sanity
             else
             {
                 rate = 0f;
-                if (InDarkness) rate -= config.darknessDrain;
+                if (InDarkness) rate -= DarknessDrain;
                 if (IsMonsterNear) rate -= config.monsterProximityDrain;
             }
 
