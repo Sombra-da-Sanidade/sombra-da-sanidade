@@ -16,7 +16,7 @@ namespace SombraDaSanidade.EditorTools
     // Gera a cena Beta: protótipo para testar tudo o que já existe num mapa gerado por seed (BetaMapGenerator),
     // com os tiles do laboratório, o Thomas, o Espécime, armários com a tabela de cada ala, itens, servidores com
     // skill check e upgrade, disjuntores, terminais com os logs da Dra. Vance, pistas em fósforo, o atalho do
-    // monstro na Energia, a troca de comportamento por ala e o painel de teste (F1).
+    // monstro na Energia, a troca de comportamento por ala, o Sonâmbulo na Médica e o painel de teste (F1).
     // Menu: Sombra da Sanidade > Beta. Batchmode: -executeMethod SombraDaSanidade.EditorTools.BetaSceneBuilder.Build
     public static class BetaSceneBuilder
     {
@@ -109,6 +109,14 @@ namespace SombraDaSanidade.EditorTools
             }
             so.ApplyModifiedPropertiesWithoutUndo();
 
+            // Sonâmbulo (Voluntário 03): adormecido no centro da sala da Ala Médica mais longe do saguão.
+            // Acorda na primeira vez que o Thomas o vê (docs/sonambulo.md). O Espécime continua na Executiva.
+            var hub = info.Rooms[BetaMapGenerator.Saguao][0].center;
+            var medica = info.Rooms[BetaMapGenerator.Medica].OrderByDescending(r => Vector2.Distance(r.center, hub)).First();
+            var walkerCell = new Vector2Int(medica.x + medica.width / 2, medica.y + medica.height / 2);
+            var walkerGo = (GameObject)PrefabUtility.InstantiatePrefab(SleepwalkerPrefabBuilder.GetOrBuild());
+            walkerGo.transform.position = new Vector3(walkerCell.x + 0.5f, walkerCell.y + 0.5f, 0f);
+
             // Painel de teste (F1) com os pontos de teleporte.
             var panel = beta.gameObject.AddComponent<BetaDebugPanel>();
             var points = new List<(string, Transform)> { ("Saguão (início)", Marker(beta, "Spawn", ctx.Player.transform.position)) };
@@ -123,6 +131,7 @@ namespace SombraDaSanidade.EditorTools
             points.AddRange(markers);
             var monster = Object.FindAnyObjectByType<MonsterController>();
             if (monster != null) points.Add(("Perto do monstro", Marker(beta, "MonsterArea", (Vector2)monster.transform.position + Vector2.down * 4f)));
+            points.Add(("Perto do Sonâmbulo", Marker(beta, "SleepwalkerArea", (Vector2)walkerGo.transform.position + Vector2.down * 4f)));
 
             var pso = new SerializedObject(panel);
             pso.FindProperty("seed").intValue = info.Seed;
