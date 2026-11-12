@@ -17,7 +17,7 @@ namespace SombraDaSanidade.Monster
     // Estados (GDD 4.2): Patrulha Cega -> Investigação Auditiva (ruído) -> Perseguição Furiosa (luz) -> Atordoado (EMP).
     // Ele é cego: só encontra o jogador pela luz da lanterna ou pelo som. Comportamento detalhado em docs/monstro.md.
     [RequireComponent(typeof(NavMeshAgent))]
-    public class MonsterController : MonoBehaviour
+    public class MonsterController : MonoBehaviour, IMonsterKiller
     {
         [SerializeField] private MonsterConfig config;
 
@@ -86,6 +86,8 @@ namespace SombraDaSanidade.Monster
 
         // Pegou o jogador e está tocando a cena de morte (MonsterKillScene). A IA fica parada até o Game Over.
         public bool IsKilling { get; private set; }
+        public float KillFps => config != null ? config.killFps : 12f;
+        public float KillHold => config != null ? config.killHold : 0.8f;
 
         // Encostou no jogador fora do modo seguro. O MonsterKillScene toca a morte e chama o Game Over no fim.
         // Sem ninguém ouvindo, o Game Over é imediato.

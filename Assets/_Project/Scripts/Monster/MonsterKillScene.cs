@@ -6,12 +6,22 @@ using UnityEngine;
 
 namespace SombraDaSanidade.Monster
 {
-    // Frente 2. Cena de morte quando o Espécime pega o jogador: no lugar do monstro e do Thomas entra
-    // um quadro de 80x80 com os dois juntos (folha EspecimeB_kills). A morte é sorteada entre
-    // mordida (arranca a cabeça e joga o corpo) e partir ao meio. Toca em tempo real e só depois chama o Game Over.
-    // No modo seguro o monstro não mata, então isto nunca toca.
-    // O MonsterSpriteAnimator cria este componente quando o prefab tem a folha das mortes.
-    [RequireComponent(typeof(MonsterController))]
+    // Quem pega o jogador e toca uma cena de morte antes do Game Over (Espécime e Sonâmbulo).
+    public interface IMonsterKiller
+    {
+        // Encostou no jogador fora do modo seguro. Sem ninguém ouvindo, o Game Over é imediato.
+        event System.Action<Transform> Caught;
+        bool IsKilling { get; }
+        float KillFps { get; }
+        float KillHold { get; }
+    }
+
+    // Frente 2. Cena de morte quando um monstro pega o jogador: no lugar do monstro e do Thomas entra
+    // um quadro de 80x80 com os dois juntos. A morte é sorteada entre as duas da folha:
+    // Espécime (EspecimeB_kills): 0 = mordida, 1 = partir ao meio.
+    // Sonâmbulo (Sonambulo_kills): 0 = engolir a cabeça, 1 = torcer o pescoço.
+    // Toca em tempo real e só depois chama o Game Over. No modo seguro os monstros não matam, então isto nunca toca.
+    // O animador de cada monstro cria este componente quando o prefab tem a folha das mortes.
     public class MonsterKillScene : MonoBehaviour
     {
         public const int FramesPerKill = 32;
@@ -19,12 +29,12 @@ namespace SombraDaSanidade.Monster
         // Os pés do monstro ficam 5 px acima da borda de baixo do quadro: alinha com o pivô do sprite normal.
         private static readonly Vector2 Pivot = new Vector2(0.5f, 0.066f);
 
-        public enum Kill { Bite = 0, Tear = 1 }
+        public enum Kill { Bite = 0, Tear = 1 }      // no Sonâmbulo: 0 = engolir, 1 = pescoço
 
         public bool IsPlaying { get; private set; }
         public Kill LastKill { get; private set; }
 
-        private MonsterController monster;
+        private IMonsterKiller monster;
         private SpriteRenderer body;
         private SpriteRenderer glow;
         private SpriteRenderer sceneBody;
@@ -36,7 +46,7 @@ namespace SombraDaSanidade.Monster
 
         public void Setup(Texture2D sheet, Texture2D glowSheet, SpriteRenderer monsterBody, SpriteRenderer monsterGlow, float pixelsPerUnit)
         {
-            monster = GetComponent<MonsterController>();
+            monster = GetComponent<IMonsterKiller>();
             body = monsterBody;
             glow = monsterGlow;
             bodyFrames = Slice(sheet, pixelsPerUnit);
@@ -78,9 +88,8 @@ namespace SombraDaSanidade.Monster
                 sceneGlow.flipX = flip;
             }
 
-            var config = monster.Config;
-            float fps = config != null && config.killFps > 0f ? config.killFps : 12f;
-            float hold = config != null ? config.killHold : 0.8f;
+            float fps = monster.KillFps > 0f ? monster.KillFps : 12f;
+            float hold = monster.KillHold;
             int first = (int)kill * FramesPerKill;
             int count = Mathf.Min(FramesPerKill, bodyFrames.Length - first);
             float t = 0f;
