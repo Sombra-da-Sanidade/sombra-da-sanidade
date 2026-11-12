@@ -22,6 +22,7 @@ O gerador (`BetaMapGenerator`) descarta mapas inválidos e tenta a seed + 1000, 
 - Em cada ala: 1 servidor de HD, disjuntores com lâmpada, 2 ou 3 armários com a tabela de loot da ala, terminal com log da Dra. Vance, itens (Estabilizador, Adrena-Syn) e decalques.
 - **Energia:** duas salas lado a lado separadas por uma parede de 3 tiles, com o atalho só do monstro (grade no chão das duas pontas).
 - O monstro começa na sala da Executiva mais longe do saguão.
+- O **Sonâmbulo** ([docs/sonambulo.md](sonambulo.md)) fica adormecido no centro da sala da Médica mais longe do saguão e só acorda quando o Thomas o vê. Painel F1: "Perto do Sonâmbulo".
 
 ## O que dá para testar
 
