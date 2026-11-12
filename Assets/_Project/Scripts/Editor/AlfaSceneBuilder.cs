@@ -449,6 +449,9 @@ namespace SombraDaSanidade.EditorTools
             var floor = CreateTilemap(grid.transform, "Floor", -10);
             var decals = CreateTilemap(grid.transform, "Decals", -8);
             var walls = CreateTilemap(grid.transform, "Walls", -5);
+            // Parede lisa = Rule Tile (escolhe face/topo pelos vizinhos); peças especiais vão no WallDetails.
+            var details = WallRuleTile.CreateDetails(walls);
+            WallRuleTile.Fill(walls, WallRuleTile.GetOrCreate(tiles), map.Width, map.Height, map.IsFloor);
             // NavMesh: o chão é andável e as paredes não (NavMeshPlus coleta tilemaps com NavMeshModifier).
             floor.gameObject.AddComponent<NavMeshModifier>();
             var block = walls.gameObject.AddComponent<NavMeshModifier>();
@@ -496,7 +499,7 @@ namespace SombraDaSanidade.EditorTools
                         t = "wall_top";
                     else
                         continue; // miolo das paredes fica preto (fundo da câmera)
-                    Set(walls, tiles, cell, t);
+                    if (t != "wall_face" && t != "wall_top") Set(details, tiles, cell, t);
                 }
             }
         }
@@ -599,7 +602,7 @@ namespace SombraDaSanidade.EditorTools
             col.size = new Vector2(1.6f, 1.4f);
             var substation = go.AddComponent<Substation>();
             var so = new SerializedObject(substation);
-            so.FindProperty("wallTiles").objectReferenceValue = GameObject.Find("Grid/Walls").GetComponent<Tilemap>();
+            so.FindProperty("wallTiles").objectReferenceValue = GameObject.Find("Grid/" + WallRuleTile.DetailsName).GetComponent<Tilemap>();
             so.FindProperty("tileCell").vector3IntValue = wallCell;
             so.FindProperty("poweredTile").objectReferenceValue = tiles.TryGetValue("substation_on", out var on) ? on : null;
             so.ApplyModifiedPropertiesWithoutUndo();

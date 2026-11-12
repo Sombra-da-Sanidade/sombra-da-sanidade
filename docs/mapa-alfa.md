@@ -21,10 +21,17 @@ Corredores de 3 tiles de largura fecham um loop: Saguão → Médica → Executi
 2. No Unity, use **Sombra da Sanidade > Gerar cena Alfa (tiles)**.
 
 O gerador (`Scripts/Editor/AlfaSceneBuilder.cs`) faz:
-- **Paredes em 3/4:** a primeira célula de parede acima do chão vira face de baixo (servidor, disjuntor, terminal, canos ou porta), a segunda vira face de cima e a borda vira topo. O miolo das paredes fica preto.
+- **Paredes em 3/4 com Rule Tile:** a parede lisa é um só tile, `Art/Tiles/Lab/wall_rule.asset` (`RuleTile`), pintado em toda célula sem chão do tilemap `Walls`. Ele escolhe o sprite pelos vizinhos: chão logo abaixo ou dois abaixo vira face (`wall_face`), chão em volta vira topo (`wall_top`), e o miolo fica preto. As peças especiais (servidor, disjuntor, terminal, canos, porta) ficam no tilemap `WallDetails`, por cima. Ver `Scripts/Editor/WallRuleTile.cs`.
 - **Colisão e sombra:** as paredes são juntadas em retângulos com `BoxCollider2D` e `ShadowCaster2D`, na layer `Walls`. A lanterna e a alucinação respeitam esses retângulos.
 - **NavMesh:** os tilemaps `Floor` (andável) e `Walls` (Not Walkable) têm `NavMeshModifier`, e o bake acontece ao carregar a cena.
 - **Jogador, monstro, HUD e sanidade:** vêm do `PrototypeSceneBuilder`, então a cena se comporta igual ao protótipo.
+
+### Criar um nível sem mexer em script
+
+- **Pelo texto:** escreva a planta em `art-src/Maps/<nome>.txt` e gere a cena pelo builder, como acima.
+- **Pela Tile Palette:** numa cena com `Grid` > `Floor`, `Decals`, `Walls` e `WallDetails`, pinte o chão com os tiles de `Art/Tiles/Lab/`, as paredes com `wall_rule` (o Rule Tile acerta face e topo sozinho) e as peças no `WallDetails`. Jogador, monstro, servidores e disjuntores são prefabs de `Prefabs/`, e os números vêm dos ScriptableObjects de `ScriptableObjects/Config/`.
+
+As cenas antigas foram convertidas com **Sombra da Sanidade > Arte > Converter paredes para Rule Tile**, com resultado idêntico célula a célula.
 
 Teste em batch:
 
