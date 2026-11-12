@@ -22,6 +22,7 @@ Corredores de 3 tiles de largura fecham um loop: Saguão → Médica → Executi
 
 O gerador (`Scripts/Editor/AlfaSceneBuilder.cs`) faz:
 - **Paredes em 3/4 com Rule Tile:** a parede lisa é um só tile, `Art/Tiles/Lab/wall_rule.asset` (`RuleTile`), pintado em toda célula sem chão do tilemap `Walls`. Ele escolhe o sprite pelos vizinhos: chão logo abaixo ou dois abaixo vira face (`wall_face`), chão em volta vira topo (`wall_top`), e o miolo fica preto. As peças especiais (servidor, disjuntor, terminal, canos, porta) ficam no tilemap `WallDetails`, por cima. Ver `Scripts/Editor/WallRuleTile.cs`.
+- **Perspectiva 3/4 dos props:** a lâmpada de teto (`L`) vai para o tilemap `Ceiling` (ordem 20, por cima dos personagens), 2 tiles acima do ponto de luz, que é a altura do teto. O armário (`A`) encosta a base no pé da parede e ganha uma sombra de contato. Ver `Scripts/Editor/PerspectiveFix.cs`; as cenas antigas foram corrigidas por **Sombra da Sanidade > Arte > Corrigir perspectiva**.
 - **Colisão e sombra:** as paredes são juntadas em retângulos com `BoxCollider2D` e `ShadowCaster2D`, na layer `Walls`. A lanterna e a alucinação respeitam esses retângulos.
 - **NavMesh:** os tilemaps `Floor` (andável) e `Walls` (Not Walkable) têm `NavMeshModifier`, e o bake acontece ao carregar a cena.
 - **Jogador, monstro, HUD e sanidade:** vêm do `PrototypeSceneBuilder`, então a cena se comporta igual ao protótipo.

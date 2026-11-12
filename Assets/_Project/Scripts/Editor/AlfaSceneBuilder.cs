@@ -451,6 +451,8 @@ namespace SombraDaSanidade.EditorTools
             var walls = CreateTilemap(grid.transform, "Walls", -5);
             // Parede lisa = Rule Tile (escolhe face/topo pelos vizinhos); peças especiais vão no WallDetails.
             var details = WallRuleTile.CreateDetails(walls);
+            // Lâmpadas de teto por cima dos personagens, na altura do teto (PerspectiveFix).
+            var ceiling = PerspectiveFix.CreateCeiling(grid.transform);
             WallRuleTile.Fill(walls, WallRuleTile.GetOrCreate(tiles), map.Width, map.Height, map.IsFloor);
             // NavMesh: o chão é andável e as paredes não (NavMeshPlus coleta tilemaps com NavMeshModifier).
             floor.gameObject.AddComponent<NavMeshModifier>();
@@ -480,8 +482,9 @@ namespace SombraDaSanidade.EditorTools
                             _ => pool[rng.Next(pool.Length)]
                         };
                         Set(floor, tiles, cell, f);
-                        string decal = c switch { 'w' => "puddle", 'p' => "papers", 'b' => "blood_smear", 'L' => "ceiling_lamp", 'v' => "warning_high_voltage", _ => null };
+                        string decal = c switch { 'w' => "puddle", 'p' => "papers", 'b' => "blood_smear", 'v' => "warning_high_voltage", _ => null };
                         if (decal != null) Set(decals, tiles, cell, decal);
+                        if (c == 'L') Set(ceiling, tiles, PerspectiveFix.CeilingCell(cell), "ceiling_lamp");
                         continue;
                     }
 
@@ -620,8 +623,9 @@ namespace SombraDaSanidade.EditorTools
         // Armário encostado na parede, com o Locker (Frente 1, issue #29) e a tabela de loot da ala (#46).
         private static void CreateLocker(Transform parent, Sprite square, string name, Vector2 cell, string wing)
         {
-            PrototypeSceneBuilder.CreateLocker(parent, square, name, cell + Vector2.up * 0.2f,
+            var go = PrototypeSceneBuilder.CreateLocker(parent, square, name, cell + Vector2.up * 0.2f,
                 PrototypeSceneBuilder.LoadLootTable(wing));
+            PerspectiveFix.StandLocker(go.GetComponent<Locker>(), square);
         }
 
         // Módulo Neural (Ala Executiva): cartucho roxo (Hipnos, a cor da Revelação pela Loucura) com brilho.
