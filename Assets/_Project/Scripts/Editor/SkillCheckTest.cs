@@ -32,6 +32,8 @@ namespace SombraDaSanidade.EditorTools
         private static readonly List<(Vector2 pos, float radius)> noises = new List<(Vector2, float)>();
         private static readonly List<string> results = new List<string>();
         private static bool failed;
+        private static DriveServer second;
+        private static readonly List<float> warnedRemaining = new List<float>();
 
         static SkillCheckTest()
         {
@@ -96,6 +98,8 @@ namespace SombraDaSanidade.EditorTools
                     cfg = Object.Instantiate(original);
                     cfg.ejectDuration = TestEject;
                     cfg.skillCheckChancePerSecond = 0f;
+                    cfg.skillCheckMinPerDrive = 0;   // os passos 1-9 começam os checks na mão
+                    cfg.upgradeTree = null;          // o terminal de upgrade pausaria o tempo entre os HDs
                     SetField(server, "config", cfg);
 
                     NoiseBus.NoiseEmitted += OnNoise;
@@ -176,9 +180,39 @@ namespace SombraDaSanidade.EditorTools
                     if (gm.DrivesCollected < 1 && t < TestEject + 2f) return;
                     interactor.HoldOverride = false;
                     Check($"HD ejetado ({gm.DrivesCollected})", gm.DrivesCollected == 1);
+
+                    // Segundo HD sem sorte nenhuma (chance 0): o check garantido precisa aparecer, a tempo.
+                    second = Object.FindObjectsByType<DriveServer>(FindObjectsInactive.Exclude)
+                        .FirstOrDefault(s => s != server && s.CanInteract);
+                    if (second == null) { Fail("Cena tem um segundo servidor energizado"); return; }
+                    var lucky = Object.Instantiate(cfg);
+                    lucky.skillCheckMinPerDrive = 1;
+                    SetField(second, "config", lucky);
+                    warnedRemaining.Clear();
+                    check.Warned += OnWarned;
+                    Teleport(player, second.transform.position + Vector3.down * 1.1f);
+                    interactor.HoldOverride = true;
+                    Next();
+                    break;
+
+                case 10:
+                    if (gm.DrivesCollected < 2 && t < TestEject + 6f) return;
+                    interactor.HoldOverride = false;
+                    check.Warned -= OnWarned;
+                    float latest = SkillCheck.LatestStart(second.SkillCheckConfig);
+                    Check($"Ejeção sem sorte ainda tem 1 skill check ({second.SkillChecksDone})", second.SkillChecksDone == 1);
+                    Check($"Check começa antes do corte de fim (restavam {(warnedRemaining.Count > 0 ? warnedRemaining[0] : 0f):0.0} s, mínimo {latest:0.0} s)",
+                        warnedRemaining.Count == 1 && warnedRemaining[0] >= latest - 0.05f);
+                    Check($"Segundo HD ejetado ({gm.DrivesCollected})", gm.DrivesCollected == 2);
                     Finish();
                     break;
             }
+        }
+
+        private static void OnWarned()
+        {
+            var check = Object.FindAnyObjectByType<SkillCheck>();
+            if (check != null) warnedRemaining.Add(check.RemainingSeconds());
         }
 
         private static void Fail(string label)

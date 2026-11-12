@@ -11,7 +11,7 @@ Decisões:
 
 ## Comportamento
 - Ejeção de **12 s** (hoje `ejectDuration = 2`).
-- Depois de 2 s de canalização, 25% de chance por segundo, no máximo 3 checks por HD.
+- Depois de 2 s de canalização, 25% de chance por segundo, no máximo 3 checks por HD. Pelo menos 1 por ejeção (forçado num ponto sorteado se o acaso não vier), e nenhum começa nos últimos ~2,1 s (aviso + varredura + folga), para não ser cortado pelo HD saindo.
 - Bipe de aviso, 0,6 s depois o ponteiro varre o mostrador em 1,1 s.
 - Good (15% do mostrador): continua normal. Great (4%): +5% de progresso.
 - Erro ou nenhum aperto: -10% de progresso, pausa de 1 s, faísca, `NoiseBus.Emit` (raio 12) e `CameraFollow.Shake`.

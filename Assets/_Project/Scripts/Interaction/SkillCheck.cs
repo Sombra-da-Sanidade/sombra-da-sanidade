@@ -38,6 +38,9 @@ namespace SombraDaSanidade.Interaction
         private float stateTime;
         private float pauseUntil;
         private float jitterSeed;
+        // Checks desta canalização e o ponto (segundos restantes) em que o check garantido é forçado.
+        private int checksThisChannel;
+        private float forceAtRemaining;
 
         // Tempo que o resultado fica no mostrador antes de sumir. Só visual.
         private const float ResultDisplay = 0.5f;
@@ -62,6 +65,8 @@ namespace SombraDaSanidade.Interaction
             {
                 target = current;
                 channelTime = 0f;
+                checksThisChannel = 0;
+                forceAtRemaining = PickForcePoint(target);
                 if (State != SkillCheckState.Result) State = SkillCheckState.Idle;
             }
             if (target == null)
@@ -80,8 +85,12 @@ namespace SombraDaSanidade.Interaction
             switch (State)
             {
                 case SkillCheckState.Idle:
-                    if (channelTime >= config.skillCheckStartDelay && !IsPaused
-                        && UnityEngine.Random.value < config.skillCheckChancePerSecond * Time.deltaTime)
+                    // Só começa se o check inteiro (aviso + varredura + folga) couber antes do HD sair.
+                    // Pelo menos skillCheckMinPerDrive por ejeção: se o sorteio não vier, força no ponto sorteado.
+                    float remaining = RemainingSeconds();
+                    bool window = channelTime >= config.skillCheckStartDelay && !IsPaused && remaining >= LatestStart(config);
+                    bool owed = checksThisChannel < config.skillCheckMinPerDrive && remaining <= forceAtRemaining;
+                    if (window && (owed || UnityEngine.Random.value < config.skillCheckChancePerSecond * Time.deltaTime))
                         StartCheck();
                     break;
 
@@ -117,9 +126,31 @@ namespace SombraDaSanidade.Interaction
             ZoneStart = UnityEngine.Random.Range(config.skillCheckZoneMin, Mathf.Max(config.skillCheckZoneMin, 1f - ZoneSize - 0.05f));
             NeedlePosition = 0f;
             target.OnSkillCheckStarted();
+            checksThisChannel++;
             Enter(SkillCheckState.Warning);
             Warned?.Invoke();
             return true;
+        }
+
+        // Último momento (segundos restantes de ejeção) em que um check ainda cabe inteiro.
+        public static float LatestStart(InteractionConfig config) =>
+            config.skillCheckWarning + config.skillCheckSweep + config.skillCheckEndMargin;
+
+        // Segundos que faltam para a canalização terminar, pelo progresso real (já conta pausas e bônus).
+        public float RemainingSeconds()
+        {
+            if (!interactor.IsChanneling || interactor.Current == null) return 0f;
+            return (1f - interactor.Progress) * interactor.Current.HoldDuration;
+        }
+
+        // Ponto sorteado entre o fim do atraso inicial e o último momento possível.
+        private static float PickForcePoint(ISkillCheckable check)
+        {
+            var config = check?.SkillCheckConfig;
+            if (config == null || !(check is IInteractable interactable)) return 0f;
+            float minRemaining = LatestStart(config);
+            float maxRemaining = Mathf.Max(minRemaining, interactable.HoldDuration - config.skillCheckStartDelay);
+            return UnityEngine.Random.Range(minRemaining, maxRemaining);
         }
 
         // Faixa good: encolhe por HD já coletado (15, 13, 11%) e com o monstro perto (-40%).

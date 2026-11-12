@@ -28,6 +28,10 @@ namespace SombraDaSanidade.Interaction
         [Range(0f, 1f)] public float skillCheckChancePerSecond = 0.25f;
         [Tooltip("Máximo de checks por HD. Não está no GDD: ajustar no playtest.")]
         [Min(0)] public int skillCheckMaxPerDrive = 3;
+        [Tooltip("Checks garantidos por ejeção (GDD 4.4: o check é o desafio da ejeção). Se o sorteio não vier, um é forçado num ponto sorteado.")]
+        [Min(0)] public int skillCheckMinPerDrive = 1;
+        [Tooltip("Folga, em segundos, além de aviso + varredura, antes do fim da ejeção. Depois disso não começa check (ele seria cortado pelo HD saindo).")]
+        [Min(0f)] public float skillCheckEndMargin = 0.4f;
         [Tooltip("Segundos entre o bipe de aviso e o ponteiro começar a varrer. Não está no GDD: ajustar no playtest.")]
         [Min(0f)] public float skillCheckWarning = 0.6f;
         [Tooltip("Segundos para o ponteiro varrer o mostrador inteiro. Não está no GDD: ajustar no playtest.")]

@@ -21,6 +21,8 @@ MonoBehaviour:
   skillCheckStartDelay: 2
   skillCheckChancePerSecond: 0.25
   skillCheckMaxPerDrive: 3
+  skillCheckMinPerDrive: 1
+  skillCheckEndMargin: 0.4
   skillCheckWarning: 0.6
   skillCheckSweep: 1.1
   skillCheckZoneMin: 0.35
