@@ -7,10 +7,12 @@ Frente 5, issue #32 (e o CONTINUAR da #45). Fluxo do GDD 8: Menu → Briefing �
 | Tela | Onde | O que faz |
 |---|---|---|
 | Menu | `Scenes/Main/Menu.unity` (`MainMenuScreen`), cena 0 do Build Profile e da build WebGL | CONTINUAR (só com checkpoint), JOGAR, CONFIGURAÇÕES, SAIR e o melhor rank da cena do jogo |
+| Abertura | Canvas `StoryCanvas` do Menu (`StoryIntro`), uma vez por sessão | Cutscene em texto com a história (GDD 9), digitada letra a letra em TextMeshPro; Espaço avança, Esc pula |
 | Briefing | Página do Menu, depois de JOGAR | Ordem de serviço e controles; INICIAR TURNO carrega a cena do jogo (`gameScene`, padrão `Beta`) |
 | Vitória | `ResultScreen`, chamada pelo `GameManager` | Gavetas de HD, selo do rank, melhor rank e as 6 estatísticas |
 | Game Over | `ResultScreen` | Selo e frase da causa (`DeathCause`); R ou o botão reiniciam |
 
+- **Música e fonte:** o Menu toca `Audio/Music/menu_drone.wav` em loop (gerado por `python3 tools/audio/gen_menu_music.py`). Os textos em Canvas usam a VT323 (SIL OFL) com font atlas do TextMeshPro em `Art/Fonts/VT323/` (**Sombra da Sanidade > Arte > Gerar fonte TMP**). Os Canvas usam `CanvasScaler` por tamanho de tela (640×360) e âncoras nos cantos e no centro.
 - **JOGAR** começa uma partida nova: zera as mortes e apaga o checkpoint antigo.
 - **CONTINUAR** aparece quando há checkpoint salvo (#45) e a cena da próxima ala está no Build Profile. O nome da cena segue a Ala Médica: `Ala` + ala (`AlaEnergia`, `AlaExecutiva`). Enquanto essas cenas não existirem, o botão não aparece. O que o checkpoint guarda está em [checkpoint.md](checkpoint.md).
 - **Estatísticas entre alas:** tempo, EMPs, sanidade média, mortes, HDs e falhas somam as alas anteriores, vindas do checkpoint.

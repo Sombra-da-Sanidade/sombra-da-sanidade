@@ -56,7 +56,7 @@ namespace SombraDaSanidade.UI
         private void Update()
         {
             var kb = Keyboard.current;
-            if (kb == null) return;
+            if (kb == null || StoryIntro.Blocking) return;
             switch (page)
             {
                 case Page.Settings:
@@ -105,7 +105,7 @@ namespace SombraDaSanidade.UI
 
         private void OnGUI()
         {
-            if (!PixelHud.HasArt) return;
+            if (!PixelHud.HasArt || StoryIntro.Blocking) return;
             PixelHud.Begin();
             var e = Event.current;
             int w = PixelHud.Width, h = PixelHud.Height, cx = w / 2;
