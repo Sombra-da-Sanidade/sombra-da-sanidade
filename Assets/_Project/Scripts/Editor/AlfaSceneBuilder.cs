@@ -24,7 +24,7 @@ namespace SombraDaSanidade.EditorTools
     // Menu: Sombra da Sanidade > Gerar cena Alfa (tiles). Mudar o mapa = editar o .txt e gerar de novo.
     // A mesma montagem gera a Ala Médica (issue #12) a partir de art-src/Maps/ala-medica.txt e a Ala Executiva
     // (issue #43) a partir de art-src/Maps/ala-executiva.txt.
-    public static class AlfaSceneBuilder
+    public static partial class AlfaSceneBuilder
     {
         private const string Root = "Assets/_Project";
         public const string ScenePath = Root + "/Scenes/Main/Alfa.unity";
@@ -327,6 +327,7 @@ namespace SombraDaSanidade.EditorTools
             ArtTestSceneBuilder.LoadOrCreateTiles();
             PrototypeSceneBuilder.GetOrCreatePlaceholderSprite();
             DriveServerPrefabBuilder.GetOrBuild();
+            PrototypeSceneBuilder.EnsurePropArt();
             int wallLayer = PrototypeSceneBuilder.EnsureLayer(PrototypeSceneBuilder.WallLayerName);
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -341,6 +342,8 @@ namespace SombraDaSanidade.EditorTools
             gmSo.FindProperty("drivesRequired").intValue = drivesRequired;
             gmSo.ApplyModifiedPropertiesWithoutUndo();
             PrototypeSceneBuilder.CreateGlobalLight();
+            // Armários colados ou fora de parede reta mudam de lugar antes de montar (AlfaSceneBuilder.Props).
+            SpreadLockers(map);
             BuildTilemaps(map, tiles);
             BuildWallColliders(map, wallLayer);
             PrototypeSceneBuilder.CreateNavMesh();
@@ -365,7 +368,7 @@ namespace SombraDaSanidade.EditorTools
                     switch (c)
                     {
                         case 'S': CreateServer(objectives, square, $"DriveServer_{wingAt(x, y)}", inFront, center); break;
-                        case 'K': CreateBreaker(objectives, square, $"Breaker_{wingAt(x, y)}_{++breakers}", inFront); break;
+                        case 'K': CreateBreaker(objectives, square, $"Breaker_{wingAt(x, y)}_{++breakers}", inFront, map, x, y); break;
                         case 'U': CreateSubstation(objectives, $"Substation_{wingAt(x, y)}", inFront, new Vector3Int(x, y, 0), tiles); break;
                         case 't': CreateDecor(items, square, $"Transformer_{x}_{y}", center, "transformer", onFloor: false); break;
                         case 'o': CreateDecor(items, square, $"CableCoil_{x}_{y}", center, "cable_coil", onFloor: true); break;
@@ -388,6 +391,13 @@ namespace SombraDaSanidade.EditorTools
             ExitDoor exit = exitCells.Count > 0 ? CreateExit(objectives, square, exitCells, terminal) : null;
             if (terminal != null) CreateEscape(terminal, exit);
             CreateClues(items, objectives, map);
+            if (sideLockers.Count > 0)
+            {
+                if (lockers == null) lockers = new GameObject("Lockers").transform;
+                CreateSideLockers(lockers, square, wingAt);
+            }
+            ScatterCorpses(map, items, playerSpawn);
+            FurnishRooms(map, items, square, wingAt, playerSpawn);
 
             var player = PrototypeSceneBuilder.CreatePlayer(square, playerConfig, flashlightConfig, sanityConfig, wallLayer, playerSpawn);
             PrototypeSceneBuilder.CreateCamera(player.transform);
@@ -484,7 +494,6 @@ namespace SombraDaSanidade.EditorTools
                         Set(floor, tiles, cell, f);
                         string decal = c switch { 'w' => "puddle", 'p' => "papers", 'b' => "blood_smear", 'v' => "warning_high_voltage", _ => null };
                         if (decal != null) Set(decals, tiles, cell, decal);
-                        if (c == 'L') Set(ceiling, tiles, PerspectiveFix.CeilingCell(cell), "ceiling_lamp");
                         continue;
                     }
 
@@ -493,7 +502,7 @@ namespace SombraDaSanidade.EditorTools
                     if (map.IsFloor(x, y - 1))
                         t = c switch
                         {
-                            'S' => "server_bottom", 'K' => "breaker_off", 'T' => "wall_terminal", 'X' or 'G' => "wall_terminal", 'P' => "wall_face_pipes",
+                            'S' => "server_bottom", 'T' => "wall_terminal", 'X' or 'G' => "wall_terminal", 'P' => "wall_face_pipes",
                             'E' => "door_bottom", 'U' => "substation_off", 'Q' => "wall_face_panel", _ => "wall_face"
                         };
                     else if (map.IsFloor(x, y - 2))
@@ -586,10 +595,150 @@ namespace SombraDaSanidade.EditorTools
             if (glow != null) glow.position = wallCell;
         }
 
-        private static void CreateBreaker(Transform parent, Sprite square, string name, Vector2 floorCell)
+        // Disjuntor: painel (sprite breaker_panel) na faixa de baixo da parede, trigger no chão em frente e as arandelas
+        // da sala (RoomLamp) espalhadas pela mesma parede. Reparado, acende a sala; no fim dos 60 s, queima.
+        private static void CreateBreaker(Transform parent, Sprite square, string name, Vector2 floorCell, Layout map, int wx, int wy)
         {
             PrototypeSceneBuilder.CreateBreaker(parent, square, name, floorCell);
-            parent.Find(name).GetComponent<SpriteRenderer>().enabled = false;   // o desenho é o tile breaker_off
+            var go = parent.Find(name).gameObject;
+            go.GetComponent<SpriteRenderer>().enabled = false;
+            var off = PrototypeSceneBuilder.LoadPropSprite("breaker_panel_off");
+            if (off == null) return;
+            var breaker = go.GetComponent<Breaker>();
+
+            // Pé da parede = borda de baixo da célula da parede (y = wy). O painel fica acima do rodapé.
+            var panel = WorldChild(go.transform, "Panel", new Vector2(wx + 0.5f, wy + 0.12f)).AddComponent<SpriteRenderer>();
+            panel.sprite = off;
+            panel.sortingOrder = -3;
+            var smoke = WorldChild(go.transform, "Smoke", new Vector2(wx + 0.5f, wy + 0.95f)).AddComponent<SpriteRenderer>();
+            smoke.sortingOrder = -2;
+            smoke.enabled = false;
+
+            var lamps = CreateRoomLamps(go.transform, map, wx, wy);
+            PrototypeSceneBuilder.SetRef(breaker, "panel", panel);
+            PrototypeSceneBuilder.SetRef(breaker, "offSprite", off);
+            PrototypeSceneBuilder.SetRef(breaker, "onSprite", PrototypeSceneBuilder.LoadPropSprite("breaker_panel_on"));
+            PrototypeSceneBuilder.SetRef(breaker, "burntSprite", PrototypeSceneBuilder.LoadPropSprite("breaker_panel_burnt"));
+            PrototypeSceneBuilder.SetRef(breaker, "smoke", smoke);
+            PrototypeSceneBuilder.SetSprites(breaker, "burnFrames", PrototypeSceneBuilder.LoadPropFrames("breaker_panel_burn"));
+            PrototypeSceneBuilder.SetSprites(breaker, "smokeFrames", PrototypeSceneBuilder.LoadPropFrames("smoke"));
+            var so = new SerializedObject(breaker);
+            var arr = so.FindProperty("lamps");
+            arr.arraySize = lamps.Count;
+            for (int i = 0; i < lamps.Count; i++) arr.GetArrayElementAtIndex(i).objectReferenceValue = lamps[i];
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        // Arandelas na parede norte da sala do disjuntor: o trecho de parede com chão embaixo, até 9 tiles para cada
+        // lado, uma a cada ~4 tiles, só em parede lisa (não em cima de servidor, porta ou terminal).
+        private static List<RoomLamp> CreateRoomLamps(Transform breaker, Layout map, int wx, int wy)
+        {
+            // Trecho da parede norte da sala: segue enquanto houver chão embaixo, passando pelas aberturas de corredor.
+            int left = wx, right = wx;
+            while (wx - left < 9 && map.IsFloor(left - 1, wy - 1)) left--;
+            while (right - wx < 9 && map.IsFloor(right + 1, wy - 1)) right++;
+            bool Wall(int x) => x != wx && map[x, wy] == '#' && map[x, wy + 1] == '#'
+                // Armário (A) em pé na frente sobe pela parede e cobriria a arandela.
+                && map[x - 1, wy - 1] != 'A' && map[x, wy - 1] != 'A' && map[x + 1, wy - 1] != 'A';
+            int len = right - left + 1;
+            int n = Mathf.Clamp(len / 5, 1, 4);
+            var spots = new List<int>();
+            for (int i = 0; i < n; i++)
+            {
+                int lx = left + Mathf.FloorToInt((i + 0.5f) * len / n);
+                foreach (int cand in new[] { lx, lx - 1, lx + 1, lx - 2, lx + 2 })
+                {
+                    if (cand < left || cand > right || !Wall(cand) || spots.Exists(o => Mathf.Abs(o - cand) < 3)) continue;
+                    spots.Add(cand);
+                    break;
+                }
+            }
+            // Nenhum ponto na divisão regular: a primeira parede lisa livre do trecho; sem nenhuma, logo acima do painel.
+            for (int cand = left; spots.Count == 0 && cand <= right; cand++)
+                if (Wall(cand)) spots.Add(cand);
+            if (spots.Count == 0) spots.Add(wx);
+
+            var off = PrototypeSceneBuilder.LoadPropSprite("wall_lamp_off");
+            var lamps = new List<RoomLamp>();
+            foreach (int lx in spots)
+            {
+                var root = WorldChild(breaker, $"RoomLamp_{lx}", new Vector2(lx + 0.5f, wy + 1.15f));
+                var art = root.AddComponent<SpriteRenderer>();
+                art.sprite = off;
+                art.sortingOrder = -3;
+                // A luz fica no chão logo abaixo da parede, para clarear a sala e não o vão da parede.
+                var light = WorldChild(root.transform, "Light", new Vector2(lx + 0.5f, wy - 0.8f)).AddComponent<Light2D>();
+                light.lightType = Light2D.LightType.Point;
+                light.color = new Color(1f, 0.85f, 0.6f);
+                light.pointLightInnerRadius = 1f;
+                light.pointLightOuterRadius = 5.5f;
+                light.falloffIntensity = 0.55f;
+                light.shadowsEnabled = true;
+                light.shadowIntensity = 0.9f;
+                light.enabled = false;
+                var lamp = root.AddComponent<RoomLamp>();
+                PrototypeSceneBuilder.SetRef(lamp, "art", art);
+                PrototypeSceneBuilder.SetRef(lamp, "glow", light);
+                PrototypeSceneBuilder.SetRef(lamp, "offSprite", off);
+                PrototypeSceneBuilder.SetRef(lamp, "onSprite", PrototypeSceneBuilder.LoadPropSprite("wall_lamp_on"));
+                PrototypeSceneBuilder.SetRef(lamp, "burntSprite", PrototypeSceneBuilder.LoadPropSprite("wall_lamp_burnt"));
+                PrototypeSceneBuilder.SetSprites(lamp, "alarmFrames", PrototypeSceneBuilder.LoadPropFrames("wall_lamp_alarm"));
+                Occupy(new Vector2Int(lx, wy - 1), -1, 1, 0, 0);
+                lamps.Add(lamp);
+            }
+            return lamps;
+        }
+
+        // Filho numa posição do mundo, sem herdar a escala do pai (os blocos das cenas geradas são escalados).
+        private static GameObject WorldChild(Transform parent, string name, Vector2 world)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+            go.transform.position = world;
+            var s = parent.lossyScale;
+            go.transform.localScale = new Vector3(1f / Mathf.Max(0.0001f, s.x), 1f / Mathf.Max(0.0001f, s.y), 1f);
+            return go;
+        }
+
+        // Mortos pelo mapa (decoração) e sinalizadores para pegar. Só em chão liso e aberto (3x3 livre), longe do
+        // início, espaçados. Sorteio fixo pelo tamanho do mapa: gerar de novo dá o mesmo resultado.
+        private static void ScatterCorpses(Layout map, Transform items, Vector2 spawn)
+        {
+            if (PrototypeSceneBuilder.LoadPropSprite("corpse_guard") == null) return;
+            var rng = new System.Random(map.Width * 31 + map.Height * 7);
+            var open = new List<Vector2Int>();
+            for (int y = 1; y < map.Height - 1; y++)
+                for (int x = 1; x < map.Width - 1; x++)
+                {
+                    bool ok = true;
+                    for (int dy = -1; dy <= 1 && ok; dy++)
+                        for (int dx = -1; dx <= 1 && ok; dx++)
+                            ok = map[x + dx, y + dy] == '.';
+                    if (ok && Vector2.Distance(new Vector2(x + 0.5f, y + 0.5f), spawn) > 7f) open.Add(new Vector2Int(x, y));
+                }
+            for (int i = open.Count - 1; i > 0; i--)
+            {
+                int j = rng.Next(i + 1);
+                (open[i], open[j]) = (open[j], open[i]);
+            }
+
+            var taken = new List<Vector2Int>();
+            bool Free(Vector2Int c, float spacing) => !taken.Exists(o => Vector2Int.Distance(o, c) < spacing);
+            string[] kinds = { "corpse_patient", "corpse_guard", "corpse_patient", "corpse_researcher" };
+            int corpses = Mathf.Clamp(open.Count / 90, 2, 7);
+            var parent = new GameObject("Corpses").transform;
+            parent.SetParent(items, false);
+            int made = 0;
+            foreach (var c in open)
+            {
+                if (made >= corpses) break;
+                if (!Free(c, 8f) || !AlfaSceneBuilder.Free(c, -2, 2, -1, 1) || InQuiet(c, spawn)) continue;
+                taken.Add(c);
+                PrototypeSceneBuilder.CreateCorpse(parent, $"Corpse_{c.x}_{c.y}", new Vector2(c.x + 0.5f, c.y - 0.3f),
+                    kinds[made % kinds.Length], rng.Next(2) == 0);
+                Occupy(c, -2, 2, -1, 1);
+                made++;
+            }
         }
 
         // Console da subestação (#42): o desenho é o tile substation_off na parede; ao religar, a Substation troca

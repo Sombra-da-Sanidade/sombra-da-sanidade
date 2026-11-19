@@ -114,7 +114,14 @@ namespace SombraDaSanidade.EditorTools
                     Check("Zona apaga no fim do tempo", !breaker.Zone.IsOn && !breaker.IsActive);
                     Check("Jogador sai da Zona Segura quando apaga", !sanity.InSafeZone);
                     Check("Monstro liberado", MonsterRepellent.Find(breaker.Zone.transform.position) == null);
-                    Check("Dá para reparar de novo", breaker.CanInteract);
+                    Check("Queimando, não dá para reparar", !breaker.CanInteract);
+                    Next();
+                    break;
+
+                case 5:
+                    if (!breaker.IsBurnt && t < 4f) return;
+                    Check("No fim do tempo o painel queima", breaker.IsBurnt);
+                    Check("Queimado, não dá para reparar de novo", !breaker.CanInteract && breaker.Prompt == "Disjuntor queimado");
                     Finish();
                     break;
             }

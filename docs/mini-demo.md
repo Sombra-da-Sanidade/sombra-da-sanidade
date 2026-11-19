@@ -64,7 +64,7 @@ Cada integrante escolhe **uma frente livre** e se atribui nas issues dela (como 
 ### Frente 4: Disjuntor e mapa
 - **Essencial do MVP:** reparo de disjuntores.
 - **Issues:** #10, #12
-- **Entrega:** ao completar o reparo, liga Light2D de teto + trigger de Zona Segura por 60s (chama `SetInSafeZone`, monstro não entra), depois libera novo reparo. Responsável pela cena `Demo.unity`: gerar, ajustar corredores e posições após o playtest.
+- **Entrega:** ao completar o reparo, liga Light2D de teto + trigger de Zona Segura por 60s (chama `SetInSafeZone`, monstro não entra), depois o painel queima e não pode ser reparado de novo (ver [props e sinalizador](props-e-sinalizador.md)). Responsável pela cena `Demo.unity`: gerar, ajustar corredores e posições após o playtest.
 - **Pode mexer em:** `Scripts/Interaction/Breaker.cs`, `Scenes/Main/Demo.unity`.
 
 ### Frente 5: Partida, HDs e build

@@ -20,7 +20,7 @@ namespace SombraDaSanidade.EditorTools
         public const int CeilingHeight = 2;   // tiles
 
         // Quanto a base do armário fica à frente do pé da parede (profundidade do móvel na vista 3/4).
-        private const float LockerDepth = 0.15f;
+        private const float LockerDepth = 0.3f;
 
         public static Tilemap CreateCeiling(Transform grid)
         {
@@ -58,7 +58,8 @@ namespace SombraDaSanidade.EditorTools
             sr.color = new Color(0f, 0f, 0f, 0.45f);
             sr.sortingOrder = -6;   // acima do chão e dos decals, abaixo do armário (-4)
             shadow.position = new Vector3(root.position.x, baseY - 0.05f, 0f);
-            shadow.localScale = new Vector3(1.05f, 0.18f, 1f);
+            // Largura do armário em pé (28 px = 1,75 u), um pouco mais estreita.
+            shadow.localScale = new Vector3(body.sprite != null ? body.sprite.bounds.size.x * 0.92f : 1.05f, 0.2f, 1f);
         }
 
         // ---------- Migração das cenas já montadas ----------
