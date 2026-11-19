@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using SombraDaSanidade.Core;
 using SombraDaSanidade.Flashlight;
+using SombraDaSanidade.Interaction;
 using SombraDaSanidade.Narrative;
 using SombraDaSanidade.Player;
 using SombraDaSanidade.Sanity;
@@ -53,8 +54,20 @@ namespace SombraDaSanidade.UI
         private int newestDrive = -1;
 
         private bool watchHeld;
+        private bool watchVisible = true;
         private bool watchSlowApplied;
-        private float watchRaise; // 0 = abaixado, 1 = no rosto
+        private float watchRaise; // 0 = ancorado no canto, 1 = foco com zoom
+
+        // Bússola e Radar Forense do HD (Chrono-Vigil GPS)
+        private DriveServer nearestDriveServer;
+        private float nearestDriveDistance = float.MaxValue;
+        private float nearestDriveAngle;
+        private float nextRadarScanTime;
+
+        // Feedback sonoro de alertas da HUD
+        private AudioSource audioSrc;
+        private AudioClip bleepClip;
+        private int lastBleepSecond = -1;
 
         private Texture2D ecg;
         private Color32[] ecgPixels;
@@ -76,6 +89,12 @@ namespace SombraDaSanidade.UI
             cam = Camera.main;
             showDebugBar = Config.showSanityDebugBar;
 
+            audioSrc = GetComponent<AudioSource>();
+            if (audioSrc == null) audioSrc = gameObject.AddComponent<AudioSource>();
+            audioSrc.playOnAwake = false;
+            audioSrc.spatialBlend = 0f;
+            bleepClip = CreateBleepClip();
+
             if (flashlight != null)
             {
                 flashlight.BatteryChanged += OnBatteryChanged;
@@ -94,6 +113,7 @@ namespace SombraDaSanidade.UI
         private void OnDestroy()
         {
             SetWatchSlow(false);
+            if (sanity != null) sanity.IsFocusing = false;
             if (flashlight != null)
             {
                 flashlight.BatteryChanged -= OnBatteryChanged;
@@ -103,6 +123,7 @@ namespace SombraDaSanidade.UI
             if (heartbeat != null) heartbeat.Beat -= OnBeat;
             if (GameManager.Instance != null) GameManager.Instance.DriveCollected -= OnDriveCollected;
             if (ecg != null) Destroy(ecg);
+            if (bleepClip != null) Destroy(bleepClip);
         }
 
         // Para testes e para outras telas (ex.: tutorial) abrirem o relógio sem teclado.
@@ -117,6 +138,7 @@ namespace SombraDaSanidade.UI
             {
                 if (kb.tabKey.wasPressedThisFrame) watchHeld = true;
                 if (kb.tabKey.wasReleasedThisFrame) watchHeld = false;
+                if (kb.hKey.wasPressedThisFrame && !ModalScreen.IsOpen && !UpgradeTerminal.IsOpen) watchVisible = !watchVisible;
                 if (kb.fKey.wasPressedThisFrame) Dismiss("f");
                 if (kb.f3Key.wasPressedThisFrame && (Application.isEditor || Debug.isDebugBuild)) showDebugBar = !showDebugBar;
             }
@@ -124,13 +146,99 @@ namespace SombraDaSanidade.UI
             if (mouse != null && mouse.leftButton.wasPressedThisFrame) Dismiss("f");
             if (!playing) watchHeld = false;
 
+            if (sanity != null) sanity.IsFocusing = watchHeld;
             SetWatchSlow(watchHeld);
             float speed = Time.deltaTime / Mathf.Max(0.01f, Config.watchRaiseSeconds);
             watchRaise = Mathf.MoveTowards(watchRaise, watchHeld ? 1f : 0f, speed);
             if (watchHeld) Dismiss("tab");
 
             UpdateHints();
-            if (watchRaise > 0f) UpdateEcg();
+            if (playing)
+            {
+                UpdateEcg();
+                UpdateRadar();
+                CheckBuffAudioWarning();
+            }
+        }
+
+        private void UpdateRadar()
+        {
+            if (Time.time < nextRadarScanTime && nearestDriveServer != null && !nearestDriveServer.IsEjected)
+            {
+                if (player != null)
+                {
+                    Vector2 diff = (Vector2)nearestDriveServer.transform.position - (Vector2)player.transform.position;
+                    nearestDriveDistance = diff.magnitude;
+                    nearestDriveAngle = Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg;
+                }
+                return;
+            }
+
+            nextRadarScanTime = Time.time + 0.25f;
+            nearestDriveServer = null;
+            nearestDriveDistance = float.MaxValue;
+
+            if (player == null) return;
+            Vector2 pPos = player.transform.position;
+            var list = DriveServer.All;
+            for (int i = 0; i < list.Count; i++)
+            {
+                var s = list[i];
+                if (s == null || s.IsEjected) continue;
+                float dist = Vector2.Distance(pPos, s.transform.position);
+                if (dist < nearestDriveDistance)
+                {
+                    nearestDriveDistance = dist;
+                    nearestDriveServer = s;
+                }
+            }
+
+            if (nearestDriveServer != null)
+            {
+                Vector2 diff = (Vector2)nearestDriveServer.transform.position - pPos;
+                nearestDriveAngle = Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg;
+            }
+        }
+
+        private void CheckBuffAudioWarning()
+        {
+            if (player == null) return;
+            if (adrena == null) adrena = player.GetComponent<AdrenaSynEffect>();
+
+            float minRemaining = float.MaxValue;
+            if (adrena != null && adrena.IsActive) minRemaining = Mathf.Min(minRemaining, adrena.Remaining);
+            if (sanity != null && sanity.IsRevealForced) minRemaining = Mathf.Min(minRemaining, sanity.ForcedRevealRemaining);
+
+            if (minRemaining <= Config.effectEndingSeconds)
+            {
+                int sec = Mathf.CeilToInt(minRemaining);
+                if (sec > 0 && sec != lastBleepSecond)
+                {
+                    lastBleepSecond = sec;
+                    if (audioSrc != null && bleepClip != null) audioSrc.PlayOneShot(bleepClip, 0.35f);
+                }
+            }
+            else
+            {
+                lastBleepSecond = -1;
+            }
+        }
+
+        private static AudioClip CreateBleepClip()
+        {
+            const int rate = 22050;
+            const float duration = 0.08f;
+            int samples = (int)(rate * duration);
+            var data = new float[samples];
+            for (int i = 0; i < samples; i++)
+            {
+                float t = i / (float)rate;
+                float env = Mathf.Sin(i / (float)samples * Mathf.PI);
+                data[i] = Mathf.Sin(2f * Mathf.PI * 880f * t) * env * 0.35f;
+            }
+            var clip = AudioClip.Create("HudBleep", samples, 1, rate, false);
+            clip.SetData(data, 0);
+            return clip;
         }
 
         // ---------- Eventos ----------
@@ -183,7 +291,7 @@ namespace SombraDaSanidade.UI
             float played = GameManager.Instance != null ? GameManager.Instance.ElapsedTime : Time.timeSinceLevelLoad;
             if (flashlight != null && played > Config.flashlightHintDelay) Show("f", "F", "lanterna");
             if (sanity != null && (sanity.State != SanityState.Lucid || (heartbeat != null && heartbeat.Tier != ProximityTier.Safe)))
-                Show("tab", "TAB", "relógio");
+                Show("tab", "TAB", "focar pulso");
             if (heartbeat != null && heartbeat.Tier == ProximityTier.Danger && flashlight != null && flashlight.IsLit
                 && (flashlightConfig == null || flashlight.Battery >= flashlightConfig.empCost))
                 Show("emp", "BOTÃO DIREITO", "pulso EMP");
@@ -263,13 +371,14 @@ namespace SombraDaSanidade.UI
 
         private Color EcgColor()
         {
+            if (sanity != null && sanity.IsFocusRecovering) return Fosforo5; // Modo Foco sob a luz: verde vibrante
             if (sanity != null && sanity.State >= SanityState.Hallucinating && Random.value < 0.15f) return Hipnos2;
             if (heartbeat == null) return Fosforo5;
             return heartbeat.Tier switch
             {
                 ProximityTier.Danger => Emergencia4,
                 ProximityTier.Warning => Ambar2,
-                _ => Fosforo5
+                _ => (sanity != null && sanity.IsFocusing ? Fosforo4 : Fosforo5)
             };
         }
 
@@ -278,20 +387,67 @@ namespace SombraDaSanidade.UI
         private void OnGUI()
         {
             if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) return;
-            // Pausa (ou outra tela modal) aberta: a pilha e as legendas não podem ficar por cima do painel.
-            if (ModalScreen.IsOpen) return;
-            if (Event.current.type != EventType.Repaint) return;
+            // Pausa, terminal de upgrade ou outra tela modal aberta: a HUD não pode ficar por cima do painel.
+            if (ModalScreen.IsOpen || UpgradeTerminal.IsOpen) return;
 
             Begin();
+            bool showWatch = watchVisible || watchRaise > 0.01f;
+
+            if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
+            {
+                if (HandleWatchToggleClick(showWatch))
+                {
+                    Event.current.Use();
+                    return;
+                }
+            }
+
+            if (Event.current.type != EventType.Repaint) return;
+
             textStyle ??= new GUIStyle(GUI.skin.label) { alignment = TextAnchor.UpperLeft, wordWrap = false, richText = false };
 
             DrawBatteryNearPlayer();
             DrawDrives(8, 8, watch: false);
             DrawSubtitles();
             DrawHint();
-            if (watchRaise > 0f) DrawWatch();
+            if (showWatch) DrawWatch();
+            else DrawWatchCollapsedButton();
             if (showDebugBar) DrawDebugBar();
             GUI.color = Color.white;
+        }
+
+        private bool HandleWatchToggleClick(bool showWatch)
+        {
+            if (showWatch)
+            {
+                int w = 64, h = HasArt ? 66 : 56;
+                int x = Screen.width / Px - w - 8;
+                int y = Screen.height / Px - h - 6;
+                if (PixelHud.MouseOver(x, y, 9, 7))
+                {
+                    watchVisible = false;
+                    return true;
+                }
+            }
+            else
+            {
+                int bx = Screen.width / Px - 24, by = Screen.height / Px - 14;
+                if (PixelHud.MouseOver(bx, by, 18, 9))
+                {
+                    watchVisible = true;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void DrawWatchCollapsedButton()
+        {
+            int bx = Screen.width / Px - 24, by = Screen.height / Px - 14;
+            bool hover = PixelHud.MouseOver(bx, by, 18, 9);
+            Box(bx, by, 18, 9, hover ? Concreto4 : Concreto3, 0.9f);
+            Box(bx + 1, by + 1, 16, 7, Vazio, 0.9f);
+            PixelHud.Text("H+", bx + 3, by + 2, hover ? Fosforo5 : Fosforo4);
         }
 
         // Pilha de 4 segmentos a um palmo do Thomas, com a marca do EMP.
@@ -356,42 +512,159 @@ namespace SombraDaSanidade.UI
             }
         }
 
-        // Relógio no pulso: sobe do canto inferior direito. ECG, HDs e bateria, sem números.
+        // Relógio no pulso: permanentemente ancorado no canto inferior direito; aumenta de tamanho em Modo Foco (Tab).
         private void DrawWatch()
         {
             bool row = HasArt;
-            int w = 62, h = row ? 56 : 46;
+            int w = 64, h = row ? 66 : 56;
             float ease = 1f - (1f - watchRaise) * (1f - watchRaise);
             int x = Screen.width / Px - w - 8;
-            int y = Mathf.RoundToInt(Mathf.Lerp(Screen.height / (float)Px + 4, Screen.height / (float)Px - h - 8, ease));
+            int y = Screen.height / Px - h - 6;
 
-            // Pulseira, caixa e bisel
-            Box(x + 14, y - 6, 34, 6, Concreto2, 1f);
-            Box(x + 14, y + h, 34, 8, Concreto2, 1f);
-            Box(x, y, w, h, Concreto3, 1f);
-            Box(x, y, w, 1, Concreto5, 1f);
-            Box(x, y + h - 1, w, 1, Concreto1, 1f);
-            Box(x + w, y + 12, 2, 6, Concreto4, 1f); // coroa
-            Box(x + 4, y + 4, w - 8, h - 8, Vazio, 1f);
-
-            // Tela: ECG em cima, HDs e pilha embaixo
-            int sx = x + 7, sy = y + 6;
-            if (ecg != null)
+            float scale = Mathf.Lerp(1f, 1.45f, ease);
+            Matrix4x4 prevMatrix = GUI.matrix;
+            if (scale > 1.001f)
             {
-                GUI.color = Color.white;
-                GUI.DrawTexture(new Rect(sx * Px, sy * Px, EcgWidth * Px, EcgHeight * Px), ecg);
+                Vector2 pivot = new Vector2((x + w) * Px, (y + h) * Px);
+                GUIUtility.ScaleAroundPivot(new Vector2(scale, scale), pivot);
             }
-            DrawDrives(sx, sy + EcgHeight + 3, watch: true);
-            if (flashlight != null) DrawBattery(sx + EcgWidth - 15, sy + EcgHeight + 4, 1f);
 
-            // LED âmbar quando está sob a luz de uma Zona Segura; ao lado, o do modo econômico (Filtro Âmbar)
-            if (sanity != null && sanity.InSafeZone) Box(x + w - 9, y + 2, 2, 1, Ambar2, 1f);
-            if (flashlight != null && flashlight.HasAmberFilter) Box(x + w - 13, y + 2, 2, 1, flashlight.IsEcoMode ? Ambar1 : Concreto2, 1f);
+            try
+            {
+                // Pulseira, caixa e bisel
+                Color caseColor = watchHeld ? Concreto4 : Concreto3;
+                Box(x + 15, y - 6, 34, 6, Concreto2, 1f);
+                Box(x + 15, y + h, 34, 8, Concreto2, 1f);
+                Box(x, y, w, h, caseColor, 1f);
+                Box(x, y, w, 1, Concreto5, 1f);
+                Box(x, y + h - 1, w, 1, Concreto1, 1f);
+                Box(x + w, y + 12, 2, 6, Concreto4, 1f); // coroa
+                Box(x + 4, y + 4, w - 8, h - 8, Vazio, 1f);
 
-            if (row) DrawWatchRow(sx, sy + EcgHeight + 14);
+                // Botão discreto para minimizar/esconder o relógio (clique ou tecla H)
+                bool minHover = !watchHeld && PixelHud.MouseOver(x, y, 9, 7);
+                Box(x + 2, y + 1, 6, 3, minHover ? Concreto5 : Concreto2, 1f);
+                Box(x + 3, y + 2, 4, 1, minHover ? Concreto8 : Concreto6, 1f);
+
+                // Borda interna destaca suavemente em modo foco
+                if (watchHeld)
+                {
+                    Color focusGlow = sanity != null && sanity.IsFocusRecovering ? Fosforo3 : Ambar1;
+                    Box(x + 4, y + 4, w - 8, 1, focusGlow, 0.7f);
+                    Box(x + 4, y + h - 5, w - 8, 1, focusGlow, 0.7f);
+                }
+
+                // Tela: ECG em cima, HDs e pilha no meio, Radar forense e efeitos embaixo
+                int sx = x + 8, sy = y + 6;
+                if (ecg != null)
+                {
+                    GUI.color = Color.white;
+                    GUI.DrawTexture(new Rect(sx * Px, sy * Px, EcgWidth * Px, EcgHeight * Px), ecg);
+                }
+                DrawDrives(sx, sy + EcgHeight + 2, watch: true);
+                if (flashlight != null) DrawBattery(sx + EcgWidth - 15, sy + EcgHeight + 3, 1f);
+
+                // Linha do Radar Forense do HD (seta direcional 4 vias e sinal RF)
+                DrawRadarRow(sx, sy + EcgHeight + 11);
+
+                // LED âmbar de Zona Segura e modo econômico
+                if (sanity != null && sanity.InSafeZone) Box(x + w - 9, y + 2, 2, 1, Ambar2, 1f);
+                if (flashlight != null && flashlight.HasAmberFilter) Box(x + w - 13, y + 2, 2, 1, flashlight.IsEcoMode ? Ambar1 : Concreto2, 1f);
+
+                if (row) DrawWatchRow(sx, sy + EcgHeight + 20);
+            }
+            finally
+            {
+                GUI.matrix = prevMatrix;
+            }
         }
 
-        // Linha de baixo do relógio: efeitos ativos à esquerda, upgrades da Lux-90 à direita (ícones 8x8).
+        // Radar de proximidade com seta direcional simples (cima, baixo, esquerda, direita)
+        private void DrawRadarRow(int x, int y)
+        {
+            if (nearestDriveServer == null || nearestDriveServer.IsEjected)
+            {
+                var gm = GameManager.Instance;
+                bool allDone = gm != null && gm.TotalDrives >= gm.TotalDrivesRequired;
+                string msg = allDone ? "HD: OK" : "SEM SINAL";
+                Color col = allDone ? Fosforo4 : Concreto5;
+                PixelHud.Text(msg, x, y, col);
+                return;
+            }
+
+            // Seta cardeal 7x7 apontando para cima, baixo, esquerda ou direita
+            Color arrowCol = !nearestDriveServer.IsPowered ? Emergencia4
+                : nearestDriveServer.IsLocked ? Ambar2
+                : Fosforo5;
+            DrawCardinalArrow(x, y, nearestDriveAngle, arrowCol);
+
+            // Barras de sinal RF (4 barras)
+            float maxDist = Config.radarMaxDistance;
+            float prox = 1f - Mathf.Clamp01(nearestDriveDistance / maxDist);
+            int bars = Mathf.Clamp(Mathf.CeilToInt(prox * 4), 1, 4);
+            int bx = x + 9;
+            for (int b = 0; b < 4; b++)
+            {
+                int barH = 2 + b;
+                Color barCol = b < bars ? (bars >= 3 ? Fosforo4 : Ambar2) : Concreto2;
+                Box(bx + b * 3, y + 6 - barH, 2, barH, barCol, 1f);
+            }
+
+            // Distância em metros ou aviso de proximidade
+            int tx = bx + 13;
+            if (nearestDriveDistance < 2.5f)
+            {
+                bool blink = Mathf.Repeat(Time.time * 4f, 1f) < 0.5f;
+                PixelHud.Text("AQUI", tx, y, blink ? Fosforo5 : Fosforo4);
+            }
+            else
+            {
+                string distStr = nearestDriveDistance < 10f ? $"{nearestDriveDistance:0.0}M" : $"{nearestDriveDistance:0}M";
+                PixelHud.Text(distStr, tx, y, Concreto7);
+            }
+        }
+
+        private static void DrawCardinalArrow(int x, int y, float angleDeg, Color col)
+        {
+            if (angleDeg >= -45f && angleDeg < 45f)
+            {
+                // Direita (→)
+                Box(x, y + 2, 3, 3, col);
+                Box(x + 3, y, 1, 7, col);
+                Box(x + 4, y + 1, 1, 5, col);
+                Box(x + 5, y + 2, 1, 3, col);
+                Box(x + 6, y + 3, 1, 1, col);
+            }
+            else if (angleDeg >= 45f && angleDeg < 135f)
+            {
+                // Cima (↑)
+                Box(x + 3, y, 1, 1, col);
+                Box(x + 2, y + 1, 3, 1, col);
+                Box(x + 1, y + 2, 5, 1, col);
+                Box(x, y + 3, 7, 1, col);
+                Box(x + 2, y + 4, 3, 3, col);
+            }
+            else if (angleDeg >= -135f && angleDeg < -45f)
+            {
+                // Baixo (↓)
+                Box(x + 2, y, 3, 3, col);
+                Box(x, y + 3, 7, 1, col);
+                Box(x + 1, y + 4, 5, 1, col);
+                Box(x + 2, y + 5, 3, 1, col);
+                Box(x + 3, y + 6, 1, 1, col);
+            }
+            else
+            {
+                // Esquerda (←)
+                Box(x, y + 3, 1, 1, col);
+                Box(x + 1, y + 2, 1, 3, col);
+                Box(x + 2, y + 1, 1, 5, col);
+                Box(x + 3, y, 1, 7, col);
+                Box(x + 4, y + 2, 3, 3, col);
+            }
+        }
+
+        // Linha de baixo do relógio: timers de efeitos ativos à esquerda, upgrades da Lux-90 à direita.
         private void DrawWatchRow(int x, int y)
         {
             int left = x;
@@ -400,16 +673,20 @@ namespace SombraDaSanidade.UI
                 if (adrena == null) adrena = player.GetComponent<AdrenaSynEffect>();
                 if (adrena != null && adrena.IsActive)
                 {
-                    bool ending = adrena.Remaining < Config.effectEndingSeconds && Mathf.Repeat(Time.time * 4f, 1f) < 0.5f;
-                    PixelHud.Sprite("hud_icons", "fx_adrena", left, y, ending ? 0.35f : 1f);
-                    left += 9;
+                    left = DrawBuffBadge(left, y, "fx_adrena", adrena.Remaining, adrena.RemainingRatio, Fosforo4);
+                }
+                if (sanity != null && sanity.IsRevealForced)
+                {
+                    left = DrawBuffBadge(left, y, "up_resonator", sanity.ForcedRevealRemaining, sanity.ForcedRevealRatio, Eletrico4);
                 }
                 if (Time.time < player.SlowedUntil)
                 {
-                    PixelHud.Sprite("hud_icons", "fx_slow", left, y);
-                    left += 9;
+                    float slowRem = player.SlowedUntil - Time.time;
+                    float slowDur = sanity != null && sanity.Config != null ? Mathf.Max(0.01f, sanity.Config.stabilizerSlowDuration) : 4f;
+                    left = DrawBuffBadge(left, y, "fx_slow", slowRem, Mathf.Clamp01(slowRem / slowDur), Ambar1, warn: false);
                 }
             }
+
             if (flashlight == null) return;
             var installed = flashlight.Installed;
             int right = x + EcgWidth - 8;
@@ -419,6 +696,23 @@ namespace SombraDaSanidade.UI
                 PixelHud.Sprite("hud_icons", UpgradeIcon(installed[i].effect), right, y);
                 right -= 9;
             }
+        }
+
+        private int DrawBuffBadge(int x, int y, string icon, float remaining, float ratio, Color normalColor, bool warn = true)
+        {
+            bool ending = warn && remaining <= Config.effectEndingSeconds;
+            float blink = ending && Mathf.Repeat(Time.time * 4f, 1f) < 0.5f ? 0.35f : 1f;
+            Color activeCol = ending ? Emergencia4 : normalColor;
+
+            PixelHud.Sprite("hud_icons", icon, x, y, blink);
+            // Micro-barra regressiva (8x2) logo abaixo do ícone para leitura periférica imediata
+            Box(x, y + 9, 8, 2, Concreto2, 0.9f);
+            int fillW = Mathf.Clamp(Mathf.CeilToInt(8f * Mathf.Clamp01(ratio)), 0, 8);
+            if (fillW > 0) Box(x, y + 9, fillW, 2, activeCol, 1f);
+
+            int sec = Mathf.CeilToInt(remaining);
+            int textW = PixelHud.Text($"{sec:0}S", x + 9, y + 1, activeCol);
+            return x + 9 + textW + 3;
         }
 
         // Ícone de cada upgrade em hud_icons.json (docs/upgrades-lux90.md).
