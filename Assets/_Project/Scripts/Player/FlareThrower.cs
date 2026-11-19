@@ -90,7 +90,7 @@ namespace SombraDaSanidade.Player
             return true;
         }
 
-        // Ícone e quantidade no canto de baixo à direita (HUD em pixel art). Some sem sinalizador, a não ser logo
+        // Ícone e quantidade embaixo à direita, ao lado do relógio (HUD em pixel art). Some sem sinalizador, a não ser logo
         // depois de tentar jogar sem nenhum.
         private void OnGUI()
         {
@@ -100,7 +100,8 @@ namespace SombraDaSanidade.Player
             if (count <= 0 && !flash) return;
             UI.PixelHud.Begin();
             int px = UI.PixelHud.Px;
-            int x = UI.PixelHud.Width - 34, y = UI.PixelHud.Height - 20;
+            // À esquerda do relógio de pulso do DemoHud (64 px + margem de 8 no canto de baixo à direita).
+            int x = UI.PixelHud.Width - 64 - 8 - 34, y = UI.PixelHud.Height - 20;
             var tex = icon.texture;
             var r = icon.textureRect;
             var uv = new Rect(r.x / tex.width, r.y / tex.height, r.width / tex.width, r.height / tex.height);

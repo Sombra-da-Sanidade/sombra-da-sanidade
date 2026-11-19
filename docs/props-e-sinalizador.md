@@ -86,7 +86,7 @@ Tudo é montado pelo `AlfaSceneBuilder` e pelo `AlfaSceneBuilder.Props`. A Beta,
 
 - **Efeito no Sonâmbulo:** enquanto o sinalizador queima, o Sonâmbulo dentro da luz fica parado, mesmo com a lanterna apagada e o Thomas de costas. É o tempo de reação para fugir ou lidar com o Espécime.
 - **Efeito no Espécime:** nenhum. O sinalizador não acorda o Sonâmbulo nem atrai o Espécime (`SignalFlare.Illuminates`).
-- **HUD:** o contador aparece no canto de baixo à direita enquanto houver sinalizador.
+- **HUD:** o contador aparece embaixo à direita, ao lado do relógio, enquanto houver sinalizador.
 
 ## Arte
 
