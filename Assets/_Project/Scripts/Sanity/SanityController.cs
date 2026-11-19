@@ -29,14 +29,23 @@ namespace SombraDaSanidade.Sanity
         public bool IsMonsterNear { get; private set; }
         // Distância até o monstro (infinita sem monstro ativo). Usada pelo batimento em faixas (issue #38).
         public float DistanceToMonster { get; private set; } = float.MaxValue;
+
+        // Modo Foco (TAB no relógio): Thomas desacelera e foca na respiração / ECG.
+        public bool IsFocusing { get; set; }
+        public bool IsFocusRecovering => IsFocusing && flashlight != null && flashlight.IsLit && !InSafeZone && !IsMonsterNear && config != null && Value < config.maxSanity * 0.6f;
+        public bool IsFocusMitigating => IsFocusing && InDarkness && !IsMonsterNear;
+
         // Limiar das pistas em fósforo (GDD regra 5: 35). O upgrade Ressonador Neural (#31) sobe para 50.
         // O Módulo Neural (Ala Executiva) revela as pistas por alguns segundos com qualquer sanidade.
         public float RevealCluesBelow => IsRevealForced ? float.PositiveInfinity
             : revealOverride >= 0f ? revealOverride : config.revealCluesBelow;
         public bool IsRevealForced => Time.time < forcedRevealUntil;
+        public float ForcedRevealRemaining => IsRevealForced ? Mathf.Max(0f, forcedRevealUntil - Time.time) : 0f;
+        public float ForcedRevealRatio => IsRevealForced && forcedRevealDuration > 0f ? Mathf.Clamp01(ForcedRevealRemaining / forcedRevealDuration) : 0f;
 
         private float revealOverride = -1f;
         private float forcedRevealUntil = -1f;
+        private float forcedRevealDuration;
 
         // Dreno no escuro: o da ala ou, sem perfil, o do config.
         public float DarknessDrain
@@ -97,7 +106,18 @@ namespace SombraDaSanidade.Sanity
             else
             {
                 rate = 0f;
-                if (InDarkness) rate -= DarknessDrain;
+                if (InDarkness)
+                {
+                    float drain = DarknessDrain;
+                    if (IsFocusing && !IsMonsterNear) drain *= 0.5f; // Foco / Respiração controlada reduz dreno no escuro
+                    rate -= drain;
+                }
+                else if (flashlight != null && flashlight.IsLit && IsFocusing && !IsMonsterNear)
+                {
+                    // Foco tático sob a luz: acalma Thomas e recupera sanidade gradualmente até 60%
+                    float focusCap = config.maxSanity * 0.6f;
+                    if (Value < focusCap) rate += 2.5f;
+                }
                 if (IsMonsterNear) rate -= config.monsterProximityDrain;
             }
 
@@ -127,6 +147,7 @@ namespace SombraDaSanidade.Sanity
         // Pistas visíveis por `seconds` com qualquer sanidade (Módulo Neural). Tomar de novo só renova.
         public void ForceRevealClues(float seconds)
         {
+            forcedRevealDuration = Mathf.Max(0.01f, seconds);
             forcedRevealUntil = Mathf.Max(forcedRevealUntil, Time.time + seconds);
         }
 
