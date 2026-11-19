@@ -27,6 +27,10 @@ namespace SombraDaSanidade.UI
         [Tooltip("Nos últimos segundos do Adrena-Syn o ícone pisca no relógio.")]
         public float effectEndingSeconds = 3f;
 
+        [Header("Radar Forense do HD")]
+        [Tooltip("Distância máxima em metros detectada pelo sensor RF do relógio.")]
+        public float radarMaxDistance = 30f;
+
         [Header("HDs")]
         [Tooltip("Segundos visível depois de coletar um HD.")]
         public float driveShowSeconds = 4f;

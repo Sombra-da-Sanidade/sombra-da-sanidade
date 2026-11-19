@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using SombraDaSanidade.Core;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 namespace SombraDaSanidade.Interaction
 {
@@ -10,10 +12,14 @@ namespace SombraDaSanidade.Interaction
     // de upgrade da Lux-90 (#31).
     public class DriveServer : MonoBehaviour, IInteractable, ISkillCheckable
     {
+        private static readonly List<DriveServer> allServers = new List<DriveServer>();
+        public static IReadOnlyList<DriveServer> All => allServers;
+
         [SerializeField] private InteractionConfig config;
         [Tooltip("Log de áudio tocado ao ejetar o HD (GDD 9: logs da Dra. Vance). Vazio na mini demo.")]
         [SerializeField] private AudioClip logClip;
         [SerializeField] private SpriteRenderer indicator;
+        [SerializeField] private Light2D beaconLight;
         [SerializeField] private Color loadedColor = new Color(0.3f, 1f, 0.45f);
         [SerializeField] private Color emptyColor = new Color(0.25f, 0.25f, 0.25f);
         [Tooltip("Subestação que alimenta o servidor (Ala de Energia, #42). Vazio: sempre ligado.")]
@@ -28,6 +34,7 @@ namespace SombraDaSanidade.Interaction
         public bool CanInteract => !ejected && !locked && config != null && IsPowered;
         public bool IsPowered => requiredPower == null || requiredPower.IsPowered;
         public bool IsLocked => locked;
+        public bool IsEjected => ejected;
 
         // Senha certa no terminal ao lado (KeypadLock).
         public void Unlock()
@@ -51,6 +58,16 @@ namespace SombraDaSanidade.Interaction
         private bool ejected;
         private float nextLateNoise;
 
+        private void OnEnable()
+        {
+            if (!allServers.Contains(this)) allServers.Add(this);
+        }
+
+        private void OnDisable()
+        {
+            allServers.Remove(this);
+        }
+
         private void Awake()
         {
             if (config == null) Debug.LogError($"{name}: DriveServer sem InteractionConfig.", this);
@@ -58,9 +75,41 @@ namespace SombraDaSanidade.Interaction
 
         private void Start()
         {
+            if (beaconLight == null) beaconLight = GetComponentInChildren<Light2D>();
+            if (beaconLight == null) beaconLight = CreateBeacon();
             RefreshIndicator();
             if (requiredPower != null) requiredPower.Powered += RefreshIndicator;
             EnsurePlayerComponents();
+        }
+
+        private void Update()
+        {
+            if (beaconLight == null) return;
+            if (ejected)
+            {
+                beaconLight.enabled = false;
+                return;
+            }
+            beaconLight.enabled = true;
+            Color targetColor = !IsPowered ? unpoweredColor : locked ? lockedColor : loadedColor;
+            beaconLight.color = targetColor;
+            // Pulso suave de respiração para guiar o olhar no breu (Frente 4)
+            float pulse = 0.55f + 0.25f * Mathf.Sin(Time.time * 2.5f);
+            beaconLight.intensity = pulse;
+        }
+
+        private Light2D CreateBeacon()
+        {
+            var go = new GameObject("Beacon_Light");
+            go.transform.SetParent(transform, false);
+            go.transform.localPosition = new Vector3(0f, 0.2f, 0f);
+            var light = go.AddComponent<Light2D>();
+            light.lightType = Light2D.LightType.Point;
+            light.color = loadedColor;
+            light.intensity = 0.6f;
+            light.pointLightOuterRadius = 3.0f;
+            light.pointLightInnerRadius = 0.2f;
+            return light;
         }
 
         private void OnDestroy()
@@ -114,6 +163,7 @@ namespace SombraDaSanidade.Interaction
         {
             ejected = true;
             if (indicator != null) indicator.color = emptyColor;
+            if (beaconLight != null) beaconLight.enabled = false;
             NoiseBus.Emit(transform.position, config.ejectNoiseRadius);
             if (logClip != null) AudioSource.PlayClipAtPoint(logClip, transform.position);
             if (GameManager.Instance != null) GameManager.Instance.CollectDrive();

@@ -10,6 +10,8 @@ namespace SombraDaSanidade.Player
     {
         public bool IsActive => appliedFactor > 0f;
         public float Remaining => IsActive ? Mathf.Max(0f, endTime - Time.time) : 0f;
+        public float Duration { get; private set; }
+        public float RemainingRatio => IsActive && Duration > 0f ? Mathf.Clamp01(Remaining / Duration) : 0f;
 
         private PlayerController player;
         private float appliedFactor;
@@ -35,6 +37,7 @@ namespace SombraDaSanidade.Player
                 appliedFactor = factor;
                 player.SpeedMultiplier *= appliedFactor;
             }
+            Duration = Mathf.Max(0.01f, duration);
             endTime = Time.time + duration;
         }
 
