@@ -144,11 +144,41 @@ namespace SombraDaSanidade.EditorTools
                         walker.State == SleepwalkerState.Frozen && walker.Velocity.magnitude < 0.05f);
                     Check($"Trava numa pose sorteada (pose {walker.Pose})", walker.Pose != SleepwalkerController.DormantPose);
                     Check("Com a luz nele, não mata", gm.IsPlaying);
-                    SetFacing(player, Vector2.down);                // vira as costas
+                    // Sinalizador: joga nele, vira as costas e apaga a lanterna. A luz do sinalizador segura ele.
+                    thrower = player.GetComponent<FlareThrower>();
+                    if (thrower == null) thrower = player.gameObject.AddComponent<FlareThrower>();
+                    SetPrivate(thrower, "burnDuration", 3f);
+                    thrower.Add(1);
+                    SetFacing(player, Vector2.down);
+                    SetLight(flashlight, false);
+                    Check("Jogou o sinalizador", thrower.TryThrow(walker.transform.position));
                     Next();
                     break;
 
                 case 7:
+                    if (t < 0.8f) return;
+                    Check("Sinalizador aceso no chão", thrower.LastFlare != null && thrower.LastFlare.IsBurning);
+                    Check("Na luz do sinalizador, o Sonâmbulo fica parado (lanterna apagada, de costas)",
+                        walker.IsLitByFlare && walker.State == SleepwalkerState.Frozen);
+                    mark = walker.transform.position;
+                    Next();
+                    break;
+
+                case 8:
+                    if (t < 1.5f) return;
+                    float held = Vector2.Distance(mark, walker.transform.position);
+                    Check($"Não se move enquanto o sinalizador queima ({held:0.00} m em 1,5 s)", held < 0.05f && gm.IsPlaying);
+                    Next();
+                    break;
+
+                case 9:
+                    if (walker.State != SleepwalkerState.Moving && t < 3f) return;
+                    Check("Sinalizador apagou e ele volta a andar", thrower.LastFlare != null && thrower.LastFlare.IsSpent
+                        && walker.State == SleepwalkerState.Moving);
+                    Next();
+                    break;
+
+                case 10:
                     if (walker.IsKilling && !killSeen)
                     {
                         killSeen = true;
@@ -165,6 +195,14 @@ namespace SombraDaSanidade.EditorTools
         }
 
         private static bool killSeen;
+        private static FlareThrower thrower;
+
+        private static void SetPrivate(object target, string field, object value)
+        {
+            var f = target.GetType().GetField(field, BindingFlags.Instance | BindingFlags.NonPublic);
+            if (f == null) throw new System.MissingFieldException(target.GetType().Name, field);
+            f.SetValue(target, value);
+        }
 
         private static void Next()
         {

@@ -100,6 +100,7 @@ Quando o terminal da eclusa recebe os 3 HDs, a purga (`Level/EscapeSequence`) ch
 - **Velocidade:** `MonsterConfig.furySpeed` (4.6, coluna Eclusa da Proposta 1) no lugar da base + bônus dos HDs. O galope da Perseguição e o modo seguro continuam multiplicando.
 - **Audição:** raio mínimo `furyHearingRadius` (9).
 - **Comportamentos:** todos os da Executiva. O `BetaWingTracker` não troca mais os comportamentos enquanto ele estiver em fúria.
+- **Perseguição constante:** as luzes de alarme estão acesas e ele sabe onde o Thomas está. Por isso persegue sempre, com ou sem lanterna: dá o grito curto e corre. Apagar a luz não despista. O EMP ainda atordoa (depois ele volta a perseguir), e a Zona Segura ainda impede a entrada.
 - O barulho da eclusa abrindo (raio 40 no `EscapeConfig`) o chama para o terminal.
 
 Detalhes da fase em [eclusa.md](eclusa.md).

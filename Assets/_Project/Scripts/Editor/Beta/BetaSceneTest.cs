@@ -145,8 +145,38 @@ namespace SombraDaSanidade.EditorTools
                     var locker = lockers[0];
                     locker.Open(LootKind.Nothing);
                     var body = (SpriteRenderer)new SerializedObject(locker).FindProperty("body").objectReferenceValue;
-                    Check($"Armário aberto usa o sprite locker_open ({(body && body.sprite ? body.sprite.name : "nenhum")})",
-                        body != null && body.sprite != null && body.sprite.name == "locker_open");
+                    Check($"Armário aberto usa o sprite aberto, de frente ou de perfil ({(body && body.sprite ? body.sprite.name : "nenhum")})",
+                        body != null && body.sprite != null && (body.sprite.name == "locker_tall_open" || body.sprite.name == "locker_side_open"));
+
+                    // Props novos: painel e arandelas nos disjuntores, mortos, sinalizadores e gravações na mesa e no corpo.
+                    var breakers = Object.FindObjectsByType<Breaker>();
+                    Check($"Disjuntores com painel e arandelas ({breakers.Length})",
+                        breakers.Length > 0 && System.Array.TrueForAll(breakers, b => b.Panel != null && b.Lamps != null && b.Lamps.Length > 0));
+                    Check($"Mortos espalhados ({GameObject.Find("Corpses")?.transform.childCount ?? 0})",
+                        GameObject.Find("Corpses") != null && GameObject.Find("Corpses").transform.childCount >= 2);
+                    var boxes = Object.FindObjectsByType<FlarePickup>();
+                    Check($"Sinalizadores em caixas de ferramentas nas bancadas ({boxes.Length}) e no jogador",
+                        boxes.Length >= 2 && System.Array.TrueForAll(boxes, b => b.IsToolbox)
+                        && Object.FindAnyObjectByType<SombraDaSanidade.Player.FlareThrower>() != null);
+                    var furniture = GameObject.Find("Furniture");
+                    int sideProps = 0;
+                    if (furniture != null)
+                        foreach (Transform f in furniture.transform)
+                            if (f.name.Contains("_side") || f.GetComponent<SpriteRenderer>().flipX) sideProps++;
+                    Check($"Mobília nas salas ({(furniture ? furniture.transform.childCount : 0)}, {sideProps} nas laterais)",
+                        furniture != null && furniture.transform.childCount >= 6 && sideProps >= 1);
+                    Check($"Sirenes de parede ({GameObject.Find("Sirens")?.transform.childCount ?? 0})",
+                        GameObject.Find("Sirens") != null && GameObject.Find("Sirens").transform.childCount >= 3);
+                    var lockerSpots = lockers.Select(l => (Vector2)l.transform.position).ToList();
+                    bool spread = true;
+                    for (int i = 0; i < lockerSpots.Count; i++)
+                        for (int j = i + 1; j < lockerSpots.Count; j++)
+                            if (Vector2.Distance(lockerSpots[i], lockerSpots[j]) < 2.5f) spread = false;
+                    Check("Armários espalhados (nenhum colado em outro)", spread);
+                    var recs = Object.FindObjectsByType<SombraDaSanidade.Narrative.AudioLogTerminal>();
+                    Check("Gravações na mesa e no corpo",
+                        System.Array.Exists(recs, r => r.transform.Find("desk_recorder") != null) &&
+                        System.Array.Exists(recs, r => r.transform.Find("corpse_recorder") != null));
 
                     panel.TeleportTo(Below<DriveServer>("Energia"));
                     Next();

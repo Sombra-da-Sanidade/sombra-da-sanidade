@@ -26,6 +26,8 @@ namespace SombraDaSanidade.EditorTools
 
         // Regiões das alas (x0, y0, x1, y1 inclusivos). O saguão fica entre Médica e Energia, embaixo.
         private static readonly RectInt HubRect = new RectInt(31, 3, 16, 9);
+        // Saguão (início): fica mais limpo, sem manchas no chão nem entulho (AlfaSceneBuilder.QuietArea).
+        public static RectInt Hub => HubRect;
         private static readonly RectInt MedicaRegion = new RectInt(2, 3, 25, 54);
         private static readonly RectInt EnergiaRegion = new RectInt(51, 3, 25, 54);
         private static readonly RectInt ExecutivaRegion = new RectInt(29, 17, 20, 40);
@@ -311,11 +313,12 @@ namespace SombraDaSanidade.EditorTools
             foreach (var r in rooms)
                 if (rng.Next(3) == 0) PlaceOnNorthWall(c, rng, r, 'P', used, needsTwoRows: false);
 
-            // Armários encostados na parede norte (2 ou 3 por ala) e os itens no meio das salas.
+            // Armários encostados na parede norte (2 ou 3 por ala, cada um numa sala) e os itens no meio das salas.
             int lockers = rng.Next(2, 4);
+            var lockerRooms = rooms.OrderBy(_ => rng.Next()).ToList();
             for (int i = 0; i < lockers; i++)
             {
-                var r = rooms[rng.Next(rooms.Count)];
+                var r = lockerRooms[i % lockerRooms.Count];
                 for (int t = 0; t < 20; t++)
                 {
                     var cell = new Vector2Int(rng.Next(r.x + 1, r.xMax - 1), r.yMax - 1);
@@ -410,6 +413,7 @@ namespace SombraDaSanidade.EditorTools
                 {
                     if (c[x, y] != '.') continue;
                     int roll = rng.Next(100);
+                    if (HubRect.Contains(new Vector2Int(x, y))) continue;   // saguão limpo
                     if (roll < 2) c[x, y] = 'w';
                     else if (roll < 4) c[x, y] = 'p';
                     else if (roll < 5) c[x, y] = 'b';

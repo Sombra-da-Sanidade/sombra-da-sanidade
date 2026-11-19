@@ -6,7 +6,8 @@ using UnityEngine.Rendering.Universal;
 namespace SombraDaSanidade.Interaction
 {
     // Disjuntor / quadro elétrico (GDD 4.2, 4.3 e regra 6). Frente 4 (Disjuntor e mapa). Issue #10.
-    // Segurar E por 4s acende a lâmpada de teto (Zona Segura) por 60s; depois dá para reparar de novo.
+    // Segurar E por 4s acende as arandelas da sala (RoomLamp) e a Zona Segura por 60s. No fim, o painel
+    // queima (fogo, faíscas e fumaça) e não pode ser reparado de novo: cada disjuntor é uma proteção de uso único.
     // Se a cena não tiver SafeZone/LED/faísca configurados, o disjuntor cria os seus no Awake, então funciona
     // nas cenas geradas (protótipo, Alfa) sem regenerar.
     public class Breaker : MonoBehaviour, IInteractable
@@ -36,18 +37,44 @@ namespace SombraDaSanidade.Interaction
         [SerializeField] private Color brokenColor = new Color(1f, 0.25f, 0.2f);
         [SerializeField] private Color activeColor = new Color(0.35f, 1f, 0.45f);
 
-        public string Prompt => "Reparar disjuntor";
-        public bool CanInteract => !isActive;
+        [Header("Arte do painel e da sala (vazios: só luz)")]
+        [SerializeField] private SpriteRenderer panel;
+        [SerializeField] private Sprite offSprite;
+        [SerializeField] private Sprite onSprite;
+        [SerializeField] private Sprite burntSprite;
+        [Tooltip("Quadros da queima (fogo e faíscas), tocados uma vez no fim do tempo.")]
+        [SerializeField] private Sprite[] burnFrames;
+        [SerializeField] private SpriteRenderer smoke;
+        [SerializeField] private Sprite[] smokeFrames;
+        [Tooltip("Arandelas da sala: acendem com o reparo e queimam junto com o painel.")]
+        [SerializeField] private RoomLamp[] lamps;
+
+        [Header("Queima")]
+        [Tooltip("Desligado: volta ao estado de antes e pode ser reparado de novo (comportamento antigo).")]
+        [SerializeField] private bool burnsOut = true;
+        [SerializeField] private float burnDuration = 1.6f;
+        [SerializeField] private float burnNoiseRadius = 6f;
+
+        public string Prompt => isBurnt ? "Disjuntor queimado" : "Reparar disjuntor";
+        public bool CanInteract => !isActive && !isBurnt && !burning;
+        public bool IsBurnt => isBurnt;
+        public RoomLamp[] Lamps => lamps;
+        public SpriteRenderer Panel => panel;
         public float HoldDuration => repairDuration;
         public bool IsActive => isActive;
         public SafeZone Zone => safeZone;
 
         // true ao acender a Zona Segura, false ao apagar. Bom gancho para som e HUD.
         public event Action<bool> StateChanged;
+        // Disparado quando o painel termina de queimar.
+        public event Action Burnt;
 
         private bool isActive;
         private float remaining;
         private bool repairing;
+        private bool isBurnt;
+        private bool burning;
+        private float burnStart;
 
         private void Awake()
         {
@@ -62,6 +89,8 @@ namespace SombraDaSanidade.Interaction
             if (sparks == null) sparks = CreateLight("Sparks", new Vector2(0f, 0.9f), new Color(0.36f, 0.7f, 1f), 0f, 1.6f);
             sparks.enabled = false;
             statusLed.color = brokenColor;
+            if (panel != null && offSprite != null) panel.sprite = offSprite;
+            if (smoke != null) smoke.enabled = false;
         }
 
         private void Update()
@@ -72,10 +101,46 @@ namespace SombraDaSanidade.Interaction
                 sparks.enabled = true;
                 sparks.intensity = UnityEngine.Random.value < 0.35f ? UnityEngine.Random.Range(0.8f, 1.6f) : 0f;
             }
+            if (burning) TickBurn();
+            if (isBurnt) TickSmoke();
             if (!isActive) return;
             remaining -= Time.deltaTime;
-            safeZone.SetWarning(remaining <= warningTime);
+            bool warn = remaining <= warningTime;
+            safeZone.SetWarning(warn);
+            if (lamps != null) foreach (var l in lamps) if (l != null) l.SetWarning(warn);
             if (remaining <= 0f) Deactivate();
+        }
+
+        private void TickBurn()
+        {
+            float t = Time.time - burnStart;
+            if (sparks != null)
+            {
+                sparks.enabled = true;
+                sparks.color = new Color(1f, 0.55f, 0.3f);
+                sparks.intensity = UnityEngine.Random.value < 0.6f ? UnityEngine.Random.Range(0.9f, 1.8f) : 0.3f;
+            }
+            if (panel != null && burnFrames != null && burnFrames.Length > 0)
+                panel.sprite = burnFrames[Mathf.Min(burnFrames.Length - 1, (int)(t / burnDuration * burnFrames.Length * 2f) % burnFrames.Length)];
+            if (t >= burnDuration) FinishBurn();
+        }
+
+        private void FinishBurn()
+        {
+            burning = false;
+            isBurnt = true;
+            if (sparks != null) { sparks.enabled = false; sparks.color = new Color(0.36f, 0.7f, 1f); }
+            if (panel != null && burntSprite != null) panel.sprite = burntSprite;
+            if (statusLed != null) statusLed.enabled = false;
+            if (smoke != null) smoke.enabled = true;
+            if (lamps != null) foreach (var l in lamps) if (l != null) l.Burn();
+            Burnt?.Invoke();
+        }
+
+        private void TickSmoke()
+        {
+            if (smoke == null || smokeFrames == null || smokeFrames.Length == 0) return;
+            smoke.sprite = smokeFrames[(int)(Time.time * 6f) % smokeFrames.Length];
         }
 
         public void BeginInteract()
@@ -96,6 +161,10 @@ namespace SombraDaSanidade.Interaction
             remaining = lightDuration;
             safeZone.TurnOn();
             if (statusLed != null) statusLed.color = activeColor;
+            if (panel != null && onSprite != null) panel.sprite = onSprite;
+            if (lamps != null)
+                for (int i = 0; i < lamps.Length; i++)
+                    if (lamps[i] != null) lamps[i].TurnOn(i * 0.12f);
             NoiseBus.Emit(transform.position, activationNoiseRadius);
             StateChanged?.Invoke(true);
         }
@@ -105,6 +174,19 @@ namespace SombraDaSanidade.Interaction
             isActive = false;
             safeZone.TurnOff();
             if (statusLed != null) statusLed.color = brokenColor;
+            if (burnsOut)
+            {
+                // Sobrecarga: o painel pega fogo e as arandelas estouram. Não dá para religar.
+                burning = true;
+                burnStart = Time.time;
+                if (lamps != null) foreach (var l in lamps) if (l != null) l.TurnOff();
+                NoiseBus.Emit(transform.position, burnNoiseRadius);
+            }
+            else
+            {
+                if (panel != null && offSprite != null) panel.sprite = offSprite;
+                if (lamps != null) foreach (var l in lamps) if (l != null) l.TurnOff();
+            }
             StateChanged?.Invoke(false);
         }
 

@@ -45,6 +45,7 @@ namespace SombraDaSanidade.EditorTools
             SessionState.SetBool(RunningKey, true);
             SessionState.SetBool(BatchKey, batch);
             step = 0;
+            furyChecked = false;
             results.Clear();
             failed = false;
             EditorApplication.update -= Tick;
@@ -87,8 +88,17 @@ namespace SombraDaSanidade.EditorTools
                 case 1:
                     if (t < 0.5f) return;
                     Check("Porta trancada: encostar não vence", gm.IsPlaying);
+                    // Lanterna apagada: na purga ele tem que vir mesmo assim.
+                    var fl = Object.FindAnyObjectByType<SombraDaSanidade.Flashlight.FlashlightController>();
+                    if (fl != null)
+                        typeof(SombraDaSanidade.Flashlight.FlashlightController)
+                            .GetField("<IsSwitchedOn>k__BackingField", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+                            ?.SetValue(fl, false);
                     terminal.CompleteInteract();
                     Check("Terminal inicia a purga", escape.Active && terminal.Activated && !terminal.CanInteract);
+                    var lamps = Object.FindObjectsByType<RoomLamp>();
+                    Check($"Na purga, arandelas e sirenes viram alarme vermelho ({lamps.Length})",
+                        lamps.Length > 0 && System.Array.TrueForAll(lamps, l => l.IsAlarm));
                     Check("Monstro em fúria com os comportamentos da Executiva",
                         monster.IsFurious && monster.Behaviours == MonsterWingBehaviours.Executiva);
                     var cfg = monster.Config;
@@ -103,6 +113,11 @@ namespace SombraDaSanidade.EditorTools
                     break;
 
                 case 2:
+                    if (!furyChecked)
+                    {
+                        furyChecked = true;
+                        Check($"Na purga persegue o jogador mesmo com a lanterna apagada ({monster.State})", monster.State == MonsterState.Chase);
+                    }
                     if (gm.IsPlaying && t < 3f) return;
                     Check("Chegar à porta destravada vence", gm.State == GameState.Victory);
                     gm.Restart();
@@ -141,6 +156,8 @@ namespace SombraDaSanidade.EditorTools
             step++;
             stepStart = Time.realtimeSinceStartup;
         }
+
+        private static bool furyChecked;
 
         private static void Check(string label, bool ok)
         {

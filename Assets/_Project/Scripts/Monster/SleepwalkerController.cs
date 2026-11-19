@@ -34,6 +34,8 @@ namespace SombraDaSanidade.Monster
         public bool IsAwake => State != SleepwalkerState.Dormant;
         // A lanterna ligada está apontada para ele agora (atualizado a cada quadro). É o que o trava.
         public bool IsLit { get; private set; }
+        // Parado pela luz de um sinalizador (e não pela lanterna).
+        public bool IsLitByFlare { get; private set; }
         // Pegou o jogador e está tocando a cena de morte.
         public bool IsKilling { get; private set; }
         public float KillFps => config.killFps;
@@ -106,11 +108,14 @@ namespace SombraDaSanidade.Monster
                 return;
             }
 
-            IsLit = ComputeLit();
+            bool byFlashlight = ComputeLit();
+            IsLitByFlare = ComputeFlareLit();
+            IsLit = byFlashlight || IsLitByFlare;
 
             if (State == SleepwalkerState.Dormant)
             {
-                if (IsLit || ComputeNoticed()) Wake();
+                // O sinalizador não acorda: só a lanterna ou o Thomas olhando.
+                if (byFlashlight || ComputeNoticed()) Wake();
                 return;
             }
 
@@ -145,6 +150,9 @@ namespace SombraDaSanidade.Monster
         // ---------- Luz e visão ----------
 
         // Lanterna ligada, com o cone nele e sem parede no meio.
+        // Sinalizador aceso no chão (SignalFlare): segura parado enquanto ele estiver dentro da luz.
+        private bool ComputeFlareLit() => SignalFlare.Illuminates(transform.position);
+
         private bool ComputeLit()
         {
             if (flashlight == null) return false;

@@ -8,7 +8,7 @@ Fase 4 do GDD (seção 7: corrida cronometrada de 2-3 min) e condição de vitó
 2. Os HDs entram e a **purga** começa (`EscapeSequence`):
    - a **porta externa** (`ExitDoor` ligado ao terminal) destrava (faixa vermelha → verde);
    - o barulho da eclusa abrindo chama o monstro;
-   - o monstro entra em **fúria** (`MonsterController.SetFury`): velocidade 4.6 e raio auditivo 9 (coluna Eclusa da Proposta 1 do v1.1) e todos os comportamentos da Executiva. O galope e o modo seguro continuam valendo.
+   - o monstro entra em **fúria** (`MonsterController.SetFury`): velocidade 4.6 e raio auditivo 9 (coluna Eclusa da Proposta 1 do v1.1) e todos os comportamentos da Executiva. Na fúria, ele **persegue o Thomas o tempo todo**, mesmo com a lanterna apagada. O galope e o modo seguro continuam valendo.
 3. O tempo restante **nunca aparece em número** (GDD 8). Quem conta é:
    - a **sirene**, que acelera e fica mais alta com o tempo (lamento sintético até a pasta Audio ter o som de verdade);
    - a **luz**: a luz global pulsa para vermelho no ritmo da sirene e os giroflex (no terminal e na porta) giram mais rápido; na fase final (últimos 20%) piscam em estrobo.

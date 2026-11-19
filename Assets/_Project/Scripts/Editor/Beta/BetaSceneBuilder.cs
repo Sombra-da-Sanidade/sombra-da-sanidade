@@ -60,6 +60,9 @@ namespace SombraDaSanidade.EditorTools
             // Assets antes de trocar de cena.
             foreach (var n in LogNames) PrototypeSceneBuilder.LoadAudioLog(n);
 
+            // Caixa de ferramentas (sinalizador) perto da sala do Sonâmbulo: reservada antes da mobília.
+            AlfaSceneBuilder.ToolboxNear = FloorNear(map, SleepwalkerCell(info) + Vector2Int.down * 4);
+            AlfaSceneBuilder.QuietArea = BetaMapGenerator.Hub;
             AlfaSceneBuilder.BuildFromLayout(map, ScenePath, drivesRequired: 3, info.WingAt, ctx => AddExtras(ctx, info));
             string root = Path.GetDirectoryName(Application.dataPath);
             File.WriteAllText(Path.Combine(root, LayoutTextPath), BetaMapGenerator.ToText(map, info.Seed));
@@ -79,8 +82,9 @@ namespace SombraDaSanidade.EditorTools
                     if (map[x, y] == 'T')
                     {
                         var log = logs[t % logs.Length];
+                        // Alterna: gravador na mesa e na mão de um pesquisador morto.
                         PrototypeSceneBuilder.CreateAudioLog(ctx.Items, ctx.Square, $"AudioLog_{info.WingAt(x, y)}_{t}",
-                            new Vector2(x + 0.5f, y - 0.5f), log);
+                            new Vector2(x + 0.5f, y - 0.5f), log, onCorpse: t % 2 == 1);
                         t++;
                     }
 
@@ -111,9 +115,7 @@ namespace SombraDaSanidade.EditorTools
 
             // Sonâmbulo (Voluntário 03): adormecido no centro da sala da Ala Médica mais longe do saguão.
             // Acorda na primeira vez que o Thomas o vê (docs/sonambulo.md). O Espécime continua na Executiva.
-            var hub = info.Rooms[BetaMapGenerator.Saguao][0].center;
-            var medica = info.Rooms[BetaMapGenerator.Medica].OrderByDescending(r => Vector2.Distance(r.center, hub)).First();
-            var walkerCell = new Vector2Int(medica.x + medica.width / 2, medica.y + medica.height / 2);
+            var walkerCell = SleepwalkerCell(info);
             var walkerGo = (GameObject)PrefabUtility.InstantiatePrefab(SleepwalkerPrefabBuilder.GetOrBuild());
             walkerGo.transform.position = new Vector3(walkerCell.x + 0.5f, walkerCell.y + 0.5f, 0f);
 
@@ -126,6 +128,7 @@ namespace SombraDaSanidade.EditorTools
             points.AddRange(Named<AdrenaSynModule>(_ => "Adrena-Syn", 1f));
             points.AddRange(Named<LithiumStabilizer>(_ => "Estabilizador", 1f));
             points.AddRange(Named<AudioLogTerminal>(o => $"Log {Wing(o.name)}", 1f));
+            points.AddRange(Named<FlarePickup>(_ => "Caixa de ferramentas (sinalizador)", 1f).Take(2));
             points.AddRange(Named<EclusaTerminal>(_ => "Terminal da eclusa", 1f));
             points.AddRange(Named<ExitDoor>(_ => "Porta externa", 1.5f));
             points.AddRange(markers);
@@ -150,6 +153,24 @@ namespace SombraDaSanidade.EditorTools
                 Object.FindObjectsByType<T>(FindObjectsSortMode.InstanceID)
                     .OrderBy(o => o.name)
                     .Select(o => (label(o), Marker(beta, $"Go_{o.name}", (Vector2)o.transform.position + Vector2.down * below)));
+        }
+
+        // Centro da sala da Ala Médica mais longe do saguão.
+        private static Vector2Int SleepwalkerCell(BetaMapGenerator.Info info)
+        {
+            var hub = info.Rooms[BetaMapGenerator.Saguao][0].center;
+            var medica = info.Rooms[BetaMapGenerator.Medica].OrderByDescending(r => Vector2.Distance(r.center, hub)).First();
+            return new Vector2Int(medica.x + medica.width / 2, medica.y + medica.height / 2);
+        }
+
+        // Célula de chão mais perto (espiral), para itens soltos não caírem dentro da parede.
+        private static Vector2Int FloorNear(AlfaSceneBuilder.Layout map, Vector2Int start)
+        {
+            for (int r = 0; r < 8; r++)
+                for (int dy = -r; dy <= r; dy++)
+                    for (int dx = -r; dx <= r; dx++)
+                        if (map.IsFloor(start.x + dx, start.y + dy)) return new Vector2Int(start.x + dx, start.y + dy);
+            return start;
         }
 
         private static Transform Marker(Transform parent, string name, Vector2 position)

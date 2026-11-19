@@ -28,6 +28,7 @@ namespace SombraDaSanidade.EditorTools
         private const string PlaceholderSpritePath = Root + "/Art/Placeholder/square.png";
         private const string ThomasSheetPath = Root + "/Art/Sprites/thomas.png";
         private const string PropsSheetPath = Root + "/Art/Props/props.png";
+        private const string PropsDir = Root + "/Art/Props";
         public const string PrototypeScenePath = Root + "/Scenes/Sandbox/Prototipo.unity";
         public const string DemoScenePath = Root + "/Scenes/Main/Demo.unity";
         internal const string WallLayerName = "Walls";
@@ -339,6 +340,8 @@ namespace SombraDaSanidade.EditorTools
             player.AddComponent<SkillCheckHud>();
             // Frente 1: tela de upgrade da Lux-90 ao ejetar HD (#31).
             player.AddComponent<UpgradeTerminal>();
+            // Sinalizadores (G): seguram o Sonâmbulo parado na luz.
+            AddFlareThrower(player, wallLayer);
 
             return player;
         }
@@ -433,7 +436,48 @@ namespace SombraDaSanidade.EditorTools
 
         // Terminal com um log extra (os principais tocam ao coletar os HDs). Tela verde piscando e luz fraca de fósforo.
         // Frente 4: chamar nos mapas das alas, se o grupo quiser logs além dos 3 dos HDs.
-        internal static AudioLogTerminal CreateAudioLog(Transform parent, Sprite square, string name, Vector2 position, AudioLog log)
+        // Gravação na mesa (onCorpse = false, encostada na parede) ou na mão de um pesquisador morto (true, no chão).
+        // Sem a arte nova, cai no terminal antigo.
+        internal static AudioLogTerminal CreateAudioLog(Transform parent, Sprite square, string name, Vector2 position, AudioLog log,
+            bool onCorpse = false)
+        {
+            string kind = onCorpse ? "corpse_recorder" : "desk_recorder";
+            if (LoadPropSprite($"{kind}_idle") == null) return CreateLegacyAudioLog(parent, square, name, position, log);
+
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+            go.transform.position = onCorpse ? position + Vector2.down * 0.9f : position;
+            var col = go.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            col.size = onCorpse ? new Vector2(2.4f, 1.6f) : new Vector2(2.2f, 1.6f);
+
+            var artGo = new GameObject(kind);
+            artGo.transform.SetParent(go.transform, false);
+            artGo.transform.localPosition = new Vector3(0f, -0.45f, 0f);
+            var art = artGo.AddComponent<SpriteRenderer>();
+            art.sprite = LoadPropSprite($"{kind}_idle");
+            // Mesa: móvel encostado na parede, como o armário. Corpo: no chão, debaixo dos personagens.
+            art.sortingOrder = onCorpse ? -6 : -4;
+
+            var glow = new GameObject("Glow").AddComponent<Light2D>();
+            glow.transform.SetParent(go.transform, false);
+            // Luz da tela do gravador: na mão estendida do corpo ou em cima da mesa.
+            glow.transform.localPosition = onCorpse ? new Vector3(-0.85f, -0.2f, 0f) : new Vector3(0f, 0.75f, 0f);
+            glow.lightType = Light2D.LightType.Point;
+            glow.color = new Color(0.33f, 0.72f, 0.44f);
+            glow.intensity = 0.45f;
+            glow.pointLightOuterRadius = 1.2f;
+
+            var terminal = go.AddComponent<AudioLogTerminal>();
+            SetRef(terminal, "log", log);
+            SetRef(terminal, "config", GetOrCreateConfig<NarrativeConfig>("NarrativeConfig"));
+            SetRef(terminal, "art", art);
+            SetRef(terminal, "idleSprite", art.sprite);
+            SetSprites(terminal, "playingFrames", LoadPropFrames($"{kind}_play"));
+            return terminal;
+        }
+
+        private static AudioLogTerminal CreateLegacyAudioLog(Transform parent, Sprite square, string name, Vector2 position, AudioLog log)
         {
             var go = CreateBlock(parent, square, name, position, new Vector2(0.7f, 0.5f), new Color(0.2f, 0.22f, 0.27f));
             var col = go.AddComponent<BoxCollider2D>();
@@ -521,13 +565,16 @@ namespace SombraDaSanidade.EditorTools
             var col = go.AddComponent<BoxCollider2D>();
             col.isTrigger = true;
             col.size = new Vector2(1.6f, 2.4f); // compensa a escala do bloco: ~1.4 x 1.4 no mundo
-            var art = UseProp(go, "locker_closed", new Vector2(1.4f, 1.4f), -4);
+            // Armário em pé de portas duplas (lockers.json); sem a folha nova, o antigo de props.json.
+            string closed = LoadPropSprite("locker_tall_closed") != null ? "locker_tall_closed" : "locker_closed";
+            string open = closed == "locker_tall_closed" ? "locker_tall_open" : "locker_open";
+            var art = UseProp(go, closed, new Vector2(1.8f, 1.6f), -4);
             var locker = go.AddComponent<Locker>();
             SetRef(locker, "config", GetOrCreateConfig<InteractionConfig>("InteractionConfig"));
             if (art != null)
             {
                 SetRef(locker, "body", art);
-                SetRef(locker, "openedSprite", LoadPropSprite("locker_open"));
+                SetRef(locker, "openedSprite", LoadPropSprite(open));
             }
             if (table != null) SetRef(locker, "table", table);
             return go;
@@ -576,8 +623,93 @@ namespace SombraDaSanidade.EditorTools
         // ---------- Helpers ----------
 
         // Sprite da folha Art/Props (art-src/Props/props.json). Null se a folha ainda não foi importada.
-        internal static Sprite LoadPropSprite(string spriteName) =>
-            AssetDatabase.LoadAllAssetsAtPath(PropsSheetPath).OfType<Sprite>().FirstOrDefault(s => s.name == spriteName);
+        // Procura em todas as folhas de Art/Props (props.png, lockers.png, corpses.png...), props.png primeiro.
+        internal static Sprite LoadPropSprite(string spriteName)
+        {
+            var main = AssetDatabase.LoadAllAssetsAtPath(PropsSheetPath).OfType<Sprite>().FirstOrDefault(s => s.name == spriteName);
+            if (main != null) return main;
+            foreach (var guid in AssetDatabase.FindAssets("t:Texture2D", new[] { PropsDir }))
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var sprite = AssetDatabase.LoadAllAssetsAtPath(path).OfType<Sprite>().FirstOrDefault(s => s.name == spriteName);
+                if (sprite != null) return sprite;
+            }
+            return null;
+        }
+
+        // Quadros numerados: prefix_0, prefix_1... até faltar.
+        internal static Sprite[] LoadPropFrames(string prefix)
+        {
+            var list = new List<Sprite>();
+            for (int i = 0; i < 32; i++)
+            {
+                var sprite = LoadPropSprite($"{prefix}_{i}");
+                if (sprite == null) break;
+                list.Add(sprite);
+            }
+            return list.ToArray();
+        }
+
+        // Folhas novas de Art/Props: garante que estão importadas e fatiadas antes de montar a cena.
+        internal static void EnsurePropArt()
+        {
+            foreach (var n in new[] { "lockers", "breaker_panel", "wall_lamp", "smoke", "corpses", "desk_recorder", "flare",
+                         "furniture", "furniture_side", "clutter", "siren", "toolbox" })
+                MonsterPrefabBuilder.EnsureArtImport($"{PropsDir}/{n}.png");
+        }
+
+        internal static Material UnlitSpriteMaterial => AssetDatabase.LoadAssetAtPath<Material>(UnlitSpriteMaterialPath);
+
+        internal static void SetSprites(Object target, string property, Sprite[] sprites)
+        {
+            var so = new SerializedObject(target);
+            var arr = so.FindProperty(property);
+            arr.arraySize = sprites.Length;
+            for (int i = 0; i < sprites.Length; i++) arr.GetArrayElementAtIndex(i).objectReferenceValue = sprites[i];
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        internal static void AddFlareThrower(GameObject player, int wallLayer)
+        {
+            var thrower = player.AddComponent<FlareThrower>();
+            SetRef(thrower, "icon", LoadPropSprite("flare_item"));
+            SetRef(thrower, "deadSprite", LoadPropSprite("flare_dead"));
+            SetRef(thrower, "unlitMaterial", UnlitSpriteMaterial);
+            var so = new SerializedObject(thrower);
+            so.FindProperty("wallMask").intValue = 1 << wallLayer;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            SetSprites(thrower, "litFrames", LoadPropFrames("flare_lit"));
+        }
+
+        // Sinalizador no chão para pegar com E, com um brilho vermelho fraco para chamar a atenção.
+        internal static GameObject CreateFlarePickup(Transform parent, Sprite square, string name, Vector2 position)
+        {
+            var go = CreateBlock(parent, square, name, position, new Vector2(0.4f, 0.4f), new Color(0.8f, 0.2f, 0.2f));
+            go.AddComponent<BoxCollider2D>().isTrigger = true;
+            var art = UseProp(go, "flare_item", new Vector2(1.2f, 1.2f), -6);
+            if (art != null) art.transform.localPosition = new Vector3(0f, -0.35f, 0f);
+            var glow = new GameObject("Glow").AddComponent<Light2D>();
+            glow.transform.SetParent(go.transform, false);
+            glow.lightType = Light2D.LightType.Point;
+            glow.color = new Color(1f, 0.35f, 0.3f);
+            glow.intensity = 0.35f;
+            glow.pointLightOuterRadius = 0.9f;
+            go.AddComponent<FlarePickup>();
+            return go;
+        }
+
+        // Morto no chão (decoração, sem colisão): pesquisador, segurança ou cobaia, numa poça de sangue.
+        internal static GameObject CreateCorpse(Transform parent, string name, Vector2 position, string sprite, bool flip)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+            go.transform.position = position;
+            var sr = go.AddComponent<SpriteRenderer>();
+            sr.sprite = LoadPropSprite(sprite);
+            sr.flipX = flip;
+            sr.sortingOrder = -6;   // no chão, debaixo dos personagens
+            return go;
+        }
 
         // Troca o bloco placeholder pelo sprite de Art/Props: o desenho vai num filho "Art" com o pivô nos pés,
         // perto da base da célula, e o bloco raiz volta para escala 1 com o renderer desligado.

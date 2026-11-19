@@ -21,6 +21,7 @@ A luz atrai o Espécime e prende o Sonâmbulo, então segurar um com a lanterna 
 
 ## Regras
 
+- **Sinalizador:** jogado com **G**, ele queima por 8 s. Nesse tempo, o Sonâmbulo dentro da luz dele (4 m) fica parado, mesmo com a lanterna apagada. O sinalizador não acorda o Sonâmbulo adormecido. Ver [props e sinalizador](props-e-sinalizador.md).
 - **Encostar sem a luz nele mata.** Toca uma das duas cenas de morte (abaixo) e só depois vem o Game Over (`DeathCause.Monster`). Com a luz nele, ele não ataca, nem encostado.
 - **Zona Segura:** ele nunca entra numa área com `MonsterRepellent` ligado. Se o jogador está dentro, ele espera na borda.
 - **Modo seguro (#48):** fica 30% mais lento. Encostar empurra o jogador 2,5 m, tira 20 de sanidade e deixa ele travado por 2 s. Não há cena de morte.

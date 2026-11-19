@@ -61,7 +61,7 @@ namespace SombraDaSanidade.Monster
         }
 
         // Fúria da Eclusa (#44): ligada pela purga (Level.EscapeSequence). Velocidade e audição da coluna Eclusa
-        // da Proposta 1 e todos os comportamentos da Executiva.
+        // da Proposta 1, todos os comportamentos da Executiva e perseguição constante ao jogador (sem precisar de luz).
         public bool IsFurious { get; private set; }
 
         public void SetFury(bool on)
@@ -243,6 +243,14 @@ namespace SombraDaSanidade.Monster
                 stateTimer -= Time.deltaTime;
                 if (stateTimer <= 0f) EndStun();
                 return;
+            }
+
+            // Fúria da purga: as luzes de alarme estão acesas e ele sabe onde o Thomas está. Persegue sempre,
+            // com ou sem lanterna (grito curto e corrida). O EMP ainda atordoa; a Zona Segura ainda barra.
+            if (IsFurious && player != null)
+            {
+                route = null;
+                if (State != MonsterState.Chase) OnLit();
             }
 
             if (route != null)
@@ -543,7 +551,7 @@ namespace SombraDaSanidade.Monster
                 }
             }
 
-            bool tracking = player != null && Time.time - lastSeenTime <= config.chaseMemory;
+            bool tracking = player != null && (IsFurious || Time.time - lastSeenTime <= config.chaseMemory);
             if (tracking) lastKnownPlayerPos = player.position;
 
             repathTimer -= Time.deltaTime;

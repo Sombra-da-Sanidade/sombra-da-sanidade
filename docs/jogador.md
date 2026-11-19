@@ -76,3 +76,7 @@ Ampola laranja usada com **E** na hora (sem inventário). Também pode sair de u
 | Adrena-Syn | Rodar teste do Adrena-Syn | `SombraDaSanidade.EditorTools.AdrenaSynTest.RunBatch` |
 | Ajuste de bateria | Rodar teste do ajuste de bateria | `SombraDaSanidade.EditorTools.BatteryPityTest.RunBatch` |
 | Loot por ala | Rodar teste do loot por ala | `SombraDaSanidade.EditorTools.LootTableTest.RunBatch` |
+
+## Sinalizador
+
+**G** joga um sinalizador na direção do mouse (`FlareThrower`). O Thomas começa com 1, pode carregar até 4 e pega mais abrindo com **E** as caixas de ferramentas em cima das bancadas (`FlarePickup`). Aceso, ele segura o Sonâmbulo parado por 8 s. Detalhes em [props e sinalizador](props-e-sinalizador.md).
