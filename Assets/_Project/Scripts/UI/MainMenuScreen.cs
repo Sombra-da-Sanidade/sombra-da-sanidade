@@ -10,8 +10,9 @@ namespace SombraDaSanidade.UI
     // A cena é gerada por Sombra da Sanidade > Criar cena de Menu (MenuSceneBuilder). Frente 5, issues #32 e #64.
     public class MainMenuScreen : MonoBehaviour
     {
-        [Tooltip("Cena carregada ao iniciar o turno. Precisa estar no Build Profile.")]
-        [SerializeField] private string gameScene = "Beta";
+        // Partida nova abre a primeira fase do WingFlow (#93). Antes era um campo serializado ("Beta" na cena);
+        // o valor antigo que ficou no Menu.unity é ignorado e some na próxima vez que a cena for salva.
+        private string gameScene = WingFlow.FirstScene;
 
         [Tooltip("Segundos entre as falhas roxas do logo (Revelação pela Loucura).")]
         [SerializeField] private float glitchEvery = 3.2f;
@@ -40,14 +41,14 @@ namespace SombraDaSanidade.UI
         }
 
         // #45: com checkpoint salvo e a cena da próxima ala no Build Profile, o menu oferece CONTINUAR.
-        // A cena da ala segue o nome da Ala Médica: "Ala" + nome da ala (AlaEnergia, AlaExecutiva).
+        // A cena vem do WingFlow (#93): a Eclusa não segue o padrão "Ala" + nome.
         public void RefreshContinue()
         {
             continueScene = null;
-            if (Checkpoint.TryLoad(out var data) && !string.IsNullOrEmpty(data.nextWing))
+            if (Checkpoint.TryLoad(out var data))
             {
-                string scene = "Ala" + data.nextWing;
-                if (Application.CanStreamedLevelBeLoaded(scene)) continueScene = scene;
+                string scene = WingFlow.SceneFor(data.nextWing);
+                if (scene != null && Application.CanStreamedLevelBeLoaded(scene)) continueScene = scene;
             }
             items = continueScene != null ? new[] { Continue, Play, Options, Quit } : new[] { Play, Options, Quit };
             selected = 0;
@@ -142,7 +143,8 @@ namespace SombraDaSanidade.UI
             bool glitch = Mathf.Repeat(Time.unscaledTime, glitchEvery) < 0.14f;
             PixelHud.Sprite("logo", glitch ? "logo_glitch" : "logo", cx - 80, h / 2 - 76);
             for (int i = 0; i < items.Length; i++) PixelHud.Button(items[i], bx, ButtonY(i), bw, i == selected);
-            var best = GameManager.BestRank(gameScene);
+            // Rank da partida completa: o calculado ao escapar pela Eclusa.
+            var best = GameManager.BestRank(WingFlow.SceneAt(WingFlow.Count - 1));
             if (best != null) PixelHud.TextCentered("MELHOR RANK: " + best.Value, cx, ButtonY(items.Length) + 4, PixelHud.Fosforo3);
             PixelHud.Sprite("hud_bars", "key_space", cx - 68, h - 20);
             PixelHud.Text("CONFIRMAR", cx - 48, h - 18, PixelHud.Fosforo3);
