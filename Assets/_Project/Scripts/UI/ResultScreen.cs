@@ -24,7 +24,9 @@ namespace SombraDaSanidade.UI
             {
                 e.Use();
                 cachedFailures = -1;
-                gm.Restart();
+                // Vitória segue para a próxima ala ou o Menu (#93); R continua reiniciando a ala.
+                if (gm.State == GameState.Victory) gm.Proceed();
+                else gm.Restart();
                 return true;
             }
             if (e.type != EventType.Repaint) return true;
@@ -33,8 +35,14 @@ namespace SombraDaSanidade.UI
             bool blink = Mathf.Repeat(Time.unscaledTime * 2f, 1f) < 0.5f;
             if (victory) DrawVictory(gm, x, y, pw, ph);
             else DrawGameOver(gm, x, y, pw, ph);
-            PixelHud.Button(victory ? "JOGAR DE NOVO" : "REINICIAR", bx, by, 112, blink);
-            PixelHud.Sprite("hud_icons", "key_r", bx + 112 + 6, by + 4);
+            PixelHud.Button(victory ? GameManager.ProceedLabel : "REINICIAR", bx, by, 112, blink);
+            if (victory)
+            {
+                PixelHud.Sprite("hud_bars", "key_space", bx - 24, by + 2);
+                PixelHud.Sprite("hud_icons", "key_r", bx + 112 + 6, by + 4);
+                PixelHud.Text("REPETIR", bx + 112 + 18, by + 5, PixelHud.Fosforo3);
+            }
+            else PixelHud.Sprite("hud_icons", "key_r", bx + 112 + 6, by + 4);
             return true;
         }
 
@@ -45,10 +53,13 @@ namespace SombraDaSanidade.UI
             PixelHud.Sprite("screens", "stamp_escaped", x + 14, y + 12, 1f, 2);
             // Fim de ala (Ala Médica no vertical slice): o título é a ala e o checkpoint é a recompensa.
             var wing = Level.WingCheckpoint.Instance;
-            if (wing != null)
+            if (wing != null && !wing.IsFinal)
             {
                 PixelHud.Text(Level.WingCheckpoint.DisplayName(wing.Wing) + " CONCLUÍDA", x + 52, y + 18, PixelHud.Fosforo5, 1f, 2);
-                PixelHud.Text("PORTA PARA O SAGUÃO DESTRAVADA.", x + 52, y + 36, PixelHud.Fosforo3);
+                string next = Level.WingCheckpoint.DisplayName(wing.NextWing);
+                PixelHud.Text($"ACESSO À {next} LIBERADO.", x + 52, y + 36, PixelHud.Fosforo3);
+                if (wing.UpgradeThisWing != null)
+                    PixelHud.Text("LUX-90: " + wing.UpgradeThisWing.displayName.ToUpperInvariant(), x + 52, y + 46, PixelHud.Ambar2);
                 if (wing.StatusLine.Length > 0)
                     PixelHud.TextCentered(wing.StatusLine, x + w / 2, y + 123, wing.Saved ? PixelHud.Fosforo5 : PixelHud.Emergencia4);
             }

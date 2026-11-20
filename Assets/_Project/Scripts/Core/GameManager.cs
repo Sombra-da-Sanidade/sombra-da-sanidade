@@ -112,7 +112,9 @@ namespace SombraDaSanidade.Core
         private int LoadPriorDrives()
         {
             // A ala vem do perfil ou, sem perfil (Ala Médica), do WingCheckpoint da cena.
+            // Sem os dois (Eclusa), pela cena (WingFlow, #93).
             string wing = difficulty != null ? difficulty.wing : FindAnyObjectByType<Level.WingCheckpoint>()?.Wing;
+            if (string.IsNullOrEmpty(wing)) wing = WingFlow.WingForScene(gameObject.scene.name);
             if (!string.IsNullOrEmpty(wing) && Checkpoint.TryLoad(out var data) && data.nextWing == wing)
                 return Mathf.Max(0, data.drives);
             return Mathf.Max(0, priorDrives);
@@ -151,8 +153,32 @@ namespace SombraDaSanidade.Core
             }
 
             var kb = Keyboard.current;
-            if (kb != null && kb.rKey.wasPressedThisFrame) Restart();
+            if (kb == null) return;
+            if (kb.rKey.wasPressedThisFrame) Restart();
+            else if (State == GameState.Victory && (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame)) Proceed();
         }
+
+        // Vitória: próxima ala (#93) ou, depois da última, o Menu. Sem a próxima cena no Build Profile, volta ao Menu.
+        public void Proceed()
+        {
+            if (State != GameState.Victory) return;
+            Time.timeScale = 1f;
+            var wing = Level.WingCheckpoint.Instance;
+            string next = wing != null ? wing.NextScene : null;
+            if (next != null)
+            {
+                SceneManager.LoadScene(next);
+                return;
+            }
+            if (wing != null && !wing.IsFinal)
+                Debug.LogWarning($"[GameManager] A próxima ala '{wing.NextWing}' não está no Build Profile. Voltando ao Menu.");
+            if (Application.CanStreamedLevelBeLoaded(WingFlow.MenuScene)) SceneManager.LoadScene(WingFlow.MenuScene);
+            else Restart();
+        }
+
+        // Texto do botão principal da vitória.
+        public static string ProceedLabel =>
+            Level.WingCheckpoint.Instance != null && Level.WingCheckpoint.Instance.NextScene != null ? "PRÓXIMA ALA" : "MENU";
 
         public void SetProfile(DifficultyProfile profile)
         {
@@ -222,9 +248,10 @@ namespace SombraDaSanidade.Core
             if (State == GameState.Victory)
             {
                 var wing = Level.WingCheckpoint.Instance;
-                title = wing != null ? Level.WingCheckpoint.DisplayName(wing.Wing) + " CONCLUÍDA" : "VOCÊ ESCAPOU";
+                bool wingDone = wing != null && !wing.IsFinal;
+                title = wingDone ? Level.WingCheckpoint.DisplayName(wing.Wing) + " CONCLUÍDA" : "VOCÊ ESCAPOU";
                 body = $"Rank {FinalRank}   HDs: {DrivesCollected}/{drivesRequired}   Tempo: {FormatTime(RunTime)}";
-                if (wing != null && wing.StatusLine.Length > 0) body += "   " + wing.StatusLine;
+                if (wingDone && wing.StatusLine.Length > 0) body += "   " + wing.StatusLine;
             }
             else
             {
@@ -241,7 +268,8 @@ namespace SombraDaSanidade.Core
             float h = Screen.height;
             GUI.Label(new Rect(0, h * 0.35f, w, 60), title, titleStyle);
             GUI.Label(new Rect(0, h * 0.35f + 70, w, 30), body, bodyStyle);
-            GUI.Label(new Rect(0, h * 0.35f + 110, w, 30), "Pressione R para reiniciar", bodyStyle);
+            string hint = State == GameState.Victory ? $"Enter: {ProceedLabel}   R: reiniciar a ala" : "Pressione R para reiniciar";
+            GUI.Label(new Rect(0, h * 0.35f + 110, w, 30), hint, bodyStyle);
         }
 
         private void EnsureStyles()
