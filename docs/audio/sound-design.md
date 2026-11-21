@@ -29,7 +29,7 @@ Consequências:
 4. **Clips gerados em runtime** (batimento, bipes, sirene) continuam válidos, mas migram para WAV pré-renderados para ter o mesmo som em todo lugar.
 5. **Clique antes do som:** o Menu já exige clique; o drone do menu começa só depois dele.
 
-Teste obrigatório antes de produzir: build WebGL com mixer de 3 grupos, crossfade de 2 versões e um clip procedural (seção 9, etapa 2).
+Medido no navegador na #100 ([ADR 0005](../decisoes/0005-audio-no-webgl.md)): 4 stems com `PlayScheduled` ficam sincronizados (deriva máxima de 3,7 ms), crossfade e `AudioClip.Create` funcionam, `OnAudioFilterRead` não é chamado.
 
 ## 3. Arquitetura
 

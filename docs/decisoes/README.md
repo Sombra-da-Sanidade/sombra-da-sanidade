@@ -8,3 +8,4 @@ Registro curto de decisões que afetam o grupo todo (versão, pacotes, arquitetu
 | [0002](0002-sem-git-lfs.md) | Sem Git LFS |
 | [0003](0003-navmeshplus.md) | NavMeshPlus para IA |
 | [0004](0004-pipeline-de-arte.md) | Pipeline de arte em texto (JSON → PNG) |
+| [0005](0005-audio-no-webgl.md) | Áudio no WebGL: efeitos pré-renderizados, só volume em runtime |
