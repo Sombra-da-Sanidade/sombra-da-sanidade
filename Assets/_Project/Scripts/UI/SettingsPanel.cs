@@ -5,15 +5,41 @@ namespace SombraDaSanidade.UI
 {
     // Página de configurações com o kit CRT, usada pela pausa e pelo menu inicial.
     // Teclado: W/S ou setas escolhem, A/D ou setas ajustam, Enter/Espaço confirmam, Esc volta. Mouse: clique. Issue #64.
+    // Volumes de música, efeitos e voz por grupo do mixer (#101).
     public class SettingsPanel
     {
-        private const int Rows = 4; // volume, brilho, tela cheia, voltar
+        private const int Sliders = 5;              // volume, música, efeitos, voz, brilho
+        private const int FullscreenRow = 5, BackRow = 6, Rows = 7;
         private const float Step = 0.1f;
-        public const int PanelWidth = 256, PanelHeight = 132;
+        private const int RowHeight = 18;
+        public const int PanelWidth = 256, PanelHeight = 160;
+
+        private static readonly string[] Labels = { "VOLUME", "MÚSICA", "EFEITOS", "VOZ", "BRILHO" };
 
         private int selected;
 
         public void Reset() => selected = 0;
+
+        private static float Get(int row) => row switch
+        {
+            0 => GameSettings.Volume,
+            1 => GameSettings.MusicVolume,
+            2 => GameSettings.EffectsVolume,
+            3 => GameSettings.VoiceVolume,
+            _ => GameSettings.Brightness
+        };
+
+        private static void Set(int row, float value)
+        {
+            switch (row)
+            {
+                case 0: GameSettings.Volume = value; break;
+                case 1: GameSettings.MusicVolume = value; break;
+                case 2: GameSettings.EffectsVolume = value; break;
+                case 3: GameSettings.VoiceVolume = value; break;
+                default: GameSettings.Brightness = value; break;
+            }
+        }
 
         // Retorna true quando o jogador pede para voltar.
         public bool HandleKeyboard(Keyboard kb)
@@ -27,17 +53,16 @@ namespace SombraDaSanidade.UI
             if (dir != 0) Adjust(dir);
             if (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame)
             {
-                if (selected == 2) GameSettings.Fullscreen = !GameSettings.Fullscreen;
-                if (selected == 3) return Close();
+                if (selected == FullscreenRow) GameSettings.Fullscreen = !GameSettings.Fullscreen;
+                if (selected == BackRow) return Close();
             }
             return false;
         }
 
         private void Adjust(int dir)
         {
-            if (selected == 0) GameSettings.Volume += dir * Step;
-            else if (selected == 1) GameSettings.Brightness += dir * Step;
-            else if (selected == 2) GameSettings.Fullscreen = !GameSettings.Fullscreen;
+            if (selected < Sliders) Set(selected, Get(selected) + dir * Step);
+            else if (selected == FullscreenRow) GameSettings.Fullscreen = !GameSettings.Fullscreen;
         }
 
         private bool Close()
@@ -51,26 +76,26 @@ namespace SombraDaSanidade.UI
         {
             var e = Event.current;
             int sliderX = x + 118, sliderW = 112;
-            int RowY(int i) => y + 26 + i * 22;
+            int RowY(int i) => y + 24 + i * RowHeight;
+            int backX = x + (PanelWidth - 96) / 2;
 
-            for (int i = 0; i < 3; i++)
-                if (PixelHud.MouseOver(x + 8, RowY(i), PanelWidth - 16, 16)) selected = i;
-            if (PixelHud.MouseOver(x + (PanelWidth - 96) / 2, RowY(3) + 4, 96, 11)) selected = 3;
+            for (int i = 0; i < BackRow; i++)
+                if (PixelHud.MouseOver(x + 8, RowY(i), PanelWidth - 16, RowHeight - 2)) selected = i;
+            if (PixelHud.MouseOver(backX, RowY(BackRow) + 4, 96, 11)) selected = BackRow;
 
             if (e.type == EventType.MouseDown && e.button == 0)
             {
-                if (selected < 2 && PixelHud.MouseOver(sliderX - 4, RowY(selected), sliderW + 8, 16))
+                if (selected < Sliders && PixelHud.MouseOver(sliderX - 4, RowY(selected), sliderW + 8, RowHeight - 2))
                 {
-                    float v = Mathf.Clamp01((e.mousePosition.x / PixelHud.Px - sliderX) / sliderW);
-                    if (selected == 0) GameSettings.Volume = v; else GameSettings.Brightness = v;
+                    Set(selected, Mathf.Clamp01((e.mousePosition.x / PixelHud.Px - sliderX) / sliderW));
                     e.Use();
                 }
-                else if (selected == 2 && PixelHud.MouseOver(x + 8, RowY(2), PanelWidth - 16, 16))
+                else if (selected == FullscreenRow && PixelHud.MouseOver(x + 8, RowY(FullscreenRow), PanelWidth - 16, RowHeight - 2))
                 {
                     GameSettings.Fullscreen = !GameSettings.Fullscreen;
                     e.Use();
                 }
-                else if (selected == 3 && PixelHud.MouseOver(x + (PanelWidth - 96) / 2, RowY(3) + 4, 96, 11))
+                else if (selected == BackRow && PixelHud.MouseOver(backX, RowY(BackRow) + 4, 96, 11))
                 {
                     e.Use();
                     return Close();
@@ -79,14 +104,15 @@ namespace SombraDaSanidade.UI
             if (e.type != EventType.Repaint) return false;
 
             PixelHud.Panel(x, y, PanelWidth, PanelHeight);
-            PixelHud.Text("CONFIGURAÇÕES", x + 16, y + 12, PixelHud.Fosforo5);
-            Row("VOLUME", 0, x, RowY(0));
-            PixelHud.Slider(sliderX, RowY(0), sliderW, GameSettings.Volume, selected == 0);
-            Row("BRILHO", 1, x, RowY(1));
-            PixelHud.Slider(sliderX, RowY(1), sliderW, GameSettings.Brightness, selected == 1);
-            Row("TELA CHEIA", 2, x, RowY(2));
-            PixelHud.Sprite("screens", GameSettings.Fullscreen ? "check_on" : "check_off", sliderX - 3, RowY(2));
-            PixelHud.Button("VOLTAR", x + (PanelWidth - 96) / 2, RowY(3) + 2, 96, selected == 3);
+            PixelHud.Text("CONFIGURAÇÕES", x + 16, y + 10, PixelHud.Fosforo5);
+            for (int i = 0; i < Sliders; i++)
+            {
+                Row(Labels[i], i, x, RowY(i));
+                PixelHud.Slider(sliderX, RowY(i), sliderW, Get(i), selected == i);
+            }
+            Row("TELA CHEIA", FullscreenRow, x, RowY(FullscreenRow));
+            PixelHud.Sprite("screens", GameSettings.Fullscreen ? "check_on" : "check_off", sliderX - 3, RowY(FullscreenRow));
+            PixelHud.Button("VOLTAR", backX, RowY(BackRow) + 2, 96, selected == BackRow);
             return false;
         }
 

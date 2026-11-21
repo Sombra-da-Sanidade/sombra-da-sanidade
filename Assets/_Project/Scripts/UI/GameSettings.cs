@@ -25,6 +25,30 @@ namespace SombraDaSanidade.UI
             set { PlayerPrefs.SetFloat(VolumeKey, Mathf.Clamp01(value)); Apply(); }
         }
 
+        // Volumes por grupo do mixer (#101, sound-design.md seção 8): música, efeitos (SFX, monstros, ambiente e
+        // UI) e voz. O VOLUME geral continua no AudioListener.
+        private const string MusicKey = "sombra.volume.music";
+        private const string EffectsKey = "sombra.volume.effects";
+        private const string VoiceKey = "sombra.volume.voice";
+
+        public static float MusicVolume
+        {
+            get => PlayerPrefs.GetFloat(MusicKey, 1f);
+            set { PlayerPrefs.SetFloat(MusicKey, Mathf.Clamp01(value)); Apply(); }
+        }
+
+        public static float EffectsVolume
+        {
+            get => PlayerPrefs.GetFloat(EffectsKey, 1f);
+            set { PlayerPrefs.SetFloat(EffectsKey, Mathf.Clamp01(value)); Apply(); }
+        }
+
+        public static float VoiceVolume
+        {
+            get => PlayerPrefs.GetFloat(VoiceKey, 1f);
+            set { PlayerPrefs.SetFloat(VoiceKey, Mathf.Clamp01(value)); Apply(); }
+        }
+
         public static float Brightness
         {
             get => PlayerPrefs.GetFloat(BrightnessKey, 0.5f);
@@ -43,6 +67,13 @@ namespace SombraDaSanidade.UI
         public static void Apply()
         {
             AudioListener.volume = Volume;
+            Audio.AudioService.SetUserVolume(Audio.AudioBus.Music, MusicVolume);
+            Audio.AudioService.SetUserVolume(Audio.AudioBus.Voice, VoiceVolume);
+            float fx = EffectsVolume;
+            Audio.AudioService.SetUserVolume(Audio.AudioBus.Sfx, fx);
+            Audio.AudioService.SetUserVolume(Audio.AudioBus.Monster, fx);
+            Audio.AudioService.SetUserVolume(Audio.AudioBus.Ambience, fx);
+            Audio.AudioService.SetUserVolume(Audio.AudioBus.Ui, fx);
             if (!Application.isEditor && Screen.fullScreen != Fullscreen) Screen.fullScreen = Fullscreen;
             EnsureVolume();
             if (colorAdjustments != null) colorAdjustments.postExposure.Override((Brightness - 0.5f) * 2f * BrightnessRangeEv);
