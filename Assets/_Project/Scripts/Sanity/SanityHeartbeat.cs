@@ -62,6 +62,9 @@ namespace SombraDaSanidade.Sanity
             breathing.spatialBlend = 0f;
             breathing.loop = true;
             breathing.volume = 0f;
+            // Grupo do mixer (#101): corpo do Thomas conta como efeito.
+            Audio.AudioService.Route(source, Audio.AudioBus.Sfx);
+            Audio.AudioService.Route(breathing, Audio.AudioBus.Sfx);
 
             if (clip == null)
             {

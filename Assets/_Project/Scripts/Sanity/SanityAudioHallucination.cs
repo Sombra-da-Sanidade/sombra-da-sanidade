@@ -234,6 +234,8 @@ namespace SombraDaSanidade.Sanity
                 audioSource = GetComponent<AudioSource>();
                 if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
                 audioSource.playOnAwake = false;
+                // Mesmo grupo dos sons reais (#101): a alucinação não pode soar diferente.
+                Audio.AudioService.Route(audioSource, Audio.AudioBus.Sfx);
                 audioSource.spatialBlend = 0.25f; // Panning estéreo preservando volume audível no 2D
                 audioSource.minDistance = 6f;
                 audioSource.maxDistance = 30f;

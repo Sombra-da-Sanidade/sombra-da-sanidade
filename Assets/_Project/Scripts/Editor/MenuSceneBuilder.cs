@@ -51,6 +51,7 @@ namespace SombraDaSanidade.EditorTools
             source.playOnAwake = true;
             source.volume = 0.7f;
             source.spatialBlend = 0f;
+            source.outputAudioMixerGroup = SombraDaSanidade.Audio.AudioService.Group(SombraDaSanidade.Audio.AudioBus.Music);   // #101
         }
 
         // Créditos e versão ancorados nos cantos de baixo.

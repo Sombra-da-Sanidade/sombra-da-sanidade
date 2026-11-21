@@ -93,6 +93,7 @@ namespace SombraDaSanidade.UI
             if (audioSrc == null) audioSrc = gameObject.AddComponent<AudioSource>();
             audioSrc.playOnAwake = false;
             audioSrc.spatialBlend = 0f;
+            Audio.AudioService.Route(audioSrc, Audio.AudioBus.Ui);   // #101
             bleepClip = CreateBleepClip();
 
             if (flashlight != null)

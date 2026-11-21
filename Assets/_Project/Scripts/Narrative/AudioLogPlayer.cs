@@ -84,6 +84,10 @@ namespace SombraDaSanidade.Narrative
             hiss.playOnAwake = false;
             hiss.spatialBlend = 0f;
             hiss.loop = true;
+            // Grupo Voz do mixer (#101): o AudioDirector baixa a música enquanto a Vance fala.
+            Audio.AudioService.Route(voice, Audio.AudioBus.Voice);
+            Audio.AudioService.Route(babble, Audio.AudioBus.Voice);
+            Audio.AudioService.Route(hiss, Audio.AudioBus.Voice);
 
             vowels = new AudioClip[Formants.Length];
             for (int i = 0; i < Formants.Length; i++) vowels[i] = CreateVowelBlip(Formants[i]);

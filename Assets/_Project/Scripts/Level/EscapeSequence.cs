@@ -50,6 +50,7 @@ namespace SombraDaSanidade.Level
             siren = gameObject.AddComponent<AudioSource>();
             siren.playOnAwake = false;
             siren.spatialBlend = 0f;
+            Audio.AudioService.Route(siren, Audio.AudioBus.Sfx);   // #101
             if (sirenClip == null)
             {
                 sirenClip = CreateSirenClip();

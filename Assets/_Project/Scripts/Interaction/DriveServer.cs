@@ -165,7 +165,8 @@ namespace SombraDaSanidade.Interaction
             if (indicator != null) indicator.color = emptyColor;
             if (beaconLight != null) beaconLight.enabled = false;
             NoiseBus.Emit(transform.position, config.ejectNoiseRadius);
-            if (logClip != null) AudioSource.PlayClipAtPoint(logClip, transform.position);
+            // PlayClipAtPoint não passa pelo mixer (#101).
+            if (logClip != null) Audio.AudioService.PlayClip(logClip, Audio.AudioBus.Voice, transform.position);
             if (GameManager.Instance != null) GameManager.Instance.CollectDrive();
             Ejected?.Invoke(this);
             OpenUpgradeTerminal();

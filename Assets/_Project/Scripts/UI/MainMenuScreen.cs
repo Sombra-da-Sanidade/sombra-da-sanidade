@@ -38,6 +38,9 @@ namespace SombraDaSanidade.UI
             Time.timeScale = 1f;
             GameSettings.Apply();
             RefreshContinue();
+            // A música do menu foi criada pelo MenuSceneBuilder antes do mixer (#101): liga ao grupo Música aqui.
+            foreach (var source in FindObjectsByType<AudioSource>(FindObjectsSortMode.None))
+                if (source.outputAudioMixerGroup == null) Audio.AudioService.Route(source, Audio.AudioBus.Music);
         }
 
         // #45: com checkpoint salvo e a cena da próxima ala no Build Profile, o menu oferece CONTINUAR.
