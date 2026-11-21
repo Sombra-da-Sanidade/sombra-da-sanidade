@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16cd57b9db794089952bf92c36dcdc4f, type: 3}
+  m_Name: AudioConfig
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Audio.AudioConfig
+  layerFadeIn: 0.3
+  layerFadeOut: 4
+  pulseTension: 0.35
+  layerVolume: 0.8
+  chaseAmbienceDuckDb: -6
+  voiceMusicDuckDb: -8
+  duckFade: 0.5
+  occlusionInterval: 0.1
+  occlusionDb: -6
+  occlusionFade: 0.25
+  spatialBlend: 0.8
+  worldMaxDistance: 8
+  monsterMaxDistance: 14
