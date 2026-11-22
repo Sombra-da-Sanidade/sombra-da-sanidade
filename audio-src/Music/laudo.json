@@ -1,0 +1,19 @@
+{
+  "kind": "music",
+  "duration": 40,
+  "seed": 40,
+  "loop": true,
+  "loop_crossfade": 2,
+  "layers": [
+    { "type": "tone", "wave": "sine", "freq": 146.83, "gain": 0.25, "tremolo": { "rate": 0.05, "depth": 0.4 } },
+    { "type": "tone", "wave": "sine", "freq": 220, "gain": 0.12 },
+    { "type": "tone", "wave": "triangle", "freq": 73.42, "gain": 0.2, "filter": { "type": "lowpass", "freq": 300 } },
+    { "type": "pulse", "bpm": 540, "start": 3, "end": 7, "gain": 0.3,
+      "hit": { "type": "noise", "color": "white", "length": 0.05, "filter": { "type": "bandpass", "freq": [1800, 4500] },
+               "env": [[0, 1], [0.05, 0]] } },
+    { "type": "pulse", "bpm": 540, "start": 23, "end": 26, "gain": 0.3,
+      "hit": { "type": "noise", "color": "white", "length": 0.05, "filter": { "type": "bandpass", "freq": [1800, 4500] },
+               "env": [[0, 1], [0.05, 0]] } },
+    { "type": "midi", "file": "Motivos/hipnos.mid", "gain": 0.12, "delay": 12, "repeat": { "every": 20, "count": 2 } }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "kind": "music",
+  "duration": 60,
+  "seed": 5,
+  "env": [[0, 0], [1, 1], [54, 1], [60, 0]],
+  "layers": [
+    { "type": "midi", "file": "Motivos/aethelgard.mid", "gain": 0.6, "delay": 2, "repeat": { "every": 6, "count": 9 } },
+    { "type": "tone", "wave": "saw", "freq": 36.71, "gain": 0.3, "filter": { "type": "lowpass", "freq": 250 },
+      "env": [[0, 0.2], [60, 1]] },
+    { "type": "tone", "wave": "sine", "freq": 51.91, "gain": 0.12, "env": [[0, 0], [30, 0], [60, 1]] },
+    { "type": "noise", "color": "brown", "gain": 0.1, "filter": { "type": "bandpass", "freq": [100, 600] } }
+  ]
+}

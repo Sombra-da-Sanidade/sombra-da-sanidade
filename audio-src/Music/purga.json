@@ -1,0 +1,22 @@
+{
+  "kind": "music",
+  "duration": 150,
+  "seed": 150,
+  "env": [[0, 0], [2, 1], [146, 1], [150, 0.6]],
+  "layers": [
+    { "type": "pulse", "bpm": 60, "bpm_end": 140, "gain": 0.8, "accent_every": 4,
+      "hit": { "type": "tone", "wave": "sine", "freq": 70, "freq_end": 38, "length": 0.35,
+               "env": [[0, 0], [0.004, 1], [0.35, 0]] } },
+    { "type": "pulse", "bpm": 60, "bpm_end": 140, "gain": 0.25,
+      "hit": { "type": "noise", "color": "white", "length": 0.03,
+               "filter": { "type": "highpass", "freq": 2500 }, "env": [[0, 1], [0.03, 0]] } },
+    { "type": "pulse", "bpm": 240, "bpm_end": 560, "start": 60, "end": 150, "gain": 0.08,
+      "hit": { "type": "noise", "color": "white", "length": 0.02,
+               "filter": { "type": "highpass", "freq": 7000 }, "env": [[0, 1], [0.02, 0]] } },
+    { "type": "tone", "wave": "saw", "freq": 36.71, "freq_end": 73.42, "gain": 0.3,
+      "filter": { "type": "lowpass", "freq": 350 }, "env": [[0, 0.4], [150, 1]] },
+    { "type": "tone", "wave": "saw", "freq": 55, "freq_end": 110, "gain": 0.15,
+      "filter": { "type": "lowpass", "freq": 600 }, "env": [[0, 0], [60, 0.3], [150, 1]] },
+    { "type": "midi", "file": "Motivos/hipnos.mid", "gain": 0.18, "delay": 10, "repeat": { "every": 10, "count": 14 } }
+  ]
+}

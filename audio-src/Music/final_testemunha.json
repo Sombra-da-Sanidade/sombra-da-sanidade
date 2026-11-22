@@ -1,0 +1,14 @@
+{
+  "kind": "music",
+  "duration": 60,
+  "seed": 4,
+  "reverb": { "mix": 0.25, "decay": 3 },
+  "env": [[0, 0], [2, 1], [52, 1], [60, 0]],
+  "layers": [
+    { "type": "midi", "program": 48, "bpm": 60, "gain": 0.45,
+      "notes": [[0, 30, "D3", 55], [0, 30, "A3", 50], [0, 30, "F#4", 45], [30, 30, "G2", 55], [30, 30, "D3", 50], [30, 30, "B3", 45],
+                [45, 15, "A2", 50], [45, 15, "E3", 45], [45, 15, "C#4", 40]] },
+    { "type": "midi", "file": "Motivos/contagem_resolvida.mid", "gain": 0.8, "delay": 4, "repeat": { "every": 24, "count": 2 } },
+    { "type": "midi", "file": "Motivos/contagem.mid", "gain": 0.3, "delay": 16, "repeat": { "every": 24, "count": 2 } }
+  ]
+}

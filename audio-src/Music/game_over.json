@@ -1,0 +1,15 @@
+{
+  "kind": "music",
+  "duration": 6,
+  "seed": 6,
+  "layers": [
+    { "type": "noise", "color": "white", "gain": 0.6, "length": 0.15, "filter": { "type": "lowpass", "freq": 6000 },
+      "env": [[0, 1], [0.15, 0]] },
+    { "type": "tone", "wave": "saw", "freq": 110, "freq_end": 18, "length": 1.4, "gain": 0.5,
+      "filter": { "type": "lowpass", "freq": 900 }, "env": [[0, 1], [1.4, 0]] },
+    { "type": "tone", "wave": "sine", "freq": 6200, "gain": 0.12, "delay": 0.3, "length": 5.7,
+      "env": [[0, 0], [0.5, 1], [5.7, 0]] },
+    { "type": "tone", "wave": "sine", "freq": 36.71, "gain": 0.4, "delay": 0.2, "length": 5.8,
+      "env": [[0, 1], [5.8, 0]] }
+  ]
+}

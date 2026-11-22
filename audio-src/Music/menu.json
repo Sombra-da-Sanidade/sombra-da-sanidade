@@ -1,0 +1,19 @@
+{
+  "kind": "music",
+  "duration": 64,
+  "seed": 90,
+  "loop": true,
+  "loop_crossfade": 3,
+  "reverb": { "mix": 0.25, "decay": 3 },
+  "layers": [
+    { "type": "tone", "wave": "saw", "freq": 55, "gain": 0.35, "filter": { "type": "lowpass", "freq": 280 },
+      "tremolo": { "rate": 0.0625, "depth": 0.35 } },
+    { "type": "tone", "wave": "sine", "freq": 55.25, "gain": 0.3 },
+    { "type": "tone", "wave": "sine", "freq": 82.5, "gain": 0.12 },
+    { "type": "tone", "wave": "sine", "freq": 77.78, "gain": 0.05, "tremolo": { "rate": 0.03125, "depth": 1 } },
+    { "type": "noise", "color": "brown", "gain": 0.15, "filter": { "type": "bandpass", "freq": [180, 1200] },
+      "tremolo": { "rate": 0.125, "depth": 0.6 } },
+    { "type": "midi", "file": "Motivos/contagem_invertida.mid", "gain": 0.45, "delay": 6,
+      "repeat": { "every": 16, "count": 4 }, "filter": { "type": "lowpass", "freq": 6000 } }
+  ]
+}

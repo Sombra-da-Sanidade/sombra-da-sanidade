@@ -1,0 +1,15 @@
+{
+  "kind": "music",
+  "duration": 30,
+  "seed": 8,
+  "loop": true,
+  "loop_crossfade": 2,
+  "variants": ["memory"],
+  "reverb": { "mix": 0.4, "decay": 4 },
+  "layers": [
+    { "type": "midi", "file": "Motivos/contagem.mid", "gain": 0.6, "delay": 1, "repeat": { "every": 10, "count": 3 } },
+    { "type": "tone", "wave": "sine", "freq": 73.42, "gain": 0.2, "tremolo": { "rate": 0.1, "depth": 0.4 } },
+    { "type": "tone", "wave": "sine", "freq": 110, "gain": 0.06 },
+    { "type": "noise", "color": "white", "gain": 0.02, "filter": { "type": "highpass", "freq": 5000 } }
+  ]
+}
