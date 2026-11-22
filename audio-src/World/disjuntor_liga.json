@@ -1,0 +1,149 @@
+{
+  "duration": 1.8,
+  "takes": 2,
+  "seed": 352,
+  "vary": {
+    "pitch": 0.04
+  },
+  "reverb": {
+    "mix": 0.1,
+    "decay": 0.6
+  },
+  "layers": [
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/impactMetal_medium_000.ogg",
+      "gain": 0.8,
+      "delay": 0.0,
+      "pitch": 0.7,
+      "filter": {
+        "type": "lowpass",
+        "freq": 6000
+      }
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/metalLatch.ogg",
+      "gain": 0.6,
+      "delay": 0.0,
+      "pitch": 0.75
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/metalClick.ogg",
+      "gain": 0.35,
+      "delay": 0.16,
+      "pitch": 1.5,
+      "end": 0.1,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.08000000000000002,
+          1
+        ],
+        [
+          0.1,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/metalClick.ogg",
+      "gain": 0.3,
+      "delay": 0.23,
+      "pitch": 1.6,
+      "end": 0.1,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.08000000000000002,
+          1
+        ],
+        [
+          0.1,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "pink",
+      "gain": 0.3,
+      "delay": 0.35,
+      "length": 0.55,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          1500,
+          4500
+        ]
+      },
+      "tremolo": {
+        "rate": 17,
+        "depth": 0.95
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.05,
+          1
+        ],
+        [
+          0.45,
+          0.6
+        ],
+        [
+          0.55,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 120,
+      "gain": 0.12,
+      "delay": 0.6,
+      "length": 1.2,
+      "filter": {
+        "type": "lowpass",
+        "freq": 700
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.15,
+          1
+        ],
+        [
+          0.8,
+          0.8
+        ],
+        [
+          1.2,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": true,
+    "volume": [
+      0.85,
+      0.95
+    ]
+  }
+}

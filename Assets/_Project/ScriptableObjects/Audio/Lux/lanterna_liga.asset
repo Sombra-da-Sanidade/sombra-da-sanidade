@@ -16,9 +16,10 @@ MonoBehaviour:
   - {fileID: 8300000, guid: c6a0547725c9eafe010a68d0354cd14f, type: 3}
   - {fileID: 8300000, guid: 4f246a41186f85fca86319ea0bc82c68, type: 3}
   - {fileID: 8300000, guid: 61289d84333eeefa3af738b806bbc379, type: 3}
+  - {fileID: 8300000, guid: 06cb740d59aedb79d4f9a2fbf35f528c, type: 3}
   muffledClips: []
   bus: 2
-  volume: {x: 0.7, y: 0.8}
+  volume: {x: 0.45, y: 0.55}
   pitch: {x: 0.95, y: 1.05}
   spatial: 0
   maxDistance: 0

@@ -48,6 +48,7 @@ namespace SombraDaSanidade.UI
             // Na cutscene o Esc é segurado para pular (#88).
             if (CutscenePlayer.IsPlaying) return;
             if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) return;
+            Audio.UiSfx.Confirm();
             IsOpen = true;
             inSettings = false;
             selected = 0;
@@ -79,10 +80,10 @@ namespace SombraDaSanidade.UI
                 if (settings.HandleKeyboard(kb)) inSettings = false;
                 return;
             }
-            if (kb.escapeKey.wasPressedThisFrame) { Close(); return; }
-            if (kb.wKey.wasPressedThisFrame || kb.upArrowKey.wasPressedThisFrame) selected = (selected + Items.Length - 1) % Items.Length;
-            if (kb.sKey.wasPressedThisFrame || kb.downArrowKey.wasPressedThisFrame) selected = (selected + 1) % Items.Length;
-            if (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame) Activate(selected);
+            if (kb.escapeKey.wasPressedThisFrame) { Audio.UiSfx.Back(); Close(); return; }
+            if (kb.wKey.wasPressedThisFrame || kb.upArrowKey.wasPressedThisFrame) { selected = (selected + Items.Length - 1) % Items.Length; Audio.UiSfx.Move(); }
+            if (kb.sKey.wasPressedThisFrame || kb.downArrowKey.wasPressedThisFrame) { selected = (selected + 1) % Items.Length; Audio.UiSfx.Move(); }
+            if (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame) { Audio.UiSfx.Confirm(); Activate(selected); }
         }
 
         private void Activate(int index)
@@ -138,6 +139,7 @@ namespace SombraDaSanidade.UI
                 if (e.type == EventType.MouseDown && e.button == 0)
                 {
                     e.Use();
+                    Audio.UiSfx.Confirm();
                     Activate(i);
                     return;
                 }

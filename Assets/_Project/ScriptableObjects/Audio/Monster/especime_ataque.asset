@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Audio.SoundEvent
   clips:
   - {fileID: 8300000, guid: 222a9944dd0a2fddf831803965cebedf, type: 3}
+  - {fileID: 8300000, guid: f1b8445cd4cee024bfcb88ddbdc7f857, type: 3}
   muffledClips: []
   bus: 3
   volume: {x: 1, y: 1}

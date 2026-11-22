@@ -40,11 +40,15 @@ namespace SombraDaSanidade.Sanity
             ApplyEffect(sanity, this);
         }
 
+        // Disparado a cada dose (Estabilizador ou sedativo do armário). Gancho do som da injeção (#106).
+        public static event System.Action<Vector2> Applied;
+
         // Efeito do Estabilizador, também usado pelo sedativo dos armários (Locker, GDD 6).
         // host roda a corrotina da lentidão: precisa continuar ativo até o fim do efeito.
         public static void ApplyEffect(SanityController sanity, MonoBehaviour host)
         {
             if (sanity == null || sanity.Config == null) return;
+            Applied?.Invoke(sanity.transform.position);
             var config = sanity.Config;
             sanity.Add(config.stabilizerAmount);
 

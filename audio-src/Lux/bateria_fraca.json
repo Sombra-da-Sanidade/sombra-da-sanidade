@@ -1,59 +1,33 @@
 {
-  "duration": 0.6,
+  "duration": 0.7,
   "takes": 3,
-  "seed": 204,
+  "seed": 441,
   "vary": {
-    "pitch": 0.05
+    "pitch": 0.05,
+    "gain": 0.05
   },
+  "bass_harmonics": 0,
   "layers": [
     {
-      "type": "tone",
-      "wave": "square",
-      "freq": 180,
-      "gain": 0.35,
+      "type": "noise",
+      "color": "white",
+      "gain": 0.5,
+      "delay": 0.0,
+      "length": 0.012,
       "filter": {
-        "type": "lowpass",
-        "freq": 3000
+        "type": "bandpass",
+        "freq": [
+          1800,
+          6000
+        ]
       },
       "env": [
         [
           0,
-          0
-        ],
-        [
-          0.01,
           1
         ],
         [
-          0.08,
-          0
-        ],
-        [
-          0.15,
-          0
-        ],
-        [
-          0.16,
-          0.8
-        ],
-        [
-          0.22,
-          0
-        ],
-        [
-          0.35,
-          0
-        ],
-        [
-          0.36,
-          0.6
-        ],
-        [
-          0.42,
-          0
-        ],
-        [
-          0.6,
+          0.012,
           0
         ]
       ]
@@ -61,29 +35,97 @@
     {
       "type": "noise",
       "color": "white",
-      "gain": 0.2,
+      "gain": 0.35,
+      "delay": 0.09,
+      "length": 0.012,
       "filter": {
         "type": "bandpass",
         "freq": [
-          2000,
+          1800,
           6000
         ]
       },
       "env": [
         [
           0,
-          0
-        ],
-        [
-          0.01,
           1
         ],
         [
-          0.08,
+          0.012,
           0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.45,
+      "delay": 0.16,
+      "length": 0.012,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          1800,
+          6000
+        ]
+      },
+      "env": [
+        [
+          0,
+          1
         ],
         [
-          0.6,
+          0.012,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "pink",
+      "gain": 0.12,
+      "length": 0.25,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          1500,
+          4000
+        ]
+      },
+      "tremolo": {
+        "rate": 25,
+        "depth": 0.95
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.25,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 900,
+      "freq_end": 520,
+      "gain": 0.06,
+      "delay": 0.2,
+      "length": 0.4,
+      "filter": {
+        "type": "lowpass",
+        "freq": 2500
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.4,
           0
         ]
       ]
@@ -92,8 +134,8 @@
   "event": {
     "spatial": false,
     "volume": [
-      0.6,
-      0.7
+      0.4,
+      0.5
     ]
   }
 }

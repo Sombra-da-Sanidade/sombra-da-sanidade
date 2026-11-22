@@ -46,14 +46,16 @@ namespace SombraDaSanidade.UI
         public bool HandleKeyboard(Keyboard kb)
         {
             if (kb == null) return false;
-            if (kb.escapeKey.wasPressedThisFrame) return Close();
-            if (kb.wKey.wasPressedThisFrame || kb.upArrowKey.wasPressedThisFrame) selected = (selected + Rows - 1) % Rows;
-            if (kb.sKey.wasPressedThisFrame || kb.downArrowKey.wasPressedThisFrame) selected = (selected + 1) % Rows;
+            if (kb.escapeKey.wasPressedThisFrame) { Audio.UiSfx.Back(); return Close(); }
+            if (kb.wKey.wasPressedThisFrame || kb.upArrowKey.wasPressedThisFrame) { selected = (selected + Rows - 1) % Rows; Audio.UiSfx.Move(); }
+            if (kb.sKey.wasPressedThisFrame || kb.downArrowKey.wasPressedThisFrame) { selected = (selected + 1) % Rows; Audio.UiSfx.Move(); }
             int dir = (kb.dKey.wasPressedThisFrame || kb.rightArrowKey.wasPressedThisFrame ? 1 : 0)
                 - (kb.aKey.wasPressedThisFrame || kb.leftArrowKey.wasPressedThisFrame ? 1 : 0);
-            if (dir != 0) Adjust(dir);
+            if (dir != 0) { Adjust(dir); Audio.UiSfx.Move(); }
             if (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame)
             {
+                if (selected == BackRow) Audio.UiSfx.Back();
+                else Audio.UiSfx.Confirm();
                 if (IsToggle(selected)) Toggle(selected);
                 if (selected == BackRow) return Close();
             }
@@ -100,16 +102,19 @@ namespace SombraDaSanidade.UI
                 if (selected < Sliders && PixelHud.MouseOver(sliderX - 4, RowY(selected), sliderW + 8, RowHeight - 2))
                 {
                     Set(selected, Mathf.Clamp01((e.mousePosition.x / PixelHud.Px - sliderX) / sliderW));
+                    Audio.UiSfx.Move();
                     e.Use();
                 }
                 else if (IsToggle(selected) && PixelHud.MouseOver(x + 8, RowY(selected), PanelWidth - 16, RowHeight - 2))
                 {
                     Toggle(selected);
+                    Audio.UiSfx.Confirm();
                     e.Use();
                 }
                 else if (selected == BackRow && PixelHud.MouseOver(backX, RowY(BackRow) + 4, 96, 11))
                 {
                     e.Use();
+                    Audio.UiSfx.Back();
                     return Close();
                 }
             }

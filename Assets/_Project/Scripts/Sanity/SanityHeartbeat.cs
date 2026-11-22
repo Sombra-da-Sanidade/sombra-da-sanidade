@@ -71,6 +71,13 @@ namespace SombraDaSanidade.Sanity
                 clip = CreateHeartbeatClip();
                 ownsClip = true;
             }
+            // Sem clip na cena: a respiração da pipeline de áudio (GameSfx, #106) e, sem ela, a sintética abaixo.
+            if (breathingClip == null)
+            {
+                var sfx = Audio.GameSfx.Load();
+                if (sfx != null && sfx.playerPanting != null && sfx.playerPanting.HasClips)
+                    breathingClip = sfx.playerPanting.clips[0];
+            }
             if (breathingClip == null)
             {
                 breathingClip = CreateBreathingClip();
@@ -95,10 +102,15 @@ namespace SombraDaSanidade.Sanity
         {
             var config = sanity.Config;
             bool playing = GameManager.Instance == null || GameManager.Instance.IsPlaying;
-            if (!playing || sanity.State == SanityState.Dead)
+            // Sanidade desligada: a cena de morte do monstro (MonsterKillScene) trava a sanidade. Com o monstro
+            // em cima, a proximidade ligava a respiração no meio da morte.
+            if (!playing || sanity.State == SanityState.Dead || !sanity.isActiveAndEnabled)
             {
                 Calm();
-                FadeBreathing(0f);
+                // Corte seco: no fim da partida o Time.timeScale é 0 e o fade (por deltaTime) nunca terminava,
+                // deixando a respiração tocando na tela de Game Over.
+                breathing.volume = 0f;
+                if (breathing.isPlaying) breathing.Stop();
                 return;
             }
 
@@ -132,7 +144,8 @@ namespace SombraDaSanidade.Sanity
 
             bool breathe = sanity.Value < config.breathingBelow || Tier == ProximityTier.Danger;
             FadeBreathing(breathe ? Mathf.Lerp(config.breathingMinVolume, config.breathingMaxVolume, Tension) : 0f);
-            breathing.pitch = Mathf.Lerp(0.95f, 1.2f, Tension);
+            // Acelera pouco: com 1,2x a respiração virava um chiado agudo e cansativo no playtest.
+            breathing.pitch = Mathf.Lerp(0.95f, 1.08f, Tension);
 
             timer -= Time.deltaTime;
             if (timer > 0f) return;

@@ -1,0 +1,313 @@
+{
+  "duration": 3.0,
+  "takes": 1,
+  "seed": 363,
+  "loop": true,
+  "loop_crossfade": 0.5,
+  "bass_harmonics": 0.3,
+  "layers": [
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 160,
+      "gain": 0.2,
+      "tremolo": {
+        "rate": 1.1,
+        "depth": 0.15
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 320,
+      "gain": 0.06,
+      "vibrato": {
+        "rate": 0.6,
+        "depth": 0.004
+      }
+    },
+    {
+      "type": "noise",
+      "color": "pink",
+      "gain": 0.06,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          1000,
+          4000
+        ]
+      }
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.25,
+      "delay": 0.1,
+      "length": 0.004,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          2500,
+          7000
+        ]
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.004,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.18,
+      "delay": 0.23,
+      "length": 0.004,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          2500,
+          7000
+        ]
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.004,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.22,
+      "delay": 0.31,
+      "length": 0.004,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          2500,
+          7000
+        ]
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.004,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.2,
+      "delay": 0.72,
+      "length": 0.004,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          2500,
+          7000
+        ]
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.004,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.25,
+      "delay": 0.8,
+      "length": 0.004,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          2500,
+          7000
+        ]
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.004,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.2,
+      "delay": 1.35,
+      "length": 0.004,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          2500,
+          7000
+        ]
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.004,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.16,
+      "delay": 1.42,
+      "length": 0.004,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          2500,
+          7000
+        ]
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.004,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.22,
+      "delay": 1.5,
+      "length": 0.004,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          2500,
+          7000
+        ]
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.004,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.2,
+      "delay": 2.05,
+      "length": 0.004,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          2500,
+          7000
+        ]
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.004,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.24,
+      "delay": 2.4,
+      "length": 0.004,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          2500,
+          7000
+        ]
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.004,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.18,
+      "delay": 2.47,
+      "length": 0.004,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          2500,
+          7000
+        ]
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.004,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": false,
+    "volume": [
+      0.3,
+      0.3
+    ]
+  }
+}

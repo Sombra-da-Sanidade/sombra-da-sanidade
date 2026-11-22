@@ -1,0 +1,280 @@
+{
+  "duration": 4.5,
+  "takes": 1,
+  "seed": 461,
+  "bass_harmonics": 0.4,
+  "reverb": {
+    "mix": 0.2,
+    "decay": 1.4
+  },
+  "layers": [
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/impactMetal_medium_000.ogg",
+      "gain": 0.9,
+      "pitch": 0.5
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 60,
+      "freq_end": 30,
+      "gain": 0.8,
+      "length": 0.6,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.6,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.45,
+      "delay": 0.15,
+      "length": 2.6,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          500,
+          6000
+        ]
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.08,
+          1
+        ],
+        [
+          0.8,
+          0.7
+        ],
+        [
+          2.6,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "brown",
+      "gain": 0.4,
+      "delay": 0.15,
+      "length": 2.2,
+      "filter": {
+        "type": "lowpass",
+        "freq": 300
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.1,
+          1
+        ],
+        [
+          2.2,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 587,
+      "gain": 0.22,
+      "delay": 1.0,
+      "length": 0.25,
+      "filter": {
+        "type": "lowpass",
+        "freq": 6000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.006,
+          1
+        ],
+        [
+          0.125,
+          0.7
+        ],
+        [
+          0.25,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 740,
+      "gain": 0.22,
+      "delay": 1.22,
+      "length": 0.25,
+      "filter": {
+        "type": "lowpass",
+        "freq": 6000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.006,
+          1
+        ],
+        [
+          0.125,
+          0.7
+        ],
+        [
+          0.25,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 880,
+      "gain": 0.22,
+      "delay": 1.44,
+      "length": 0.25,
+      "filter": {
+        "type": "lowpass",
+        "freq": 6000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.006,
+          1
+        ],
+        [
+          0.125,
+          0.7
+        ],
+        [
+          0.25,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 1175,
+      "gain": 0.24,
+      "delay": 1.66,
+      "length": 1.4,
+      "filter": {
+        "type": "lowpass",
+        "freq": 6000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.006,
+          1
+        ],
+        [
+          0.7,
+          0.7
+        ],
+        [
+          1.4,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 587,
+      "gain": 0.12,
+      "delay": 1.66,
+      "length": 1.4,
+      "filter": {
+        "type": "lowpass",
+        "freq": 6000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.006,
+          1
+        ],
+        [
+          0.7,
+          0.7
+        ],
+        [
+          1.4,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 880,
+      "gain": 0.1,
+      "delay": 1.66,
+      "length": 1.4,
+      "filter": {
+        "type": "lowpass",
+        "freq": 6000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.006,
+          1
+        ],
+        [
+          0.7,
+          0.7
+        ],
+        [
+          1.4,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": false,
+    "volume": [
+      0.9,
+      0.9
+    ]
+  }
+}

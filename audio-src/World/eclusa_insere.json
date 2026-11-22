@@ -1,0 +1,271 @@
+{
+  "duration": 3.0,
+  "takes": 1,
+  "seed": 451,
+  "bass_harmonics": 0.3,
+  "reverb": {
+    "mix": 0.12,
+    "decay": 0.8
+  },
+  "layers": [
+    {
+      "type": "noise",
+      "color": "pink",
+      "gain": 0.25,
+      "delay": 0.15,
+      "length": 0.25,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          800,
+          3000
+        ]
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.05,
+          1
+        ],
+        [
+          0.25,
+          0.3
+        ]
+      ]
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/metalLatch.ogg",
+      "gain": 0.8,
+      "delay": 0.43000000000000005,
+      "pitch": 0.8
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 120,
+      "freq_end": 80,
+      "gain": 0.35,
+      "delay": 0.43000000000000005,
+      "length": 0.08,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.08,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 600,
+      "gain": 0.22,
+      "delay": 0.6,
+      "length": 0.12,
+      "filter": {
+        "type": "lowpass",
+        "freq": 6000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.004,
+          1
+        ],
+        [
+          0.072,
+          0.7
+        ],
+        [
+          0.12,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "pink",
+      "gain": 0.25,
+      "delay": 1.15,
+      "length": 0.25,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          800,
+          3000
+        ]
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.05,
+          1
+        ],
+        [
+          0.25,
+          0.3
+        ]
+      ]
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/metalLatch.ogg",
+      "gain": 0.8,
+      "delay": 1.43,
+      "pitch": 0.78
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 120,
+      "freq_end": 80,
+      "gain": 0.35,
+      "delay": 1.43,
+      "length": 0.08,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.08,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 800,
+      "gain": 0.22,
+      "delay": 1.5999999999999999,
+      "length": 0.12,
+      "filter": {
+        "type": "lowpass",
+        "freq": 6000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.004,
+          1
+        ],
+        [
+          0.072,
+          0.7
+        ],
+        [
+          0.12,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "pink",
+      "gain": 0.25,
+      "delay": 2.15,
+      "length": 0.25,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          800,
+          3000
+        ]
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.05,
+          1
+        ],
+        [
+          0.25,
+          0.3
+        ]
+      ]
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/metalLatch.ogg",
+      "gain": 0.8,
+      "delay": 2.4299999999999997,
+      "pitch": 0.76
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 120,
+      "freq_end": 80,
+      "gain": 0.35,
+      "delay": 2.4299999999999997,
+      "length": 0.08,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.08,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 1000,
+      "gain": 0.22,
+      "delay": 2.6,
+      "length": 0.12,
+      "filter": {
+        "type": "lowpass",
+        "freq": 6000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.004,
+          1
+        ],
+        [
+          0.072,
+          0.7
+        ],
+        [
+          0.12,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": false,
+    "volume": [
+      0.8,
+      0.8
+    ]
+  }
+}

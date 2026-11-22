@@ -1,0 +1,17 @@
+{
+  "duration": 0.8,
+  "takes": 2,
+  "seed": 348,
+  "vary": { "pitch": 0.05, "gain": 0.05 },
+  "bass_harmonics": 0.2,
+  "layers": [
+    { "type": "sample", "file": "../Raw/Kenney/handleSmallLeather.ogg", "gain": 0.35, "end": 0.25,
+      "env": [[0, 1], [0.2, 1], [0.25, 0]] },
+    { "type": "sample", "file": "../Raw/Kenney/impactGlass_light_001.ogg", "gain": 0.5, "delay": 0.06, "pitch": 1.2 },
+    { "type": "sample", "file": "../Raw/Kenney/metalClick.ogg", "gain": 0.45, "delay": 0.3, "pitch": 1.35, "end": 0.12,
+      "env": [[0, 1], [0.1, 1], [0.12, 0]] },
+    { "type": "noise", "color": "white", "gain": 0.12, "delay": 0.33, "length": 0.22,
+      "filter": { "type": "bandpass", "freq": [3500, 8000] }, "env": [[0, 0], [0.02, 1], [0.22, 0]] }
+  ],
+  "event": { "spatial": false, "volume": [0.65, 0.75] }
+}

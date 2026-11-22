@@ -16,6 +16,11 @@ namespace SombraDaSanidade.Audio
         [Tooltip("Passos com o Adrena-Syn ativo.")]
         public SoundEvent footstepRun;
 
+        [Tooltip("Respiração ofegante em loop (SanityHeartbeat). Sem ela, o SanityHeartbeat gera a sintética.")]
+        public SoundEvent playerPanting;
+        [Tooltip("Sussurro da alucinação sonora (SanityAudioHallucination). Sem ele, o sintético do script.")]
+        public SoundEvent hallucinationWhisper;
+
         [Header("Lux-90")]
         public SoundEvent flashlightOn;
         public SoundEvent flashlightOff;
@@ -55,6 +60,40 @@ namespace SombraDaSanidade.Audio
         public SoundEvent cameraAlarm;
         public SoundEvent cameraBlackout;
         public SoundEvent cameraShort;
+
+        [Header("Mundo e itens (#106)")]
+        public SoundEvent breakerOn;
+        public SoundEvent breakerOff;
+        public SoundEvent breakerBurnt;
+        public SoundEvent driveEject;
+        public SoundEvent driveCollect;
+        public SoundEvent lockerOpen;
+        public SoundEvent itemPickup;
+        public SoundEvent injection;
+        public SoundEvent flareIgnite;
+        public SoundEvent flareBurn;
+        public SoundEvent keypadOk;
+        public SoundEvent keypadWrong;
+        public SoundEvent substationOn;
+        [Tooltip("Loops enquanto o jogador segura E: consertando o disjuntor, forçando o armário, ejetando o HD.")]
+        public SoundEvent breakerRepair;
+        public SoundEvent lockerForce;
+        public SoundEvent driveEjecting;
+        public SoundEvent toolboxOpen;
+        public SoundEvent substationRepair;
+        public SoundEvent neuralModule;
+        public SoundEvent keypadKey;
+        public SoundEvent eclusaInsert;
+        public SoundEvent eclusaOn;
+        [Tooltip("Vitória final (VOCÊ ESCAPOU): eclusa despressurizando e o sinal de homologação da Aethelgard.")]
+        public SoundEvent victory;
+
+        [Header("Interface (#106)")]
+        public SoundEvent uiMove;
+        public SoundEvent uiConfirm;
+        public SoundEvent uiBack;
+        public SoundEvent uiUpgrade;
+        public SoundEvent uiSaved;
 
         private static GameSfx cached;
 

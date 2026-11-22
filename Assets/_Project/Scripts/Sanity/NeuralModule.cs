@@ -42,9 +42,13 @@ namespace SombraDaSanidade.Sanity
         }
 
         // O custo pode levar a sanidade a 0: é o risco do pilar 2, sem trava (igual ao Adrena-Syn).
+        // Disparado ao conectar o módulo. Gancho do som (#106).
+        public static event System.Action<Vector2> Applied;
+
         public static void Apply(SanityController sanity)
         {
             if (sanity == null || sanity.Config == null) return;
+            Applied?.Invoke(sanity.transform.position);
             sanity.ForceRevealClues(sanity.Config.neuralModuleRevealSeconds);
             sanity.Add(-sanity.Config.neuralModuleCost);
         }

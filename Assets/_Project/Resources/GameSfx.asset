@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Audio.GameSfx
   footstepWalk: {fileID: 11400000, guid: c481790ffaea667c4a3378680c61823f, type: 2}
   footstepRun: {fileID: 11400000, guid: 95688c9a51e2693ac97b3b9ccb7e4e66, type: 2}
+  playerPanting: {fileID: 11400000, guid: e082aefa54bae5f419ebcb4dcd848edf, type: 2}
+  hallucinationWhisper: {fileID: 11400000, guid: a4f3b3c4407cedb40bb23d3b9fa3a688, type: 2}
   flashlightOn: {fileID: 11400000, guid: 556bd3e1ea58a37be949dbb06c64030b, type: 2}
   flashlightOff: {fileID: 11400000, guid: 6c00b9d2efebe8dc1859e09c904e37fa, type: 2}
   flashlightHum: {fileID: 11400000, guid: da06db1d2a74b954b91a836f479082f7, type: 2}
@@ -41,3 +43,31 @@ MonoBehaviour:
   cameraAlarm: {fileID: 11400000, guid: 299a6c062fb05c9e8806527ba5c70cd1, type: 2}
   cameraBlackout: {fileID: 11400000, guid: 6f96c7cccc202e212a1ae3c19e8a79f0, type: 2}
   cameraShort: {fileID: 11400000, guid: 60446b2ad9ba423b7bf4d94717622624, type: 2}
+  breakerOn: {fileID: 11400000, guid: d6b91e969a14f184a9a3dbec7c8a642e, type: 2}
+  breakerOff: {fileID: 11400000, guid: d126e9b03662f95479db5f889fa30ec7, type: 2}
+  breakerBurnt: {fileID: 11400000, guid: 1c48c86f71cf71a40a2976d3e30f33f8, type: 2}
+  driveEject: {fileID: 11400000, guid: 8fe78c210a1c4694eb8b60f1523e5611, type: 2}
+  driveCollect: {fileID: 11400000, guid: f528f61c38475cd44a0c184054627d76, type: 2}
+  lockerOpen: {fileID: 11400000, guid: 380ec8f8800de67498d2c40f2362d457, type: 2}
+  itemPickup: {fileID: 11400000, guid: f3fa0f0f742b5264da05b105d9b2468f, type: 2}
+  injection: {fileID: 11400000, guid: 9c021d120ae85a043ac7e218bd07da70, type: 2}
+  flareIgnite: {fileID: 11400000, guid: f562857d0eab2964a9feb9c6261a66d9, type: 2}
+  flareBurn: {fileID: 11400000, guid: 2ea00ed29819b8e46993eadd5407aa8a, type: 2}
+  keypadOk: {fileID: 11400000, guid: 12a32cc604e94c54c9a0e11da2f2ba15, type: 2}
+  keypadWrong: {fileID: 11400000, guid: 58f19528bd880854e9f8e57fa2fb04a9, type: 2}
+  substationOn: {fileID: 11400000, guid: 17cab62fd0e73a24fa13b4cffa1170f2, type: 2}
+  breakerRepair: {fileID: 11400000, guid: e3f03312ffd69aa4e9085a66f6e004be, type: 2}
+  lockerForce: {fileID: 11400000, guid: b69890455cde3654ba4be139a4767b33, type: 2}
+  driveEjecting: {fileID: 11400000, guid: 67c1f717f7a69484db631f35c9bf03f6, type: 2}
+  toolboxOpen: {fileID: 11400000, guid: 93c1926ef4d3f7c4aa2c32772290fd3a, type: 2}
+  substationRepair: {fileID: 11400000, guid: 7a22671cbe7197d4ab7df19462cd258b, type: 2}
+  neuralModule: {fileID: 11400000, guid: aea964dca1225804f9ee0ee8e8de6788, type: 2}
+  keypadKey: {fileID: 11400000, guid: 3eb7efdbc7ab5f44ca895f17b7671267, type: 2}
+  eclusaInsert: {fileID: 11400000, guid: ff98eab60673d2e4db9d23c0e41c6de1, type: 2}
+  eclusaOn: {fileID: 11400000, guid: afa8d6c69965b614e919b8836f642da5, type: 2}
+  victory: {fileID: 11400000, guid: bb2360e4c7fe4874a81306465719fbbe, type: 2}
+  uiMove: {fileID: 11400000, guid: b9673d3fa01e3ea43a29f783e03bf9e7, type: 2}
+  uiConfirm: {fileID: 11400000, guid: aae7c83497b74c441829e0c4febd497e, type: 2}
+  uiBack: {fileID: 11400000, guid: e6d9f4dd813c9934794a99c12a420814, type: 2}
+  uiUpgrade: {fileID: 11400000, guid: 34cf0cb680850de4e8361f01fb53e3bf, type: 2}
+  uiSaved: {fileID: 11400000, guid: 2ca4c78ba06b9e042bf1d3456b2362ef, type: 2}

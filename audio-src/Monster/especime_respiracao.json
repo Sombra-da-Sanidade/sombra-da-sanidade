@@ -1,6 +1,6 @@
 {
   "bus": "Monster",
-  "duration": 4.5,
+  "duration": 6.0,
   "takes": 2,
   "seed": 11,
   "loop": true,
@@ -43,10 +43,10 @@
         ],
         [
           3.4,
-          0.1
+          0.05
         ],
         [
-          4.5,
+          6.0,
           0
         ]
       ]
@@ -54,7 +54,7 @@
     {
       "type": "noise",
       "color": "pink",
-      "gain": 0.25,
+      "gain": 0.12,
       "filter": [
         {
           "type": "highpass",
@@ -62,7 +62,7 @@
         },
         {
           "type": "lowpass",
-          "freq": 5000
+          "freq": 4000
         }
       ],
       "env": [
@@ -87,7 +87,7 @@
           0
         ],
         [
-          4.5,
+          6.0,
           0
         ]
       ]
@@ -97,15 +97,15 @@
       "wave": "saw",
       "freq": 62,
       "freq_end": 55,
-      "gain": 0.2,
-      "drive": 3,
+      "gain": 0.07,
+      "drive": 1.5,
       "filter": {
         "type": "lowpass",
-        "freq": 400
+        "freq": 300
       },
       "tremolo": {
-        "rate": 9,
-        "depth": 0.7
+        "rate": 6,
+        "depth": 0.5
       },
       "env": [
         [
@@ -122,14 +122,14 @@
         ],
         [
           2.4,
-          0.8
+          0.7
         ],
         [
           3.4,
           0
         ],
         [
-          4.5,
+          6.0,
           0
         ]
       ]

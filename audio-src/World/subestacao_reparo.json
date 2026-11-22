@@ -1,0 +1,461 @@
+{
+  "duration": 6.0,
+  "takes": 2,
+  "seed": 371,
+  "vary": {
+    "pitch": 0.03,
+    "gain": 0.05
+  },
+  "bass_harmonics": 0.4,
+  "reverb": {
+    "mix": 0.12,
+    "decay": 0.8
+  },
+  "layers": [
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/impactMetal_medium_000.ogg",
+      "gain": 0.7,
+      "delay": 0.0,
+      "pitch": 0.6
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.45,
+      "delay": 0.0,
+      "length": 0.3,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          3000,
+          9000
+        ]
+      },
+      "tremolo": {
+        "rate": 35,
+        "depth": 0.9
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.3,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 1200,
+      "freq_end": 300,
+      "gain": 0.1125,
+      "delay": 0.0,
+      "length": 0.15,
+      "filter": {
+        "type": "lowpass",
+        "freq": 4000
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.15,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 85,
+      "freq_end": 55,
+      "gain": 0.36000000000000004,
+      "delay": 0.0,
+      "length": 0.12,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.12,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 50,
+      "freq_end": 100,
+      "gain": 0.15,
+      "filter": {
+        "type": "lowpass",
+        "freq": 700
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.4,
+          0.5
+        ],
+        [
+          5.6,
+          1
+        ],
+        [
+          6.0,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "pink",
+      "gain": 0.07,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          800,
+          3000
+        ]
+      },
+      "tremolo": {
+        "rate": 0.8,
+        "depth": 0.4
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          1.0,
+          1
+        ],
+        [
+          5.6,
+          1
+        ],
+        [
+          6.0,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.39499999999999996,
+      "delay": 1.5,
+      "length": 0.3,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          3000,
+          9000
+        ]
+      },
+      "tremolo": {
+        "rate": 35,
+        "depth": 0.9
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.3,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 1200,
+      "freq_end": 300,
+      "gain": 0.09874999999999999,
+      "delay": 1.5,
+      "length": 0.15,
+      "filter": {
+        "type": "lowpass",
+        "freq": 4000
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.15,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 85,
+      "freq_end": 55,
+      "gain": 0.316,
+      "delay": 1.5,
+      "length": 0.12,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.12,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.43999999999999995,
+      "delay": 3.0,
+      "length": 0.3,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          3000,
+          9000
+        ]
+      },
+      "tremolo": {
+        "rate": 35,
+        "depth": 0.9
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.3,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 1200,
+      "freq_end": 300,
+      "gain": 0.10999999999999999,
+      "delay": 3.0,
+      "length": 0.15,
+      "filter": {
+        "type": "lowpass",
+        "freq": 4000
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.15,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 85,
+      "freq_end": 55,
+      "gain": 0.352,
+      "delay": 3.0,
+      "length": 0.12,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.12,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.485,
+      "delay": 4.5,
+      "length": 0.3,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          3000,
+          9000
+        ]
+      },
+      "tremolo": {
+        "rate": 35,
+        "depth": 0.9
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.3,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 1200,
+      "freq_end": 300,
+      "gain": 0.12125,
+      "delay": 4.5,
+      "length": 0.15,
+      "filter": {
+        "type": "lowpass",
+        "freq": 4000
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.15,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 85,
+      "freq_end": 55,
+      "gain": 0.388,
+      "delay": 4.5,
+      "length": 0.12,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.12,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/metalClick.ogg",
+      "gain": 0.25,
+      "delay": 0.7,
+      "pitch": 1.2,
+      "end": 0.1,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.08000000000000002,
+          1
+        ],
+        [
+          0.1,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/metalClick.ogg",
+      "gain": 0.25,
+      "delay": 2.2,
+      "pitch": 1.2,
+      "end": 0.1,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.08000000000000002,
+          1
+        ],
+        [
+          0.1,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/metalClick.ogg",
+      "gain": 0.25,
+      "delay": 3.7,
+      "pitch": 1.2,
+      "end": 0.1,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.08000000000000002,
+          1
+        ],
+        [
+          0.1,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/metalClick.ogg",
+      "gain": 0.25,
+      "delay": 5.2,
+      "pitch": 1.2,
+      "end": 0.1,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.08000000000000002,
+          1
+        ],
+        [
+          0.1,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": false,
+    "volume": [
+      0.65,
+      0.65
+    ]
+  }
+}

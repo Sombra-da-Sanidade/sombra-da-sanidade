@@ -42,10 +42,11 @@ namespace SombraDaSanidade.Audio
         [Range(0f, 1f)] public float batteryLowRatio = 0.2f;
         [Tooltip("Segundos entre dois avisos de bateria fraca.")]
         public float batteryLowInterval = 6f;
-        [Tooltip("Volume do zumbido contínuo da lanterna acesa.")]
-        [Range(0f, 1f)] public float flashlightHumVolume = 0.12f;
+        [Tooltip("Volume do zumbido contínuo da lanterna acesa. Toca quase o jogo todo: fica no limite de ouvir " +
+                 "para dar presença sem cansar (0,12 incomodava no playtest).")]
+        [Range(0f, 1f)] public float flashlightHumVolume = 0.06f;
         [Tooltip("Volume da respiração do Espécime patrulhando / em perseguição.")]
-        public Vector2 specimenBreathVolume = new Vector2(0.55f, 1f);
+        public Vector2 specimenBreathVolume = new Vector2(0.4f, 0.75f);
         [Tooltip("Ticks do ponteiro do multímetro por varredura.")]
         public int skillTicksPerSweep = 8;
 
