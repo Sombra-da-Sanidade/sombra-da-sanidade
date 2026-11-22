@@ -59,6 +59,8 @@ namespace SombraDaSanidade.EditorTools
         public static readonly (string field, string sound)[] GameSfxTable =
         {
             ("footstepWalk", "Player/passos_andar"), ("footstepRun", "Player/passos_correr"),
+            ("playerPanting", "Player/respiracao_ofegante"),
+            ("hallucinationWhisper", "Sanity/alucinacao_sussurro"),
             ("flashlightOn", "Lux/lanterna_liga"), ("flashlightOff", "Lux/lanterna_desliga"),
             ("flashlightHum", "Lux/lanterna_zumbido"), ("batteryLow", "Lux/bateria_fraca"),
             ("batteryDead", "Lux/bateria_esgotada"), ("empFire", "Lux/emp_disparo"), ("empFail", "Lux/emp_falha"),
@@ -72,6 +74,19 @@ namespace SombraDaSanidade.EditorTools
             ("cameraServo", "Camera/camera_servo"), ("cameraDetect", "Camera/camera_detecta"),
             ("cameraAlarm", "Camera/camera_alarme"), ("cameraBlackout", "Camera/camera_apagao"),
             ("cameraShort", "Camera/camera_curto"),
+            ("breakerOn", "World/disjuntor_liga"), ("breakerOff", "World/disjuntor_desliga"),
+            ("breakerBurnt", "World/disjuntor_queima"), ("driveEject", "World/hd_ejeta"), ("driveCollect", "World/hd_coleta"),
+            ("lockerOpen", "World/armario_abre"), ("itemPickup", "World/item_pega"), ("injection", "World/item_injecao"),
+            ("flareIgnite", "World/sinalizador_acende"),
+            ("flareBurn", "World/sinalizador_queimando"), ("keypadOk", "World/teclado_certo"),
+            ("keypadWrong", "World/teclado_errado"), ("substationOn", "World/subestacao_liga"),
+            ("breakerRepair", "World/disjuntor_reparo"), ("lockerForce", "World/armario_forca"),
+            ("driveEjecting", "World/hd_ejetando"), ("toolboxOpen", "World/caixa_abre"),
+            ("substationRepair", "World/subestacao_reparo"),
+            ("neuralModule", "World/modulo_neural"), ("keypadKey", "World/teclado_tecla"),
+            ("eclusaInsert", "World/eclusa_insere"), ("eclusaOn", "World/eclusa_liga"), ("victory", "World/vitoria_eclusa"),
+            ("uiMove", "UI/ui_navegar"), ("uiConfirm", "UI/ui_confirmar"), ("uiBack", "UI/ui_voltar"),
+            ("uiUpgrade", "UI/ui_upgrade"), ("uiSaved", "UI/ui_salvo"),
         };
 
         private static int LinkGameSfx()

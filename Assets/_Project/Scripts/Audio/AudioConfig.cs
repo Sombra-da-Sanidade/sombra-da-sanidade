@@ -46,7 +46,7 @@ namespace SombraDaSanidade.Audio
                  "para dar presença sem cansar (0,12 incomodava no playtest).")]
         [Range(0f, 1f)] public float flashlightHumVolume = 0.06f;
         [Tooltip("Volume da respiração do Espécime patrulhando / em perseguição.")]
-        public Vector2 specimenBreathVolume = new Vector2(0.55f, 1f);
+        public Vector2 specimenBreathVolume = new Vector2(0.4f, 0.75f);
         [Tooltip("Ticks do ponteiro do multímetro por varredura.")]
         public int skillTicksPerSweep = 8;
 
