@@ -1,0 +1,127 @@
+{
+  "duration": 0.7,
+  "takes": 1,
+  "seed": 404,
+  "layers": [
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 880,
+      "gain": 0.3,
+      "delay": 0,
+      "length": 0.12,
+      "filter": {
+        "type": "lowpass",
+        "freq": 6000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.004,
+          1
+        ],
+        [
+          0.072,
+          0.7
+        ],
+        [
+          0.12,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 1175,
+      "gain": 0.3,
+      "delay": 0.12,
+      "length": 0.12,
+      "filter": {
+        "type": "lowpass",
+        "freq": 6000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.004,
+          1
+        ],
+        [
+          0.072,
+          0.7
+        ],
+        [
+          0.12,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 1760,
+      "gain": 0.3,
+      "delay": 0.24,
+      "length": 0.35,
+      "filter": {
+        "type": "lowpass",
+        "freq": 6000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.004,
+          1
+        ],
+        [
+          0.21,
+          0.7
+        ],
+        [
+          0.35,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.06,
+      "length": 0.6,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          2000,
+          8000
+        ]
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.6,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": false,
+    "volume": [
+      0.7,
+      0.7
+    ]
+  }
+}

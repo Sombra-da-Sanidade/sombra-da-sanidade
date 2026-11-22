@@ -1,0 +1,68 @@
+{
+  "duration": 0.8,
+  "takes": 2,
+  "seed": 364,
+  "vary": {
+    "pitch": 0.04
+  },
+  "reverb": {
+    "mix": 0.08,
+    "decay": 0.4
+  },
+  "layers": [
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 320,
+      "freq_end": 180,
+      "gain": 0.12,
+      "length": 0.3,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.3,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/metalLatch.ogg",
+      "gain": 0.8,
+      "delay": 0.3,
+      "pitch": 0.85
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/metalClick.ogg",
+      "gain": 0.3,
+      "delay": 0.45,
+      "pitch": 1.2,
+      "end": 0.1,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.08000000000000002,
+          1
+        ],
+        [
+          0.1,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": true,
+    "volume": [
+      0.6,
+      0.7
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "duration": 0.06,
+  "takes": 2,
+  "seed": 401,
+  "vary": {
+    "pitch": 0.02
+  },
+  "layers": [
+    {
+      "type": "tone",
+      "wave": "square",
+      "freq": 1800,
+      "gain": 0.25,
+      "delay": 0,
+      "length": 0.035,
+      "filter": {
+        "type": "lowpass",
+        "freq": 5000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.004,
+          1
+        ],
+        [
+          0.021,
+          0.7
+        ],
+        [
+          0.035,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": false,
+    "volume": [
+      0.5,
+      0.5
+    ]
+  }
+}
