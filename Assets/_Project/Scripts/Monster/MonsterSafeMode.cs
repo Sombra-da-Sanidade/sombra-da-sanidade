@@ -15,6 +15,11 @@ namespace SombraDaSanidade.Monster
 
         public static event Action<bool> Changed;
 
+        // O projeto entra no Play sem recarregar o domínio: sem isto o valor lido numa sessão de Play anterior
+        // ficava preso e apagar o PlayerPrefs (Edit > Clear All PlayerPrefs) não desligava o modo seguro.
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetCache() => cached = null;
+
         public static bool Enabled
         {
             get
