@@ -45,6 +45,8 @@ namespace SombraDaSanidade.UI
         public void Open()
         {
             if (IsOpen || UpgradeTerminal.IsOpen) return;
+            // Na cutscene o Esc é segurado para pular (#88).
+            if (CutscenePlayer.IsPlaying) return;
             if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) return;
             IsOpen = true;
             inSettings = false;
