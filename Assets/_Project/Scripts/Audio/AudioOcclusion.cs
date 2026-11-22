@@ -17,6 +17,10 @@ namespace SombraDaSanidade.Audio
         private float nextCheck;
         private float mix;   // 0 = limpa, 1 = abafada
 
+        // Volume do loop (antes da oclusão). Mudança vale no mesmo quadro: o Sonâmbulo corta o rangido em seco.
+        public float Volume { get => baseVolume; set => baseVolume = Mathf.Max(0f, value); }
+        public SoundEvent Sound => sound;
+
         public bool Occluded { get; private set; }
         public float Mix => mix;
         public AudioSource Dry => dry;

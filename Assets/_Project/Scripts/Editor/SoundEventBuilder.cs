@@ -46,9 +46,53 @@ namespace SombraDaSanidade.EditorTools
             }
             sets = BuildMusicSets(clips);
             int linked = LinkSoundtrack();
+            int sfxLinked = LinkGameSfx();
 
             AssetDatabase.SaveAssets();
-            Debug.Log($"[SoundEvents] {events} SoundEvent(s), {sets} MusicSet(s) e {linked} faixa(s) fixa(s) no AudioConfig.");
+            Debug.Log($"[SoundEvents] {events} SoundEvent(s), {sets} MusicSet(s), {linked} faixa(s) fixa(s) no AudioConfig " +
+                      $"e {sfxLinked} som(ns) no GameSfx.");
+        }
+
+        public const string GameSfxPath = "Assets/_Project/Resources/" + GameSfx.ResourcePath + ".asset";
+
+        // Campos do GameSfx (#105) → SoundEvent em ScriptableObjects/Audio/<Categoria>/<nome>.asset.
+        public static readonly (string field, string sound)[] GameSfxTable =
+        {
+            ("footstepWalk", "Player/passos_andar"), ("footstepRun", "Player/passos_correr"),
+            ("flashlightOn", "Lux/lanterna_liga"), ("flashlightOff", "Lux/lanterna_desliga"),
+            ("flashlightHum", "Lux/lanterna_zumbido"), ("batteryLow", "Lux/bateria_fraca"),
+            ("batteryDead", "Lux/bateria_esgotada"), ("empFire", "Lux/emp_disparo"), ("empFail", "Lux/emp_falha"),
+            ("specimenBreath", "Monster/especime_respiracao"), ("specimenHear", "Monster/especime_estalo"),
+            ("specimenStep", "Monster/especime_passo"), ("specimenScream", "Monster/especime_grito"),
+            ("specimenStunned", "Monster/especime_atordoado"), ("specimenAttack", "Monster/especime_ataque"),
+            ("sleepwalkerCreak", "Monster/sonambulo_rangido"), ("sleepwalkerBreath", "Monster/sonambulo_respiracao"),
+            ("sleepwalkerWake", "Monster/sonambulo_despertar"), ("sleepwalkerAttack", "Monster/sonambulo_ataque"),
+            ("skillWarn", "SkillCheck/sc_aviso"), ("skillTick", "SkillCheck/sc_tique"), ("skillGood", "SkillCheck/sc_bom"),
+            ("skillGreat", "SkillCheck/sc_otimo"), ("skillFail", "SkillCheck/sc_falha"),
+            ("cameraServo", "Camera/camera_servo"), ("cameraDetect", "Camera/camera_detecta"),
+            ("cameraAlarm", "Camera/camera_alarme"), ("cameraBlackout", "Camera/camera_apagao"),
+            ("cameraShort", "Camera/camera_curto"),
+        };
+
+        private static int LinkGameSfx()
+        {
+            var sfx = AssetDatabase.LoadAssetAtPath<GameSfx>(GameSfxPath);
+            if (sfx == null)
+            {
+                sfx = ScriptableObject.CreateInstance<GameSfx>();
+                AssetDatabase.CreateAsset(sfx, GameSfxPath);
+            }
+            var so = new SerializedObject(sfx);
+            int linked = 0;
+            foreach (var (field, sound) in GameSfxTable)
+            {
+                var asset = AssetDatabase.LoadAssetAtPath<SoundEvent>(EventsRoot + sound + ".asset");
+                if (asset == null) continue;
+                so.FindProperty(field).objectReferenceValue = asset;
+                linked++;
+            }
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return linked;
         }
 
         // Faixas fixas da trilha (#103) → campos do AudioConfig. Arquivo que não existe deixa o campo como está.

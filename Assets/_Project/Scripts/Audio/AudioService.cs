@@ -22,6 +22,9 @@ namespace SombraDaSanidade.Audio
         private static int nextSource;
         private static Transform root;
 
+        // Avisado a cada SoundEvent tocado (testes e depuração).
+        public static event System.Action<SoundEvent, AudioSource> Played;
+
         public static AudioMixer Mixer => EnsureMixer();
         public static bool HasMixer => EnsureMixer() != null;
 
@@ -99,6 +102,7 @@ namespace SombraDaSanidade.Audio
             source.Play();
 
             if (sound.noiseRadius > 0f && position.HasValue) NoiseBus.Emit(position.Value, sound.noiseRadius);
+            Played?.Invoke(sound, source);
             return source;
         }
 
