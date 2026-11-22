@@ -72,7 +72,7 @@ namespace SombraDaSanidade.Sanity
         [Tooltip("A respiração começa abaixo desta sanidade, ou sempre na faixa de perigo.")]
         public float breathingBelow = 35f;
         [Tooltip("Volume da respiração com tensão mínima e máxima.")]
-        [Range(0f, 1f)] public float breathingMinVolume = 0.15f;
-        [Range(0f, 1f)] public float breathingMaxVolume = 0.7f;
+        [Range(0f, 1f)] public float breathingMinVolume = 0.08f;
+        [Range(0f, 1f)] public float breathingMaxVolume = 0.35f;
     }
 }
