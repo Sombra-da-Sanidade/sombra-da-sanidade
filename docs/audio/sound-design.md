@@ -109,6 +109,21 @@ Cada linha é um `SoundEvent`. P1 é informação de jogo e vem primeiro.
 | Narrativa | Bipe da Vance (existe), bipe do Thomas uma oitava abaixo, glitch de fim de memória, digitação das legendas, cela da Vance abrindo | 3 |
 | UI | Navegar, confirmar, voltar, escolha de upgrade, "Progresso salvo", transição CRT | 3 |
 
+### Feito na #105
+
+Receitas em `audio-src/{Player,Lux,Monster,SkillCheck,Camera}/`, ligadas no `Resources/GameSfx` e tocadas pelo `GameSfxHooks` (criado em toda cena de jogo, ouvindo os eventos dos sistemas; nenhuma cena muda). Nenhum desses sons emite ruído no `NoiseBus`: o que o Espécime ouve não mudou.
+
+| Gancho | Sons |
+|---|---|
+| Passos do Thomas pela distância andada (0,85 u) | `passos_andar` (6 tomadas), `passos_correr` com Adrena-Syn |
+| `FlashlightController.LitChanged`, `EmpFired`, `EmpFailed`, bateria < 20% | liga, desliga, zumbido aceso, bateria fraca (a cada 6 s), esgotada, EMP, EMP falho |
+| Espécime: loop com `AudioOcclusion`, `StateChanged`, `Caught`, distância andada | respiração (mais alta na perseguição, some atordoado), estalo ao investigar, grito na perseguição, atordoado, passos, ataque |
+| Sonâmbulo: estado, `Woke`, `Caught` | rangido só em `Moving` (corta no mesmo quadro ao congelar), respiração em `Frozen`, despertar, ataque |
+| `SkillCheck.Warned`, `Resolved`, ponteiro | aviso, 8 tiques por varredura, bom, ótimo, falha |
+| Câmera (#79, ainda sem gancho) | servo, detecção, alarme, apagão, curto do EMP |
+
+Ainda não: passos por tipo de piso (as cenas não marcam o piso), respiração cansada.
+
 ## 6. Mix e níveis
 
 | Grupo | Alvo da fonte (normalizar antes de importar) |
