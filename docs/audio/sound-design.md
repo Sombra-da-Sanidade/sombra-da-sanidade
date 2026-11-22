@@ -125,9 +125,9 @@ Teste de escuta: jogar 2 min de olhos fechados com o monstro andando; o jogador 
 | Fonte | Para quê | Registro |
 |---|---|---|
 | **Síntese em código** (`tools/audio/`, Python + numpy) | Drones, bipes, hum elétrico, câmera, sirenes, ruídos de fita, UI | Receita versionada |
-| **Foley gravado** pelo grupo (celular, quarto silencioso, 30 cm) | Passos, armário, papel, metal, respiração, vozes processadas do monstro | Autor e data em `docs/arte/FONTES` |
+| **Foley gravado** pelo grupo (celular, quarto silencioso, 30 cm) | Passos, armário, papel, metal, respiração, vozes processadas do monstro | Autor e data em `docs/audio/fontes.md` |
 | **MIDI + soundfont** (`mido` + FluidSynth) | Motivos melódicos (celesta, piano, jingle) | `.mid` versionado em `audio-src/` |
-| **CC0 / royalty free** (Freesound CC0, Sonniss GDC) | Texturas difíceis de gravar | Link e licença em `docs/arte/FONTES` |
+| **CC0 / royalty free** (Freesound CC0, Sonniss GDC) | Texturas difíceis de gravar | Link e licença em `docs/audio/fontes.md` |
 
 Sem geração de áudio por serviço externo: vocalizações dos monstros saem de foley gravado pelo grupo (voz, garganta, respiração) processado nas receitas.
 

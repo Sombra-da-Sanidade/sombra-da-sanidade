@@ -91,6 +91,16 @@ Guia completo: [docs/arte/guia-de-estilo.md](docs/arte/guia-de-estilo.md). Decis
 - O Unity fatia e configura o PNG sozinho (16 PPU, Point). Para ver no escuro com lanterna: **Sombra da Sanidade > Arte > Gerar cena de teste de arte**.
 - Commite o JSON, o PNG e o `.meta` juntos. Commit `art(<asset>): ...`, PR com print da cena de teste.
 
+## Áudio
+
+Guia completo: [docs/audio/pipeline.md](docs/audio/pipeline.md). Plano: [docs/audio/sound-design.md](docs/audio/sound-design.md). Decisão: [ADR 0005](docs/decisoes/0005-audio-no-webgl.md).
+
+- A fonte do som é texto: `audio-src/<Categoria>/<nome>.json`. Foley gravado fica em `audio-src/Raw/`.
+- Depois de editar, rode `python3 tools/audio/render_audio.py <nome>` (precisa de `numpy`, `scipy` e `ffmpeg`; MIDI também de `fluidsynth`). Ele gera os `.ogg` em `Assets/_Project/Audio/`. **Não edite esses `.ogg` direto.**
+- No Unity, **Sombra da Sanidade > Áudio > Gerar SoundEvents** cria o asset do som. No código, toque com `AudioService.Play(som, posição)`; fonte própria passa pelo mixer com `AudioService.Route(fonte, grupo)`.
+- Sem filtro em runtime (o WebGL ignora): versões abafada, distante e de memória saem do render.
+- Commite a receita, os `.ogg`, os `.meta` e o `SoundEvent` juntos. Commit `audio(<asset>): ...`.
+
 ## GDD
 
 - `docs/gdd/gdd.md` é a fonte de verdade para o código. Se o comportamento implementado divergir do GDD, atualize o GDD no mesmo PR (ou abra uma issue com a label `gdd`).
