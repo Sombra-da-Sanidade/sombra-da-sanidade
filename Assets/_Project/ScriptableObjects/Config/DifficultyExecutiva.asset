@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: DifficultyExecutiva
   m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Core.DifficultyProfile
   wing: Executiva
+  camerasCallSpecimen: 1
   monsterSpeed: 4.2
   monsterHearingRadius: 7
   monsterBehaviours: 15

@@ -28,6 +28,10 @@ namespace SombraDaSanidade.Core
         [Tooltip("Segundos até o monstro aparecer. 0 = presente desde a entrada. A Médica usa o WingIntro.")]
         [Min(0f)] public float monsterDelaySeconds;
 
+        [Header("Câmeras de segurança (#79)")]
+        [Tooltip("Ligado: o alarme da câmera também chama o Espécime até o Thomas (planejamento-rc 3: fase 3 e Eclusa).")]
+        public bool camerasCallSpecimen;
+
         [Header("Sanidade")]
         [Tooltip("Dreno por segundo no escuro (Proposta 1: 1.0 / 1.5 / 2.0 / 2.0).")]
         public float darknessDrain = 1f;
