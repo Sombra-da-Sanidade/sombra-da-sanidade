@@ -19,6 +19,8 @@ namespace SombraDaSanidade.Audio
 
         // Ligado pelo CutscenePlayer (#88) enquanto uma cutscene toca.
         public static bool CutsceneActive { get; set; }
+        // Faixa fixa pedida pela cutscene (memória, revelação, finais). null: só abaixa a música da fase.
+        public static AudioClip CutsceneTrack { get; set; }
 
         private AudioConfig config;
         private MusicLayers music;
@@ -115,6 +117,7 @@ namespace SombraDaSanidade.Audio
                 var wing = Level.WingCheckpoint.Instance;
                 return wing == null || wing.IsFinal ? config.laudoMusic : null;
             }
+            if (CutsceneActive && CutsceneTrack != null) return CutsceneTrack;
             var escape = Level.EscapeSequence.Instance;
             if (escape != null && escape.Active) { loop = false; return config.purgeMusic; }
             if (sanity != null && sanity.InSafeZone && !CutsceneActive) return config.safeRoomMusic;
@@ -195,6 +198,10 @@ namespace SombraDaSanidade.Audio
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void ResetOnPlay() => CutsceneActive = false;
+        private static void ResetOnPlay()
+        {
+            CutsceneActive = false;
+            CutsceneTrack = null;
+        }
     }
 }
