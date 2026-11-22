@@ -24,7 +24,7 @@ import tempfile
 from pathlib import Path
 
 import numpy as np
-from scipy import signal
+from scipy import ndimage, signal
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "audio-src"
@@ -32,9 +32,13 @@ OUT = ROOT / "Assets" / "_Project" / "Audio"
 RATE = 44100
 SF2 = os.environ.get("SOMBRA_SF2", "/usr/share/soundfonts/FluidR3_GM.sf2")
 
-# Alvo de loudness por grupo (docs/audio/sound-design.md seção 6), em LUFS integrado.
-TARGET_LUFS = {"Sfx": -18.0, "Monster": -16.0, "Voice": -18.0, "Ui": -18.0, "Ambience": -28.0, "Music": -24.0}
-SHORT_PEAK_DB = -6.0      # sons curtos demais para medir LUFS: normaliza pelo pico
+# Alvo de loudness por grupo (docs/audio/sound-design.md seção 6), em LUFS integrado. Pensado para jogo de
+# navegador em alto-falante de notebook (-16 a -14 LUFS no mix), não para console (-24): ver ADR 0005.
+TARGET_LUFS = {"Sfx": -12.0, "Monster": -10.0, "Voice": -12.0, "Ui": -14.0, "Ambience": -20.0, "Music": -16.0}
+# Harmônicos do grave (baixo psicoacústico) por padrão: notebook não reproduz abaixo de ~150 Hz.
+DEFAULT_BASS_HARMONICS = {"Ui": 0.0}
+BASS_HARMONICS = 0.6
+SHORT_PEAK_DB = -3.0      # sons curtos demais para medir LUFS: normaliza pelo pico
 TRUE_PEAK_DB = -1.0       # teto de todos os arquivos
 
 # Grupo padrão pela pasta da receita (igual ao SoundEventBuilder no Unity).
@@ -363,9 +367,36 @@ def normalize_gain(audio, bus, tmp):
     return db(target - lufs)
 
 
+def enhance_bass(audio, amount):
+    """Baixo psicoacústico: satura a parte abaixo de 150 Hz e soma os harmônicos de 150 a 800 Hz.
+    Em alto-falante pequeno o ouvido reconstrói a fundamental a partir deles (o grave "aparece")."""
+    if amount <= 0:
+        return audio
+    low = butter(audio, "lowpass", 150, order=4)
+    rms = np.sqrt(np.mean(low ** 2)) + 1e-9
+    harm = np.tanh(low / rms * 1.5)
+    harm = butter(butter(harm, "highpass", 150, order=4), "lowpass", 800, order=2)
+    harm *= rms / (np.sqrt(np.mean(harm ** 2)) + 1e-9)
+    return audio + amount * harm
+
+
 def limit_true_peak(audio):
-    tp = true_peak_db(audio)
-    return audio * db(TRUE_PEAK_DB - tp) if tp > TRUE_PEAK_DB else audio
+    """Limitador: reduz o ganho só onde há pico (ataque 1 ms, soltura 80 ms) e garante o teto de -1 dBTP."""
+    ceiling = db(TRUE_PEAK_DB - 0.6)   # folga para o OGG
+    peak = np.abs(audio)
+    if peak.max() <= ceiling:
+        return audio
+    need = np.minimum(1.0, ceiling / np.maximum(peak, 1e-9))
+    # Mínimo numa janela de 1 ms à frente (lookahead) e soltura exponencial.
+    look = seconds(0.001)
+    need = ndimage.minimum_filter1d(need, size=look + 1, origin=-(look // 2), mode="nearest")
+    # Soltura: o ganho volta a 1 com constante de 80 ms, mas nunca fica acima do necessário.
+    rel = np.exp(-1.0 / seconds(0.08))
+    smooth = signal.lfilter([1 - rel], [1, -rel], need, zi=[need[0] * rel])[0]
+    gain = np.minimum(need, smooth)
+    out = audio * gain
+    tp = true_peak_db(out)
+    return out * db(TRUE_PEAK_DB - tp) if tp > TRUE_PEAK_DB else out
 
 
 def encode_ogg(audio, path, tmp):
@@ -411,6 +442,7 @@ def render_recipe(path):
     with tempfile.TemporaryDirectory() as tmp:
         for take, base in enumerate(output_names(recipe, name)):
             audio = render_take(recipe, take, path.parent, tmp)
+            audio = enhance_bass(audio, recipe.get("bass_harmonics", DEFAULT_BASS_HARMONICS.get(bus, BASS_HARMONICS)))
             gain = normalize_gain(audio, bus, tmp)   # ganho medido na versão limpa, igual para as variantes
             for v in variants:
                 rng = np.random.default_rng(recipe.get("seed", 1) * 7919 + take)
