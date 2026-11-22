@@ -1,68 +1,23 @@
 {
-  "duration": 0.35,
-  "takes": 3,
-  "seed": 201,
-  "vary": {
-    "pitch": 0.04
-  },
+  "duration": 0.16,
+  "takes": 4,
+  "seed": 211,
+  "vary": { "pitch": 0.05, "gain": 0.05 },
   "bass_harmonics": 0,
   "layers": [
-    {
-      "type": "noise",
-      "color": "white",
-      "gain": 0.8,
-      "length": 0.02,
-      "filter": {
-        "type": "bandpass",
-        "freq": [
-          1500,
-          7000
-        ]
-      },
-      "env": [
-        [
-          0,
-          1
-        ],
-        [
-          0.02,
-          0
-        ]
-      ]
-    },
-    {
-      "type": "tone",
-      "wave": "saw",
-      "freq": 120,
-      "freq_end": 240,
-      "gain": 0.25,
-      "delay": 0.02,
-      "length": 0.3,
-      "filter": {
-        "type": "lowpass",
-        "freq": 2500
-      },
-      "env": [
-        [
-          0,
-          0
-        ],
-        [
-          0.05,
-          1
-        ],
-        [
-          0.3,
-          0
-        ]
-      ]
-    }
+    { "type": "noise", "color": "white", "gain": 0.9, "length": 0.006,
+      "filter": { "type": "bandpass", "freq": [2200, 6500] },
+      "env": [[0, 1], [0.006, 0]] },
+    { "type": "tone", "wave": "sine", "freq": 190, "freq_end": 130, "gain": 0.45, "length": 0.035,
+      "env": [[0, 1], [0.035, 0]] },
+    { "type": "noise", "color": "white", "gain": 0.22, "delay": 0.006, "length": 0.025,
+      "filter": { "type": "bandpass", "freq": [3500, 9000] },
+      "env": [[0, 1], [0.025, 0]] },
+    { "type": "noise", "color": "white", "gain": 0.35, "delay": 0.07, "length": 0.004,
+      "filter": { "type": "bandpass", "freq": [2800, 7500] },
+      "env": [[0, 1], [0.004, 0]] },
+    { "type": "tone", "wave": "sine", "freq": 3100, "gain": 0.05, "delay": 0.012, "length": 0.09,
+      "env": [[0, 1], [0.09, 0]] }
   ],
-  "event": {
-    "spatial": false,
-    "volume": [
-      0.7,
-      0.8
-    ]
-  }
+  "event": { "spatial": false, "volume": [0.45, 0.55] }
 }
