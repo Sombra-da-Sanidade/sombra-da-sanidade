@@ -80,16 +80,19 @@ Sons com menos de 0,5 s vão pelo pico (-6 dBFS). As versões usam o mesmo ganho
 
 ### Camadas
 
-Toda camada aceita `gain`, `delay` (s), `length` (s), `env`, `filter` (um ou lista), `drive` e `tremolo` (`rate`, `depth`).
+Toda camada aceita `gain`, `delay` (s), `length` (s), `env`, `filter` (um ou lista), `drive`, `tremolo` (`rate`, `depth`) e `repeat` (`every` em segundos, `count`).
 
 | `type` | Campos |
 |---|---|
 | `tone` | `wave` (`sine`, `saw`, `square`, `triangle`), `freq`, `freq_end` (glide), `vibrato` (`rate`, `depth`) |
 | `noise` | `color` (`white`, `pink`, `brown`) |
 | `sample` | `file` (relativo à receita, ex. `../Raw/porta.flac`), `start`, `end`, `pitch` |
+| `pulse` | `hit` (uma camada qualquer, com `length`), `bpm`, `bpm_end` (acelera linearmente), `start`, `end` (s), `accent_every`, `accent_gain` |
 | `midi` | `notes` (`[início, duração, nota, velocidade]` em tempos, nota `"A4"` ou número), `bpm`, `program` (General MIDI, 8 = celesta), ou `file` com um `.mid` |
 
 `env` é ADSR (`attack`, `decay`, `sustain`, `release` em segundos) ou pontos `[[tempo, valor], ...]`. `filter` é `{ "type": "lowpass" | "highpass" | "bandpass", "freq": 800 }` (bandpass: `"freq": [lo, hi]`).
+
+Motivos da trilha: `python3 tools/audio/motifs.py` gera `audio-src/Music/Motivos/*.mid` (camada `midi` com `"file": "Motivos/contagem.mid"`). A trilha completa está em `audio-src/Music/`.
 
 Exemplos completos em `audio-src/_Exemplos/`: bipe de UI (3 tomadas), respiração de monstro (loop com versões abafada e distante) e o motivo da contagem (MIDI com versão de memória).
 

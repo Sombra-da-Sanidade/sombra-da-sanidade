@@ -73,17 +73,21 @@ Regras de mix: L3 entra em 0,3 s e sai em 4 s (recuo lento, curva dente-de-serra
 
 ### Faixas fixas
 
-| Faixa | Duração | Descrição |
-|---|---|---|
-| Menu | loop 90 s | Drone atual + contagem invertida na celesta |
-| Sala segura | loop 60 s | Única faixa "calma": acordes abertos, fita. Fade nos últimos 10 s da Zona Segura avisa que a luz vai cair |
-| Memória | loop 30 s | Contagem com wow/flutter e passa-baixa pré-renderados |
-| Eclusa / purga | **150 s exatos** | Composição linear que é o próprio cronômetro: pulso acelera de 60 a 140 bpm, sirene entra em 90 s e 130 s. O jogador sabe quanto falta pelo ouvido |
-| Revelação (C3) | 45 s | Contagem descendente pela primeira vez, voz da Vance limpa |
-| Final "Testemunha" | 60 s | Contagem resolvida em Ré maior, sem fita |
-| Final "Amostra entregue" | 60 s | Jingle Aethelgard limpo e alegre sobre o drone: ironia |
-| Game Over | 6 s | Corte seco, zumbido de ouvido, fita parando |
-| Laudo | loop 40 s | Impressora matricial + drone suave |
+Feitas na #103: receitas em `audio-src/Music/`, motivos em `audio-src/Music/Motivos/*.mid` (gerados por `tools/audio/motifs.py`), saída em `Assets/_Project/Audio/Music/`. Todas em -24 LUFS.
+
+| Faixa | Arquivo | Duração | Descrição | Onde toca |
+|---|---|---|---|---|
+| Menu | `menu.ogg` | loop 61 s | Drone grave em Lá + contagem invertida (subindo) na celesta a cada 16 s | `MainMenuScreen` (troca o drone antigo da cena) |
+| Sala segura | `sala_segura.ogg` | loop 56 s | Única faixa calma: pad em Ré menor, Bb, F, C com o motivo da Vance no piano, leve saturação de fita | `AudioDirector` na Zona Segura |
+| Memória | `memoria_memory.ogg` | loop 28 s | Contagem descendo na celesta, versão de fita (wow/flutter, passa-baixa) | Cutscenes de memória (#88/#91) |
+| Eclusa / purga | `purga.ogg` | **150 s exatos** | Pulso grave de 60 a 140 bpm, chimbal a partir de 60 s, drone subindo uma oitava, bipe Hipnos a cada 10 s. A sirene é a da `EscapeSequence` (código), não da faixa | `AudioDirector` com a purga, sincronizado com `EscapeSequence.Elapsed` |
+| Revelação (C3) | `revelacao.ogg` | 45 s | Contagem descendo no piano pela primeira vez, cordas em Ré menor | Cutscene C3 (#91) |
+| Final "Testemunha" | `final_testemunha.ogg` | 60 s | Contagem resolvida em Ré maior no piano, cordas, sem fita | Cutscene C4 (#91) |
+| Final "Amostra entregue" | `final_amostra.ogg` | 60 s | Jingle Aethelgard alegre no vibrafone sobre drone que cresce: ironia | Cutscene C5 (#91) |
+| Game Over | `game_over.ogg` | 6 s | Estalo, fita parando, zumbido de ouvido | `AudioDirector`, corte seco no mesmo quadro |
+| Laudo | `laudo.ogg` | loop 38 s | Drone suave em Ré, impressora matricial, bipe Hipnos | `AudioDirector` na vitória da última fase |
+
+Os loops ficam mais curtos que a `duration` da receita: o crossfade da emenda corta o fim. A faixa da sala segura ainda não faz o fade nos últimos 10 s da Zona Segura (o `Breaker` não expõe o tempo restante).
 
 ## 5. Efeitos sonoros por sistema
 
