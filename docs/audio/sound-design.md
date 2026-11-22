@@ -73,7 +73,7 @@ Regras de mix: L3 entra em 0,3 s e sai em 4 s (recuo lento, curva dente-de-serra
 
 ### Faixas fixas
 
-Feitas na #103: receitas em `audio-src/Music/`, motivos em `audio-src/Music/Motivos/*.mid` (gerados por `tools/audio/motifs.py`), saída em `Assets/_Project/Audio/Music/`. Todas em -24 LUFS.
+Feitas na #103: receitas em `audio-src/Music/`, motivos em `audio-src/Music/Motivos/*.mid` (gerados por `tools/audio/motifs.py`), saída em `Assets/_Project/Audio/Music/`. Todas em -16 LUFS.
 
 | Faixa | Arquivo | Duração | Descrição | Onde toca |
 |---|---|---|---|---|
@@ -113,14 +113,17 @@ Cada linha é um `SoundEvent`. P1 é informação de jogo e vem primeiro.
 
 | Grupo | Alvo da fonte (normalizar antes de importar) |
 |---|---|
-| SFX e passos | -18 LUFS (curtos: pico -6 dBFS) |
-| Monstros | -16 LUFS (precisam se destacar) |
-| Vozes (bipes) | -18 LUFS |
-| Ambiente | -28 LUFS |
-| Música | -24 LUFS |
-| Teto de todos | -1 dBTP |
+| SFX e passos | -12 LUFS (curtos: pico -3 dBFS) |
+| Monstros | -10 LUFS (precisam se destacar) |
+| Vozes (bipes) | -12 LUFS |
+| UI | -14 LUFS |
+| Ambiente | -20 LUFS |
+| Música | -16 LUFS |
+| Teto de todos | -1 dBTP (limitador no render) |
 
-Mix final do jogo perto de -23 LUFS (Sony ASWG-R001 para PC/console), medido gravando 5 min de jogo. Ducking: monstro em perseguição abaixa ambiente em 6 dB; voz da Vance abaixa música em 8 dB.
+Mix final do jogo perto de -16 LUFS, medido gravando 5 min de jogo. O alvo de console (-23/-24 LUFS, Sony ASWG-R001) ficou baixo demais: em 22/11/2026 foi preciso pôr o notebook em 240% para ouvir. Jogo de navegador em alto-falante de notebook pede -16 a -14 LUFS.
+
+**Alto-falante pequeno:** notebook quase não reproduz abaixo de ~150 Hz, e a trilha é feita de drones graves (o menu tinha 97% da energia abaixo de 150 Hz). O render soma harmônicos do grave entre 150 e 800 Hz (baixo psicoacústico, `bass_harmonics`, padrão 0,6; 1,4 nas faixas mais graves). Conferir sempre a loudness com o grave cortado (`highpass=f=150`): é o que o notebook toca. Ducking: monstro em perseguição abaixa ambiente em 6 dB; voz da Vance abaixa música em 8 dB.
 
 Teste de escuta: jogar 2 min de olhos fechados com o monstro andando; o jogador deve apontar a direção e dizer se está perto ou longe.
 
@@ -177,5 +180,5 @@ Total de cerca de 35 h. Dependências: a 2 trava a 3, e a 3 e a 4 travam o resto
 1. Toda ação do jogador e dos monstros tem som, com pelo menos 3 takes nos sons repetidos.
 2. No teste de olhos fechados, 4 de 5 tentativas acertam a direção do monstro.
 3. A purga de 150 s é sentida sem número na tela.
-4. Mix entre -25 e -21 LUFS medido no WebGL, sem clipping.
+4. Mix entre -18 e -14 LUFS medido no WebGL, sem clipping, audível em notebook a 100% de volume.
 5. Origem de todo arquivo de terceiros registrada.

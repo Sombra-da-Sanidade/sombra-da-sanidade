@@ -30,16 +30,17 @@ Arquivo sem tomada `_NN` (música) também é importado como CompressedInMemory.
 
 ## Volume
 
-O render ajusta cada tomada para o alvo do grupo (sound-design.md seção 6) e limita o pico em -1 dBTP:
+O render ajusta cada tomada para o alvo do grupo (sound-design.md seção 6) e limita o pico em -1 dBTP com um limitador (só os picos baixam):
 
 | Grupo | Alvo |
 |---|---|
-| Sfx, Voice, Ui | -18 LUFS |
-| Monster | -16 LUFS |
-| Music | -24 LUFS |
-| Ambience | -28 LUFS |
+| Sfx, Voice | -12 LUFS |
+| Ui | -14 LUFS |
+| Monster | -10 LUFS |
+| Music | -16 LUFS |
+| Ambience | -20 LUFS |
 
-Sons com menos de 0,5 s vão pelo pico (-6 dBFS). As versões usam o mesmo ganho da versão limpa: a abafada fica naturalmente mais baixa.
+Sons com menos de 0,5 s vão pelo pico (-3 dBFS). Antes de normalizar, o render soma harmônicos do grave (150 a 800 Hz) para o som aparecer em alto-falante de notebook; controle com `"bass_harmonics"` na receita (padrão 0,6, UI 0; `0` desliga). As versões usam o mesmo ganho da versão limpa: a abafada fica naturalmente mais baixa.
 
 ## Receita
 
