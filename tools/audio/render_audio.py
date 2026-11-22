@@ -229,6 +229,8 @@ def render_layer(layer, n, rng, pitch, recipe_dir, tmp):
     elif kind == "midi":
         audio = render_midi(layer, recipe_dir, tmp)
         audio = audio / (np.abs(audio).max() + 1e-9)
+    elif kind == "pulse":
+        audio = render_pulse(layer, length, rng, pitch, recipe_dir, tmp)
     else:
         raise ValueError(f"camada desconhecida: {kind}")
 
@@ -241,8 +243,34 @@ def render_layer(layer, n, rng, pitch, recipe_dir, tmp):
         audio = audio * (1 - tr.get("depth", 0.5) * (0.5 + 0.5 * np.sin(2 * np.pi * tr.get("rate", 4) * t)))
     audio = audio * envelope(len(audio), layer.get("env"))
     buf = np.zeros(n)
-    place(buf, audio * layer.get("gain", 1.0), seconds(layer.get("delay", 0)))
+    rep = layer.get("repeat", {"every": 0, "count": 1})
+    for i in range(rep.get("count", 1)):
+        place(buf, audio * layer.get("gain", 1.0), seconds(layer.get("delay", 0) + i * rep.get("every", 0)))
     return buf
+
+
+def beat_times(bpm, bpm_end, start, end):
+    """Instantes das batidas com o andamento indo de bpm a bpm_end linearmente entre start e end (s)."""
+    dur = max(1e-6, end - start)
+    t = np.arange(seconds(dur)) / RATE
+    tempo = bpm + (bpm_end - bpm) * t / dur
+    beats = np.cumsum(tempo / 60.0) / RATE
+    idx = np.searchsorted(beats, np.arange(0, beats[-1]))
+    return start + idx / RATE
+
+
+def render_pulse(layer, n, rng, pitch, recipe_dir, tmp):
+    """Batidas de um som ("hit", uma camada qualquer) num andamento que pode acelerar (purga, sound-design 4)."""
+    hit_spec = dict(layer["hit"])
+    hit_len = seconds(hit_spec.get("length", 0.4))
+    hit = render_layer(hit_spec, hit_len, rng, pitch, recipe_dir, tmp)
+    out = np.zeros(n)
+    start, end = layer.get("start", 0.0), layer.get("end", n / RATE)
+    accent = layer.get("accent_every", 0)
+    for i, at in enumerate(beat_times(layer["bpm"], layer.get("bpm_end", layer["bpm"]), start, end)):
+        g = layer.get("accent_gain", 1.4) if accent and i % accent == 0 else 1.0
+        place(out, hit * g, seconds(at))
+    return out
 
 
 def render_take(recipe, take, recipe_dir, tmp):
