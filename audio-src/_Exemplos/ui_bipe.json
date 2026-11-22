@@ -1,0 +1,15 @@
+{
+  "bus": "Ui",
+  "duration": 0.12,
+  "takes": 3,
+  "seed": 3,
+  "vary": { "pitch": 0.03, "gain": 0.05 },
+  "layers": [
+    { "type": "tone", "wave": "square", "freq": 880, "gain": 0.4,
+      "filter": { "type": "lowpass", "freq": 3000 },
+      "env": { "attack": 0.002, "decay": 0.05, "sustain": 0.3, "release": 0.04 } },
+    { "type": "tone", "wave": "sine", "freq": 1760, "gain": 0.15,
+      "env": [[0, 0], [0.002, 1], [0.03, 0]] }
+  ],
+  "event": { "spatial": false, "pitch": [0.98, 1.02], "volume": [0.8, 0.9] }
+}

@@ -1,0 +1,16 @@
+{
+  "kind": "music",
+  "bus": "Music",
+  "duration": 9.0,
+  "seed": 1,
+  "variants": ["memory"],
+  "reverb": { "mix": 0.35, "decay": 2.5 },
+  "layers": [
+    { "type": "midi", "program": 8, "bpm": 50, "gain": 1.0,
+      "notes": [
+        [0, 1.5, "A5", 80], [1.5, 1.5, "G5", 75], [3, 1.5, "F5", 70], [4.5, 2.5, "E5", 65]
+      ] },
+    { "type": "tone", "wave": "sine", "freq": 73.42, "gain": 0.12,
+      "env": { "attack": 1.5, "sustain": 1.0, "release": 2.0 } }
+  ]
+}
