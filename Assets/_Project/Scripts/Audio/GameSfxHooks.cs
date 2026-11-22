@@ -35,9 +35,11 @@ namespace SombraDaSanidade.Audio
 
         private class Specimen { public MonsterController m; public AudioOcclusion breath; public Vector2 last; public float walked; }
         private class Sleeper { public SleepwalkerController s; public AudioOcclusion creak, breath; }
+        private class Watcher { public SecurityCamera c; public AudioOcclusion servo; }
 
         private readonly List<Specimen> specimens = new List<Specimen>();
         private readonly List<Sleeper> sleepers = new List<Sleeper>();
+        private readonly List<Watcher> watchers = new List<Watcher>();
 
         public int SpecimenCount => specimens.Count;
         public int SleeperCount => sleepers.Count;
@@ -142,6 +144,7 @@ namespace SombraDaSanidade.Audio
             UpdateFlashlight();
             UpdateSpecimens();
             UpdateSleepers();
+            UpdateCameras();
             UpdateSkillCheck();
         }
 
@@ -229,6 +232,39 @@ namespace SombraDaSanidade.Audio
                 // Só se move no escuro: o som corta no mesmo quadro em que a luz o congela (sound-design.md 5).
                 if (e.creak != null) e.creak.Volume = active && e.s.State == SleepwalkerState.Moving ? 1f : 0f;
                 if (e.breath != null) e.breath.Volume = active && e.s.State == SleepwalkerState.Frozen ? 0.8f : 0f;
+            }
+        }
+
+        // ---------- Câmeras de segurança (#79) ----------
+
+        private void OnCameraState(SecurityCamera c, SecurityCameraState state)
+        {
+            Vector2 at = c.transform.position;
+            switch (state)
+            {
+                case SecurityCameraState.Detecting: Play(sfx.cameraDetect, at); break;
+                case SecurityCameraState.Alarm: Play(sfx.cameraAlarm, at); Play(sfx.cameraBlackout, at); break;
+                case SecurityCameraState.Disabled:
+                case SecurityCameraState.Off: Play(sfx.cameraShort, at); break;
+            }
+        }
+
+        // O motor só soa enquanto a câmera gira.
+        private void UpdateCameras()
+        {
+            // Registra na primeira vez que a câmera aparece (cena carregada ou instanciada depois).
+            foreach (var c in SecurityCamera.All)
+            {
+                if (watchers.Exists(w => w.c == c)) continue;
+                watchers.Add(new Watcher { c = c, servo = Loop(c.gameObject, sfx.cameraServo, 0f) });
+                c.StateChanged += state => OnCameraState(c, state);
+            }
+            foreach (var w in watchers)
+            {
+                if (w.c == null || w.servo == null) continue;
+                bool moving = w.c.isActiveAndEnabled
+                    && (w.c.State == SecurityCameraState.Sweeping || w.c.State == SecurityCameraState.Detecting);
+                w.servo.Volume = moving ? 0.6f : 0f;
             }
         }
 
