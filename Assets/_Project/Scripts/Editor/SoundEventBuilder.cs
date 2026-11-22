@@ -120,12 +120,28 @@ namespace SombraDaSanidade.EditorTools
             ("laudoMusic", "Music/laudo.ogg"),
         };
 
+        // Música por fase (#104): MusicSet (nome = "music_set" das receitas audio-src/Music/ala_*) → AudioConfig.
+        public static readonly (string field, string set)[] WingMusic =
+        {
+            ("medicaMusic", "Medica"),
+            ("energiaMusic", "Energia"),
+            ("executivaMusic", "Executiva"),
+            ("eclusaMusic", "Eclusa"),
+        };
+
         private static int LinkSoundtrack()
         {
             var config = AssetDatabase.LoadAssetAtPath<AudioConfig>(AudioMixerBuilder.ConfigPath);
             if (config == null) return 0;
             var so = new SerializedObject(config);
             int linked = 0;
+            foreach (var (field, setName) in WingMusic)
+            {
+                var set = AssetDatabase.LoadAssetAtPath<MusicSet>(EventsRoot + "Music/" + setName + ".asset");
+                if (set == null) continue;
+                so.FindProperty(field).objectReferenceValue = set;
+                linked++;
+            }
             foreach (var (field, file) in Soundtrack)
             {
                 var clip = AssetDatabase.LoadAssetAtPath<AudioClip>(AudioImportRules.AudioRoot + file);

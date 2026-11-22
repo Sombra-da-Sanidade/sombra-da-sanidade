@@ -30,6 +30,17 @@ namespace SombraDaSanidade.Audio
         // Silencia todas as camadas (faixa fixa tocando: purga, game over, laudo). Volta com o mesmo fade.
         public bool Muted { get; set; }
 
+        // Corte seco (Game Over, sound-design.md seção 4): muda e zera todas as camadas no mesmo quadro, sem o fade.
+        public void Cut()
+        {
+            Muted = true;
+            for (int i = 0; i < sources.Length; i++)
+            {
+                current[i] = 0f;
+                sources[i].volume = 0f;
+            }
+        }
+
         private void Start()
         {
             config = AudioConfig.Load();
