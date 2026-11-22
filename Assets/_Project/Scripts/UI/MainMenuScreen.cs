@@ -112,7 +112,7 @@ namespace SombraDaSanidade.UI
         private static void Load(string scene)
         {
             RunStats.StartRun();
-            SceneManager.LoadScene(scene);
+            CrtTransition.LoadScene(scene);
         }
 
         private void OnGUI()
