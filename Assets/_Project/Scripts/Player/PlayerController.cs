@@ -51,8 +51,15 @@ namespace SombraDaSanidade.Player
             rb.linearVelocity = MoveInput * speed;
         }
 
+        // Cutscenes (#88) travam o movimento sem desligar o componente (a física continua parando o corpo).
+        public static bool InputLocked { get; set; }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetLock() => InputLocked = false;
+
         private void ReadMovement()
         {
+            if (InputLocked) { MoveInput = Vector2.zero; return; }
             var kb = Keyboard.current;
             if (kb == null) return;
 
