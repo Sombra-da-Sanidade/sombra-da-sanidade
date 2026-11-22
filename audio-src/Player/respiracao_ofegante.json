@@ -1,0 +1,13 @@
+{
+  "bus": "Sfx",
+  "duration": 15.4,
+  "takes": 1,
+  "seed": 385,
+  "loop": true,
+  "loop_crossfade": 0.8,
+  "bass_harmonics": 0,
+  "layers": [
+    { "type": "sample", "file": "../Raw/OwlishMedia/respiracao_assustada.flac", "gain": 1.0 }
+  ],
+  "event": { "spatial": false, "volume": [1, 1], "pitch": [1, 1] }
+}
