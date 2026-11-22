@@ -56,7 +56,7 @@ namespace SombraDaSanidade.UI
             var wing = Level.WingCheckpoint.Instance;
             if (wing != null && !wing.IsFinal)
             {
-                PixelHud.Text(Level.WingCheckpoint.DisplayName(wing.Wing) + " CONCLUÍDA", x + 52, y + 18, PixelHud.Fosforo5, 1f, 2);
+                Title(Level.WingCheckpoint.DisplayName(wing.Wing) + " CONCLUÍDA", x + 52, y + 18, x + w - 14);
                 string next = Level.WingCheckpoint.DisplayName(wing.NextWing);
                 PixelHud.Text($"ACESSO À {next} LIBERADO.", x + 52, y + 36, PixelHud.Fosforo3);
                 if (wing.UpgradeThisWing != null)
@@ -66,7 +66,7 @@ namespace SombraDaSanidade.UI
             }
             else
             {
-                PixelHud.Text("VOCÊ ESCAPOU", x + 52, y + 18, PixelHud.Fosforo5, 1f, 2);
+                Title("VOCÊ ESCAPOU", x + 52, y + 18, x + w - 14);
                 PixelHud.Text("ECLUSA ABERTA. HDS ENTREGUES À SUPERFÍCIE.", x + 52, y + 36, PixelHud.Fosforo3);
             }
 
@@ -106,6 +106,17 @@ namespace SombraDaSanidade.UI
                 : "O ESPÉCIME VAZIO TE ALCANÇOU.";
             PixelHud.TextCentered(cause, cx, y + 84, PixelHud.Concreto7);
             cachedFailures = -1;
+        }
+
+        // Título em tamanho 2 quando cabe até a borda do painel; senão em tamanho 1, na altura do meio da linha.
+        // "ALA DE ENERGIA CONCLUÍDA" e "ALA EXECUTIVA CONCLUÍDA" passavam da borda em tamanho 2.
+        private static int TitleScale(string title, int x, int right) =>
+            PixelHud.TextWidth(title, 2) <= right - x ? 2 : 1;
+
+        private static void Title(string title, int x, int y, int right)
+        {
+            int scale = TitleScale(title, x, right);
+            PixelHud.Text(title, x, scale == 2 ? y : y + 4, PixelHud.Fosforo5, 1f, scale);
         }
 
         private static void Stat(string label, string value, int x, int y, int right)

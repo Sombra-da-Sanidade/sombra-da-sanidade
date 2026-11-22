@@ -15,6 +15,8 @@ Frente 5, issue #32 (e o CONTINUAR da #45). Fluxo do GDD 8: Menu → Briefing �
 - **Música e fonte:** o Menu toca `Audio/Music/menu_drone.wav` em loop (gerado por `python3 tools/audio/gen_menu_music.py`). Os textos em Canvas usam a VT323 (SIL OFL) com font atlas do TextMeshPro em `Art/Fonts/VT323/` (**Sombra da Sanidade > Arte > Gerar fonte TMP**). Os Canvas usam `CanvasScaler` por tamanho de tela (640×360) e âncoras nos cantos e no centro.
 - **JOGAR** começa uma partida nova: zera as mortes e apaga o checkpoint antigo.
 - **CONTINUAR** aparece quando há checkpoint salvo (#45) e a cena da próxima ala está no Build Profile. O nome da cena segue a Ala Médica: `Ala` + ala (`AlaEnergia`, `AlaExecutiva`). Enquanto essas cenas não existirem, o botão não aparece. O que o checkpoint guarda está em [checkpoint.md](checkpoint.md).
+- **CONFIGURAÇÕES** (menu e pausa): volumes, brilho, tela cheia e **MODO SEGURO** (#48). Com o modo seguro ligado, o monstro e o Sonâmbulo empurram e drenam sanidade em vez de matar; a linha mostra "EMPURRA, NÃO MATA". Fica salvo no PlayerPrefs.
+- **Ver a vitória sem jogar:** no Play de uma cena de ala, **Sombra da Sanidade > Debug > Vencer a ala atual** coleta os HDs que faltam e vence (salva o checkpoint como uma vitória normal).
 - **Estatísticas entre alas:** tempo, EMPs, sanidade média, mortes, HDs e falhas somam as alas anteriores, vindas do checkpoint.
 
 ## Estatísticas

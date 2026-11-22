@@ -100,12 +100,12 @@ namespace SombraDaSanidade.UI
                 case 2:
                     Close();
                     if (GameManager.Instance != null) GameManager.Instance.Restart();
-                    else SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                    else CrtTransition.LoadScene(SceneManager.GetActiveScene().name);
                     break;
                 default:
                     Close();
                     Time.timeScale = 1f;
-                    if (Application.CanStreamedLevelBeLoaded(MenuScene)) SceneManager.LoadScene(MenuScene);
+                    if (Application.CanStreamedLevelBeLoaded(MenuScene)) CrtTransition.LoadScene(MenuScene);
                     else Application.Quit();
                     break;
             }
