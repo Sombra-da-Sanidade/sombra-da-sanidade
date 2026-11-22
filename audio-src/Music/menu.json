@@ -1,5 +1,6 @@
 {
   "kind": "music",
+  "bass_harmonics": 1.4,
   "duration": 64,
   "seed": 90,
   "loop": true,

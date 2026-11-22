@@ -1,5 +1,6 @@
 {
   "kind": "music",
+  "bass_harmonics": 1.4,
   "duration": 6,
   "seed": 6,
   "layers": [

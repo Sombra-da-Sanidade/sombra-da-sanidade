@@ -1,5 +1,6 @@
 {
   "kind": "music",
+  "bass_harmonics": 1.4,
   "duration": 150,
   "seed": 150,
   "env": [[0, 0], [2, 1], [146, 1], [150, 0.6]],
