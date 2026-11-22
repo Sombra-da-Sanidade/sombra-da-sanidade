@@ -23,6 +23,7 @@ namespace SombraDaSanidade.UI
             if (e.type == EventType.MouseDown && e.button == 0 && PixelHud.MouseOver(bx, by + 2, 112, 11))
             {
                 e.Use();
+                Audio.UiSfx.Confirm();
                 cachedFailures = -1;
                 // Vitória segue para a próxima ala ou o Menu (#93); R continua reiniciando a ala.
                 if (gm.State == GameState.Victory) gm.Proceed();
