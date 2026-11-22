@@ -14,10 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Narrative.AudioLog
   id: VANCE-02
   speaker: VANCE
-  title: "Registro 12: falha de contenção"
+  title: "Registro 12: o Voluntário 03"
   voice: {fileID: 0}
   lines:
-  - "Registro 12. A contenção elétrica caiu na subestação três."
-  - "O 07 atravessou a eclusa interna. Perdemos o turno da noite inteiro."
-  - "A lanterna atrai, mas a luz das lâmpadas de teto ele não atravessa."
-  - "Se alguém ouvir isto: religue os disjuntores e fique embaixo da luz."
+  - "Registro 12. A contenção caiu na subestação três."
+  - "O 03 foi o primeiro. Ele não dorme desde a segunda sessão."
+  - "Enquanto alguém olha para ele, ele não se mexe. Nem respira."
+  - "No escuro ele corre. Perdemos o turno da noite inteiro assim."
+  - "Se você estiver ouvindo isto: mantenha a luz nele e não pisque."

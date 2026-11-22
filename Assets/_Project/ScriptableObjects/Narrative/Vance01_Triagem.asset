@@ -18,6 +18,7 @@ MonoBehaviour:
   voice: {fileID: 0}
   lines:
   - "Registro 04. Projeto Hipnos, Sub-Nível 4. Voluntário 07 estável."
-  - "A sobrecarga de luz queimou as córneas dele. Ele não reage a nada que vê."
+  - "A sobrecarga de luz queimou as córneas dele. Ele não reage ao que vê."
   - "Mas quando um técnico respira do outro lado do vidro, ele vira a cabeça."
   - "Ele não precisa enxergar. Ele escuta."
+  - "O 08 já está a caminho. Desta vez, sem erros no protocolo."

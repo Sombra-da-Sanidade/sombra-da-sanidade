@@ -18,6 +18,7 @@ MonoBehaviour:
   voice: {fileID: 0}
   lines:
   - "Registro 19. A diretoria negou a evacuação."
-  - "Pediram um auditor externo para recuperar os HDs do projeto. Um só."
+  - "Pediram um auditor externo para recuperar os HDs. Um só."
   - "O perfil dele chegou antes dele: pressão, batimento, histórico de pânico."
-  - "Eles não querem os dados de volta. Querem medir quanto ele aguenta aqui."
+  - "Eu reconheci a letra na ficha. Fui eu que preenchi."
+  - "Eles não querem os dados de volta. Querem medir quanto ele aguenta."

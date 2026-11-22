@@ -2,42 +2,9 @@
 
 Frente 3 (Sanidade, HUD e narrativa), issue #39. **Status: rascunho para o grupo revisar.**
 
-O GDD 9 diz que os logs da Dra. Valerie Vance revelam três coisas: o Projeto Hipnos, a falha de contenção e a conspiração (Thomas foi enviado de propósito). Há um log para cada uma, e **cada HD coletado toca o próximo log**: o 1º HD toca o VANCE-01, o 2º o VANCE-02 e o 3º o VANCE-03, em qualquer ordem de servidor. O HD vira a recompensa narrativa da ala. A reviravolta exata do Ato 3 (#40) continua pendente: o log 3 só aponta a conspiração, sem resolvê-la.
+Os textos dos 3 logs, das falas do Thomas, das pistas e das cutscenes do RC ficam em [roteiro-rc.md](roteiro-rc.md) (#90). **Cada HD coletado toca o próximo log**: o 1º HD toca o VANCE-01 (o 07 é cego), o 2º o VANCE-02 (o 03 só se move no escuro) e o 3º o VANCE-03 (o auditor é o 08), em qualquer ordem de servidor. O HD vira a recompensa narrativa da ala.
 
-Cada roteiro tem frases curtas, uma legenda por linha, e reforça uma regra do jogo.
-
-## VANCE-01: triagem do Voluntário 07 (1º HD)
-
-Regra que ensina: **o monstro é cego e caça pelo som.**
-
-> Registro 04. Projeto Hipnos, Sub-Nível 4. Voluntário 07 estável.
-> A sobrecarga de luz queimou as córneas dele. Ele não reage a nada que vê.
-> Mas quando um técnico respira do outro lado do vidro, ele vira a cabeça.
-> Ele não precisa enxergar. Ele escuta.
-
-## VANCE-02: falha de contenção (2º HD)
-
-Regra que ensina: **a luz da lanterna atrai, a das lâmpadas de teto protege (Zona Segura).**
-
-> Registro 12. A contenção elétrica caiu na subestação três.
-> O 07 atravessou a eclusa interna. Perdemos o turno da noite inteiro.
-> A lanterna atrai, mas a luz das lâmpadas de teto ele não atravessa.
-> Se alguém ouvir isto: religue os disjuntores e fique embaixo da luz.
-
-## VANCE-03: o auditor (3º HD)
-
-Revela: **Thomas foi mandado de propósito.**
-
-> Registro 19. A diretoria negou a evacuação.
-> Pediram um auditor externo para recuperar os HDs do projeto. Um só.
-> O perfil dele chegou antes dele: pressão, batimento, histórico de pânico.
-> Eles não querem os dados de volta. Querem medir quanto ele aguenta aqui.
-
-## Para o grupo decidir
-
-1. Tom e texto dos 3 roteiros.
-2. Se o VANCE-03 revela demais antes do Ato 3.
-3. **Ato 3 (#40):** proposta que veio do primeiro rascunho, ainda sem código no jogo. No 3º HD, a Aethelgard aciona a "Diretiva 88-Omega", uma purga termobárica da base. Começa uma contagem de 60 s até a eclusa, com sirene. Se o tempo acaba, é game over. Isso conversa com a "Fuga da Eclusa cronometrada" do GDD 7 (fase 4, issue #44, Frente 4).
+Este arquivo descreve como os logs soam e funcionam no jogo.
 
 ## Como soa
 
