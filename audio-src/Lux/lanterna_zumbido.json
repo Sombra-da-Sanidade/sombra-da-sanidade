@@ -1,0 +1,50 @@
+{
+  "duration": 4,
+  "takes": 1,
+  "seed": 203,
+  "loop": true,
+  "loop_crossfade": 0.5,
+  "bass_harmonics": 0,
+  "layers": [
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 120,
+      "gain": 0.3,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          200,
+          2400
+        ]
+      },
+      "tremolo": {
+        "rate": 0.7,
+        "depth": 0.25
+      }
+    },
+    {
+      "type": "noise",
+      "color": "pink",
+      "gain": 0.08,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          3000,
+          8000
+        ]
+      }
+    }
+  ],
+  "event": {
+    "spatial": false,
+    "volume": [
+      1,
+      1
+    ],
+    "pitch": [
+      1,
+      1
+    ]
+  }
+}

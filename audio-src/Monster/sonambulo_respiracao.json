@@ -1,0 +1,76 @@
+{
+  "duration": 4,
+  "takes": 1,
+  "seed": 312,
+  "loop": true,
+  "loop_crossfade": 0.6,
+  "variants": [
+    "muffled"
+  ],
+  "layers": [
+    {
+      "type": "noise",
+      "color": "pink",
+      "gain": 0.7,
+      "filter": [
+        {
+          "type": "highpass",
+          "freq": 900
+        },
+        {
+          "type": "lowpass",
+          "freq": 4500
+        }
+      ],
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.4,
+          1
+        ],
+        [
+          0.7,
+          0.2
+        ],
+        [
+          1.1,
+          0.9
+        ],
+        [
+          1.5,
+          0
+        ],
+        [
+          2.4,
+          0
+        ],
+        [
+          2.8,
+          1
+        ],
+        [
+          3.2,
+          0
+        ],
+        [
+          4,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": true,
+    "volume": [
+      1,
+      1
+    ],
+    "pitch": [
+      1,
+      1
+    ]
+  }
+}

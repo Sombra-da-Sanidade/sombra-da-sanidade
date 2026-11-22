@@ -1,0 +1,77 @@
+{
+  "duration": 0.5,
+  "takes": 3,
+  "seed": 301,
+  "vary": {
+    "pitch": 0.08
+  },
+  "variants": [
+    "muffled"
+  ],
+  "layers": [
+    {
+      "type": "pulse",
+      "bpm": 900,
+      "start": 0,
+      "end": 0.25,
+      "gain": 0.9,
+      "hit": {
+        "type": "noise",
+        "color": "white",
+        "length": 0.015,
+        "filter": {
+          "type": "bandpass",
+          "freq": [
+            800,
+            4000
+          ]
+        },
+        "env": [
+          [
+            0,
+            1
+          ],
+          [
+            0.015,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 80,
+      "freq_end": 60,
+      "gain": 0.3,
+      "delay": 0.15,
+      "length": 0.35,
+      "drive": 3,
+      "filter": {
+        "type": "lowpass",
+        "freq": 700
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.05,
+          1
+        ],
+        [
+          0.35,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": true,
+    "volume": [
+      0.9,
+      1
+    ]
+  }
+}

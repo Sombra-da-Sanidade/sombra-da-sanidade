@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d04ddb4a18e401093f19a04a74cfd60, type: 3}
+  m_Name: especime_passo
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Audio.SoundEvent
+  clips:
+  - {fileID: 8300000, guid: 29917bdc2d98b07c6a637d93b6eadca4, type: 3}
+  - {fileID: 8300000, guid: b228eb380a3e5e8b0e5a9da1764a4248, type: 3}
+  - {fileID: 8300000, guid: facc6127577eae612d634d705512e9ae, type: 3}
+  - {fileID: 8300000, guid: 506d916b362c0562bfca0deebaad44ba, type: 3}
+  - {fileID: 8300000, guid: 5f620b2dcd37019a6c9406665fdbbe6a, type: 3}
+  - {fileID: 8300000, guid: d2da7baef1885444c482a3fb61487f25, type: 3}
+  muffledClips:
+  - {fileID: 8300000, guid: 3467adbceab801b4bf76cf1b3bafddba, type: 3}
+  - {fileID: 8300000, guid: 69aa1da4ac687099948e419f6b7a26e5, type: 3}
+  - {fileID: 8300000, guid: dab0afe2a0c61678b584150fbe859cae, type: 3}
+  - {fileID: 8300000, guid: 5573ab4d7eecfcdb37dac7c798cb7f9e, type: 3}
+  - {fileID: 8300000, guid: 501045d59fdca41374bcef63297cbc3c, type: 3}
+  - {fileID: 8300000, guid: 87ab634c7eaf78b20756b25a2b06fe97, type: 3}
+  bus: 3
+  volume: {x: 0.8, y: 1}
+  pitch: {x: 0.95, y: 1.05}
+  spatial: 1
+  maxDistance: 0
+  noiseRadius: 0
+  cooldown: 0

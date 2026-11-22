@@ -1,0 +1,82 @@
+{
+  "duration": 3,
+  "takes": 1,
+  "seed": 311,
+  "loop": true,
+  "loop_crossfade": 0.3,
+  "variants": [
+    "muffled"
+  ],
+  "layers": [
+    {
+      "type": "pulse",
+      "bpm": 420,
+      "gain": 0.6,
+      "accent_every": 3,
+      "hit": {
+        "type": "noise",
+        "color": "white",
+        "length": 0.03,
+        "filter": {
+          "type": "bandpass",
+          "freq": [
+            600,
+            2600
+          ]
+        },
+        "env": [
+          [
+            0,
+            1
+          ],
+          [
+            0.03,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 55,
+      "freq_end": 48,
+      "gain": 0.35,
+      "drive": 4,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          150,
+          900
+        ]
+      },
+      "tremolo": {
+        "rate": 7,
+        "depth": 0.8
+      }
+    },
+    {
+      "type": "noise",
+      "color": "brown",
+      "gain": 0.3,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          100,
+          500
+        ]
+      }
+    }
+  ],
+  "event": {
+    "spatial": true,
+    "volume": [
+      1,
+      1
+    ],
+    "pitch": [
+      1,
+      1
+    ]
+  }
+}

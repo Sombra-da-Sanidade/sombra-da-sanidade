@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d04ddb4a18e401093f19a04a74cfd60, type: 3}
+  m_Name: camera_curto
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Audio.SoundEvent
+  clips:
+  - {fileID: 8300000, guid: 461e0c1d03b55f58469ef54c19621b1e, type: 3}
+  - {fileID: 8300000, guid: 02095189a3f030177ff819b3eb826df1, type: 3}
+  muffledClips: []
+  bus: 2
+  volume: {x: 0.9, y: 1}
+  pitch: {x: 0.95, y: 1.05}
+  spatial: 1
+  maxDistance: 0
+  noiseRadius: 0
+  cooldown: 0

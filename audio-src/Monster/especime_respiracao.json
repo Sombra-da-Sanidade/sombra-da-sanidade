@@ -1,0 +1,149 @@
+{
+  "bus": "Monster",
+  "duration": 4.5,
+  "takes": 2,
+  "seed": 11,
+  "loop": true,
+  "loop_crossfade": 0.6,
+  "variants": [
+    "muffled",
+    "far"
+  ],
+  "vary": {
+    "pitch": 0.06
+  },
+  "layers": [
+    {
+      "type": "noise",
+      "color": "brown",
+      "gain": 0.8,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          120,
+          900
+        ]
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.9,
+          1
+        ],
+        [
+          1.6,
+          0.2
+        ],
+        [
+          2.2,
+          0.9
+        ],
+        [
+          3.4,
+          0.1
+        ],
+        [
+          4.5,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "pink",
+      "gain": 0.25,
+      "filter": [
+        {
+          "type": "highpass",
+          "freq": 1800
+        },
+        {
+          "type": "lowpass",
+          "freq": 5000
+        }
+      ],
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.9,
+          1
+        ],
+        [
+          1.6,
+          0
+        ],
+        [
+          2.2,
+          1
+        ],
+        [
+          3.4,
+          0
+        ],
+        [
+          4.5,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 62,
+      "freq_end": 55,
+      "gain": 0.2,
+      "drive": 3,
+      "filter": {
+        "type": "lowpass",
+        "freq": 400
+      },
+      "tremolo": {
+        "rate": 9,
+        "depth": 0.7
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          1.0,
+          1
+        ],
+        [
+          1.6,
+          0
+        ],
+        [
+          2.4,
+          0.8
+        ],
+        [
+          3.4,
+          0
+        ],
+        [
+          4.5,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": true,
+    "volume": [
+      0.9,
+      1.0
+    ],
+    "pitch": [
+      0.97,
+      1.03
+    ]
+  }
+}

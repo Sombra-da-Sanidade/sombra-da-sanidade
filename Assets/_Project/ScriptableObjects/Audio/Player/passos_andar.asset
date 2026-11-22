@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d04ddb4a18e401093f19a04a74cfd60, type: 3}
+  m_Name: passos_andar
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Audio.SoundEvent
+  clips:
+  - {fileID: 8300000, guid: 2018cdfa770b249b611e9eb243ad270d, type: 3}
+  - {fileID: 8300000, guid: ebe51368cf3d6b87f1daa5ae2e6e030d, type: 3}
+  - {fileID: 8300000, guid: bb04f4f1a9ae9ca783fa7695f086e9b6, type: 3}
+  - {fileID: 8300000, guid: 054c0ec9cfbd64c8dc50b94594aaf2e1, type: 3}
+  - {fileID: 8300000, guid: b1423468b1b4252e833421d60f3481ff, type: 3}
+  - {fileID: 8300000, guid: a355f89263523a0f41c7250d942a08ba, type: 3}
+  muffledClips: []
+  bus: 2
+  volume: {x: 0.55, y: 0.7}
+  pitch: {x: 0.94, y: 1.06}
+  spatial: 0
+  maxDistance: 0
+  noiseRadius: 0
+  cooldown: 0

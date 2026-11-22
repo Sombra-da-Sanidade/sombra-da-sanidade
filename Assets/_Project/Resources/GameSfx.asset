@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e845a9b43ac9437cb1639311bc2c85a4, type: 3}
+  m_Name: GameSfx
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Audio.GameSfx
+  footstepWalk: {fileID: 11400000, guid: c481790ffaea667c4a3378680c61823f, type: 2}
+  footstepRun: {fileID: 11400000, guid: 95688c9a51e2693ac97b3b9ccb7e4e66, type: 2}
+  flashlightOn: {fileID: 11400000, guid: 556bd3e1ea58a37be949dbb06c64030b, type: 2}
+  flashlightOff: {fileID: 11400000, guid: 6c00b9d2efebe8dc1859e09c904e37fa, type: 2}
+  flashlightHum: {fileID: 11400000, guid: da06db1d2a74b954b91a836f479082f7, type: 2}
+  batteryLow: {fileID: 11400000, guid: b5a2ba6723c2601a79d8693d4e1fffc5, type: 2}
+  batteryDead: {fileID: 11400000, guid: a89fa8ece7b7bb9f3b4da9cb6391d1c6, type: 2}
+  empFire: {fileID: 11400000, guid: e080039f43cafd1cea2e6733df236ddf, type: 2}
+  empFail: {fileID: 11400000, guid: c9feef0b4d7a04dc2b3d36fbdb1d074a, type: 2}
+  specimenBreath: {fileID: 11400000, guid: 57dbc5cafacb26c87a0e7995868f8629, type: 2}
+  specimenHear: {fileID: 11400000, guid: 2928c39f12728a760aff093048e8a873, type: 2}
+  specimenStep: {fileID: 11400000, guid: dc468a03bbcf73a48aebe6fcf2c9e9da, type: 2}
+  specimenScream: {fileID: 11400000, guid: 8538defb943bf7a448c61ffca07e4caa, type: 2}
+  specimenStunned: {fileID: 11400000, guid: 554efc0154b4a1da3a201772272163ad, type: 2}
+  specimenAttack: {fileID: 11400000, guid: 88cb94253f7093673af261e955415fa1, type: 2}
+  sleepwalkerCreak: {fileID: 11400000, guid: d7af896ae49aca919a12fc682c591bb2, type: 2}
+  sleepwalkerBreath: {fileID: 11400000, guid: d80dfba82d0425498aa484d28b6bf501, type: 2}
+  sleepwalkerWake: {fileID: 11400000, guid: 35b7ad01c24a4c561b8bdadfa59e9ffa, type: 2}
+  sleepwalkerAttack: {fileID: 11400000, guid: f5d7847d017df3b6a931933c18589932, type: 2}
+  skillWarn: {fileID: 11400000, guid: 586c21d02203db8aba6cbff66e8b8769, type: 2}
+  skillTick: {fileID: 11400000, guid: 516305c7782692259bfd4e551cc8c5e4, type: 2}
+  skillGood: {fileID: 11400000, guid: a3db001ddeb3e69c8a3999fbeb95b5c7, type: 2}
+  skillGreat: {fileID: 11400000, guid: aee9cb23dfcb103bf851e12da715ab33, type: 2}
+  skillFail: {fileID: 11400000, guid: 34678a72403f05636ada3e07753c8329, type: 2}
+  cameraServo: {fileID: 11400000, guid: edb86de6feea586b0af8be45fb31d3ac, type: 2}
+  cameraDetect: {fileID: 11400000, guid: 11167502b9e9cbc3e817d41ca22e118f, type: 2}
+  cameraAlarm: {fileID: 11400000, guid: 299a6c062fb05c9e8806527ba5c70cd1, type: 2}
+  cameraBlackout: {fileID: 11400000, guid: 6f96c7cccc202e212a1ae3c19e8a79f0, type: 2}
+  cameraShort: {fileID: 11400000, guid: 60446b2ad9ba423b7bf4d94717622624, type: 2}

@@ -1,0 +1,40 @@
+{
+  "duration": 0.03,
+  "takes": 3,
+  "seed": 402,
+  "vary": {
+    "pitch": 0.05
+  },
+  "bass_harmonics": 0,
+  "layers": [
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.6,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          2000,
+          6000
+        ]
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.03,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": false,
+    "volume": [
+      0.4,
+      0.5
+    ]
+  }
+}

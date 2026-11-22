@@ -1,0 +1,139 @@
+{
+  "duration": 0.6,
+  "takes": 1,
+  "seed": 502,
+  "bass_harmonics": 0,
+  "layers": [
+    {
+      "type": "tone",
+      "wave": "square",
+      "freq": 1760,
+      "gain": 0.5,
+      "delay": 0,
+      "length": 0.06,
+      "filter": {
+        "type": "lowpass",
+        "freq": 4000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.003,
+          1
+        ],
+        [
+          0.048,
+          1
+        ],
+        [
+          0.06,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "square",
+      "freq": 1760,
+      "gain": 0.5,
+      "delay": 0.2,
+      "length": 0.06,
+      "filter": {
+        "type": "lowpass",
+        "freq": 4000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.003,
+          1
+        ],
+        [
+          0.048,
+          1
+        ],
+        [
+          0.06,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "square",
+      "freq": 1760,
+      "gain": 0.5,
+      "delay": 0.35,
+      "length": 0.06,
+      "filter": {
+        "type": "lowpass",
+        "freq": 4000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.003,
+          1
+        ],
+        [
+          0.048,
+          1
+        ],
+        [
+          0.06,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "square",
+      "freq": 1760,
+      "gain": 0.5,
+      "delay": 0.45,
+      "length": 0.06,
+      "filter": {
+        "type": "lowpass",
+        "freq": 4000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.003,
+          1
+        ],
+        [
+          0.048,
+          1
+        ],
+        [
+          0.06,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": true,
+    "volume": [
+      0.9,
+      0.9
+    ],
+    "pitch": [
+      1,
+      1
+    ]
+  }
+}

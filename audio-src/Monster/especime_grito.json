@@ -1,0 +1,107 @@
+{
+  "duration": 1.6,
+  "takes": 2,
+  "seed": 303,
+  "vary": {
+    "pitch": 0.06
+  },
+  "drive": 2.2,
+  "variants": [
+    "muffled"
+  ],
+  "layers": [
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 420,
+      "freq_end": 260,
+      "gain": 0.6,
+      "vibrato": {
+        "rate": 11,
+        "depth": 0.04
+      },
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          500,
+          3500
+        ]
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.08,
+          1
+        ],
+        [
+          1.2,
+          0.7
+        ],
+        [
+          1.6,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "pink",
+      "gain": 0.5,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          1500,
+          6000
+        ]
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.05,
+          1
+        ],
+        [
+          1.6,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 95,
+      "gain": 0.4,
+      "filter": {
+        "type": "lowpass",
+        "freq": 500
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.1,
+          1
+        ],
+        [
+          1.6,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": true,
+    "volume": [
+      1,
+      1
+    ]
+  }
+}

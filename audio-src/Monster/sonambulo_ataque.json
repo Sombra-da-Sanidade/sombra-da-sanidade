@@ -1,0 +1,67 @@
+{
+  "duration": 1.0,
+  "takes": 1,
+  "seed": 314,
+  "drive": 2.5,
+  "layers": [
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.9,
+      "length": 0.2,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          500,
+          5000
+        ]
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.2,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 300,
+      "freq_end": 120,
+      "gain": 0.6,
+      "length": 0.9,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          300,
+          3000
+        ]
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.9,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": true,
+    "volume": [
+      1,
+      1
+    ],
+    "pitch": [
+      1,
+      1
+    ]
+  }
+}

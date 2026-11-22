@@ -1,0 +1,79 @@
+{
+  "duration": 0.3,
+  "takes": 1,
+  "seed": 401,
+  "bass_harmonics": 0,
+  "layers": [
+    {
+      "type": "tone",
+      "wave": "square",
+      "freq": 1320,
+      "gain": 0.5,
+      "delay": 0,
+      "length": 0.08,
+      "filter": {
+        "type": "lowpass",
+        "freq": 4000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.003,
+          1
+        ],
+        [
+          0.064,
+          1
+        ],
+        [
+          0.08,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "square",
+      "freq": 1320,
+      "gain": 0.5,
+      "delay": 0.14,
+      "length": 0.08,
+      "filter": {
+        "type": "lowpass",
+        "freq": 4000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.003,
+          1
+        ],
+        [
+          0.064,
+          1
+        ],
+        [
+          0.08,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": false,
+    "volume": [
+      0.8,
+      0.8
+    ],
+    "pitch": [
+      1,
+      1
+    ]
+  }
+}
