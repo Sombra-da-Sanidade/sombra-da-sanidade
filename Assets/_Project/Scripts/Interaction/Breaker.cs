@@ -190,6 +190,19 @@ namespace SombraDaSanidade.Interaction
             StateChanged?.Invoke(false);
         }
 
+        // Apagão do alarme da câmera de segurança (#79): a sala apaga até o jogador consertar de novo.
+        // Nunca queima o painel, mesmo com burnsOut, para o jogador sempre poder religar.
+        public void Cut()
+        {
+            if (!isActive) return;
+            isActive = false;
+            safeZone.TurnOff();
+            if (statusLed != null) statusLed.color = brokenColor;
+            if (panel != null && offSprite != null) panel.sprite = offSprite;
+            if (lamps != null) foreach (var l in lamps) if (l != null) l.TurnOff();
+            StateChanged?.Invoke(false);
+        }
+
         private void StopSparks()
         {
             repairing = false;
