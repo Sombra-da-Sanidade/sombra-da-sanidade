@@ -78,6 +78,8 @@ Sons com menos de 0,5 s vão pelo pico (-3 dBFS). Antes de normalizar, o render 
 | `filter`, `drive`, `reverb`, `env` | Processamento do som inteiro, depois das camadas |
 | `event` | Campos do `SoundEvent` no Unity. `noiseRadius` > 0 faz o Espécime ouvir |
 | `music_set`, `layer` | Música em camadas: o builder põe o arquivo na camada `layer` (0 a 3) do `MusicSet` |
+| `lufs` | Troca o alvo de loudness do grupo. As camadas da música por fase usam alvos menores (-21 a -18), porque tocam somadas |
+| `peak` | Troca o teto de pico (padrão -1 dBTP). As camadas da música por fase usam de -6 a -8, porque as batidas somam no mesmo instante |
 
 ### Camadas
 

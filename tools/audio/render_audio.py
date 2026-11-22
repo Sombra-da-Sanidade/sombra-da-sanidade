@@ -359,8 +359,9 @@ def true_peak_db(audio):
     return 20 * np.log10(np.abs(up).max() + 1e-12)
 
 
-def normalize_gain(audio, bus, tmp):
-    target = TARGET_LUFS.get(bus, -18.0)
+def normalize_gain(audio, bus, tmp, lufs_override=None):
+    # "lufs" na receita troca o alvo do grupo: as camadas da música por fase somam entre si (#104).
+    target = lufs_override if lufs_override is not None else TARGET_LUFS.get(bus, -18.0)
     lufs = measure_lufs(audio, tmp) if len(audio) >= seconds(0.5) else None
     if lufs is None:
         return db(SHORT_PEAK_DB) / (np.abs(audio).max() + 1e-12)
@@ -380,9 +381,9 @@ def enhance_bass(audio, amount):
     return audio + amount * harm
 
 
-def limit_true_peak(audio):
+def limit_true_peak(audio, top=TRUE_PEAK_DB):
     """Limitador: reduz o ganho só onde há pico (ataque 1 ms, soltura 80 ms) e garante o teto de -1 dBTP."""
-    ceiling = db(TRUE_PEAK_DB - 0.6)   # folga para o OGG
+    ceiling = db(top - 0.6)   # folga para o OGG
     peak = np.abs(audio)
     if peak.max() <= ceiling:
         return audio
@@ -396,7 +397,7 @@ def limit_true_peak(audio):
     gain = np.minimum(need, smooth)
     out = audio * gain
     tp = true_peak_db(out)
-    return out * db(TRUE_PEAK_DB - tp) if tp > TRUE_PEAK_DB else out
+    return out * db(top - tp) if tp > top else out
 
 
 def encode_ogg(audio, path, tmp):
@@ -443,10 +444,11 @@ def render_recipe(path):
         for take, base in enumerate(output_names(recipe, name)):
             audio = render_take(recipe, take, path.parent, tmp)
             audio = enhance_bass(audio, recipe.get("bass_harmonics", DEFAULT_BASS_HARMONICS.get(bus, BASS_HARMONICS)))
-            gain = normalize_gain(audio, bus, tmp)   # ganho medido na versão limpa, igual para as variantes
+            gain = normalize_gain(audio, bus, tmp, recipe.get("lufs"))   # ganho medido na versão limpa, igual para as variantes
             for v in variants:
                 rng = np.random.default_rng(recipe.get("seed", 1) * 7919 + take)
-                out = limit_true_peak(variant(audio, v, rng) * gain)
+                # "peak": teto menor (camadas da música por fase, que somam as batidas no mesmo instante).
+                out = limit_true_peak(variant(audio, v, rng) * gain, recipe.get("peak", TRUE_PEAK_DB))
                 file = OUT / category / (base + ("" if v == "dry" else f"_{v}") + ".ogg")
                 encode_ogg(out, file, tmp)
                 written.append(file.relative_to(ROOT).as_posix())
