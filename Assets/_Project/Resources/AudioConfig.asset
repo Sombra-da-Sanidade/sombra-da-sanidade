@@ -16,6 +16,12 @@ MonoBehaviour:
   layerFadeOut: 4
   pulseTension: 0.35
   layerVolume: 0.8
+  menuMusic: {fileID: 8300000, guid: 7f8491b41a24bd37d23914ae7232c3cb, type: 3}
+  safeRoomMusic: {fileID: 8300000, guid: 7e32e5bef01f84dc1ef2985a07983c4c, type: 3}
+  purgeMusic: {fileID: 8300000, guid: f9a188a12c7d0ca2de3d17d5e19430fc, type: 3}
+  gameOverSting: {fileID: 8300000, guid: eef86c8669af09cbd191bfcf39b99416, type: 3}
+  laudoMusic: {fileID: 8300000, guid: c2247b2c7ba17b508428ce1df91ecc9c, type: 3}
+  fixedFade: 1.5
   chaseAmbienceDuckDb: -6
   voiceMusicDuckDb: -8
   duckFade: 0.5

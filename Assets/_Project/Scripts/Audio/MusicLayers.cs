@@ -27,6 +27,9 @@ namespace SombraDaSanidade.Audio
 
         public void SetIntensity(int intensity) => Intensity = Mathf.Clamp(intensity, 0, Mathf.Max(0, sources.Length - 1));
 
+        // Silencia todas as camadas (faixa fixa tocando: purga, game over, laudo). Volta com o mesmo fade.
+        public bool Muted { get; set; }
+
         private void Start()
         {
             config = AudioConfig.Load();
@@ -62,7 +65,7 @@ namespace SombraDaSanidade.Audio
             float dt = Time.unscaledDeltaTime;
             for (int i = 0; i < sources.Length; i++)
             {
-                float target = i <= Intensity ? config.layerVolume : 0f;
+                float target = !Muted && i <= Intensity ? config.layerVolume : 0f;
                 // Entra rápido (susto) e sai devagar (recuo).
                 float speed = target > current[i] ? 1f / Mathf.Max(0.01f, config.layerFadeIn) : 1f / Mathf.Max(0.01f, config.layerFadeOut);
                 current[i] = Mathf.MoveTowards(current[i], target, speed * config.layerVolume * dt);

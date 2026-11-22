@@ -14,7 +14,7 @@ namespace SombraDaSanidade.EditorTools
     public static class MenuSceneBuilder
     {
         public const string ScenePath = "Assets/_Project/Scenes/Main/Menu.unity";
-        public const string MusicPath = "Assets/_Project/Audio/Music/menu_drone.wav";
+        public const string MusicPath = "Assets/_Project/Audio/Music/menu.ogg";   // #103 (audio-src/Music/menu.json)
 
         // Mesma resolução de referência do HUD em pixel art (PixelHud).
         private static readonly Vector2 ReferenceResolution = new Vector2(640, 360);
@@ -44,12 +44,12 @@ namespace SombraDaSanidade.EditorTools
         private static void CreateMusic()
         {
             var clip = AssetDatabase.LoadAssetAtPath<AudioClip>(MusicPath);
-            if (clip == null) Debug.LogWarning($"[Menu] {MusicPath} não existe. Rode python3 tools/audio/gen_menu_music.py.");
+            if (clip == null) Debug.LogWarning($"[Menu] {MusicPath} não existe. Rode python3 tools/audio/render_audio.py menu.");
             var source = new GameObject("MenuMusic").AddComponent<AudioSource>();
             source.clip = clip;
             source.loop = true;
             source.playOnAwake = true;
-            source.volume = 0.7f;
+            source.volume = 1f;
             source.spatialBlend = 0f;
             source.outputAudioMixerGroup = SombraDaSanidade.Audio.AudioService.Group(SombraDaSanidade.Audio.AudioBus.Music);   // #101
         }

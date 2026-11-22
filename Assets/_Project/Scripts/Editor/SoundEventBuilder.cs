@@ -45,9 +45,37 @@ namespace SombraDaSanidade.EditorTools
                 events++;
             }
             sets = BuildMusicSets(clips);
+            int linked = LinkSoundtrack();
 
             AssetDatabase.SaveAssets();
-            Debug.Log($"[SoundEvents] {events} SoundEvent(s) e {sets} MusicSet(s) atualizados.");
+            Debug.Log($"[SoundEvents] {events} SoundEvent(s), {sets} MusicSet(s) e {linked} faixa(s) fixa(s) no AudioConfig.");
+        }
+
+        // Faixas fixas da trilha (#103) → campos do AudioConfig. Arquivo que não existe deixa o campo como está.
+        public static readonly (string field, string file)[] Soundtrack =
+        {
+            ("menuMusic", "Music/menu.ogg"),
+            ("safeRoomMusic", "Music/sala_segura.ogg"),
+            ("purgeMusic", "Music/purga.ogg"),
+            ("gameOverSting", "Music/game_over.ogg"),
+            ("laudoMusic", "Music/laudo.ogg"),
+        };
+
+        private static int LinkSoundtrack()
+        {
+            var config = AssetDatabase.LoadAssetAtPath<AudioConfig>(AudioMixerBuilder.ConfigPath);
+            if (config == null) return 0;
+            var so = new SerializedObject(config);
+            int linked = 0;
+            foreach (var (field, file) in Soundtrack)
+            {
+                var clip = AssetDatabase.LoadAssetAtPath<AudioClip>(AudioImportRules.AudioRoot + file);
+                if (clip == null) continue;
+                so.FindProperty(field).objectReferenceValue = clip;
+                linked++;
+            }
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return linked;
         }
 
         public static void BuildBatch()

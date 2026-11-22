@@ -19,6 +19,20 @@ namespace SombraDaSanidade.Audio
         [Tooltip("Volume de cada camada quando ativa.")]
         [Range(0f, 1f)] public float layerVolume = 0.8f;
 
+        [Header("Faixas fixas (seção 4, #103). Ligadas por Sombra da Sanidade > Áudio > Gerar SoundEvents")]
+        [Tooltip("Menu: drone com a contagem invertida.")]
+        public AudioClip menuMusic;
+        [Tooltip("Zona Segura: única faixa calma.")]
+        public AudioClip safeRoomMusic;
+        [Tooltip("Purga da Eclusa: 150 s exatos, o próprio cronômetro (GDD 8: o tempo não aparece em número).")]
+        public AudioClip purgeMusic;
+        [Tooltip("Game Over: corte seco e zumbido.")]
+        public AudioClip gameOverSting;
+        [Tooltip("Laudo (vitória na última fase).")]
+        public AudioClip laudoMusic;
+        [Tooltip("Segundos de crossfade entre a música da fase e uma faixa fixa.")]
+        public float fixedFade = 1.5f;
+
         [Header("Ducking (seção 6)")]
         [Tooltip("dB a menos no Ambiente com o monstro em perseguição.")]
         public float chaseAmbienceDuckDb = -6f;

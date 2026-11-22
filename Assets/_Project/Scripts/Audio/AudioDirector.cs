@@ -31,6 +31,15 @@ namespace SombraDaSanidade.Audio
         public int TargetIntensity { get; private set; } = 1;
         public bool Chasing { get; private set; }
 
+        // Faixa fixa tocando por cima (ou no lugar) da música da fase (#103): sala segura, purga, game over, laudo.
+        public AudioClip FixedTrack => fixedSource != null ? fixedSource.clip : null;
+        public float FixedVolume => fixedSource != null ? fixedSource.volume : 0f;
+        public AudioSource FixedSource => fixedSource;
+
+        private AudioSource fixedSource;
+        private AudioClip pendingClip;
+        private GameManager gm;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void HookSceneLoads()
         {
@@ -59,6 +68,7 @@ namespace SombraDaSanidade.Audio
 
         private void OnDestroy()
         {
+            if (gm != null) gm.GameOverTriggered -= OnGameOver;
             if (Instance != this) return;
             Instance = null;
             AudioService.SetDuck(AudioBus.Ambience, 0f);
@@ -72,6 +82,77 @@ namespace SombraDaSanidade.Audio
             monster = FindAnyObjectByType<MonsterController>();
             sleepwalker = FindAnyObjectByType<SleepwalkerController>();
             cam = Camera.main;
+            gm = GameManager.Instance;
+            if (gm != null) gm.GameOverTriggered += OnGameOver;
+
+            fixedSource = gameObject.AddComponent<AudioSource>();
+            fixedSource.playOnAwake = false;
+            fixedSource.spatialBlend = 0f;
+            fixedSource.ignoreListenerPause = true;
+            AudioService.Route(fixedSource, AudioBus.Music);
+        }
+
+        // Game Over é corte seco (sound-design.md seção 4): sem fade, a música da fase some no mesmo quadro.
+        private void OnGameOver(DeathCause cause)
+        {
+            if (music != null) music.Muted = true;
+            if (fixedSource == null || config.gameOverSting == null) return;
+            pendingClip = null;
+            fixedSource.Stop();
+            fixedSource.clip = config.gameOverSting;
+            fixedSource.loop = false;
+            fixedSource.volume = 1f;
+            fixedSource.Play();
+        }
+
+        // Qual faixa fixa deveria tocar agora. null: só a música da fase.
+        private AudioClip DesiredFixed(out bool loop)
+        {
+            loop = true;
+            if (gm != null && gm.State == GameState.GameOver) { loop = false; return config.gameOverSting; }
+            if (gm != null && gm.State == GameState.Victory)
+            {
+                var wing = Level.WingCheckpoint.Instance;
+                return wing == null || wing.IsFinal ? config.laudoMusic : null;
+            }
+            var escape = Level.EscapeSequence.Instance;
+            if (escape != null && escape.Active) { loop = false; return config.purgeMusic; }
+            if (sanity != null && sanity.InSafeZone && !CutsceneActive) return config.safeRoomMusic;
+            return null;
+        }
+
+        private void UpdateFixedTrack()
+        {
+            if (fixedSource == null) return;
+            var desired = DesiredFixed(out bool loop);
+            float step = Time.unscaledDeltaTime / Mathf.Max(0.05f, config.fixedFade);
+
+            if (desired != fixedSource.clip || !fixedSource.isPlaying && desired != null && loop)
+            {
+                // O sting do Game Over não volta a tocar depois de terminar.
+                if (desired != null && desired == config.gameOverSting && fixedSource.clip == desired) return;
+                pendingClip = desired;
+                fixedSource.volume = Mathf.MoveTowards(fixedSource.volume, 0f, step);
+                if (fixedSource.volume > 0f && fixedSource.isPlaying) return;
+                fixedSource.Stop();
+                fixedSource.clip = pendingClip;
+                fixedSource.loop = loop;
+                if (pendingClip != null) fixedSource.Play();
+            }
+            else if (desired != null)
+            {
+                fixedSource.volume = Mathf.MoveTowards(fixedSource.volume, 1f, step);
+            }
+
+            // A purga é o cronômetro: a música acompanha o tempo real da sequência (inclusive SetRemaining).
+            var escape = Level.EscapeSequence.Instance;
+            if (desired != null && desired == config.purgeMusic && escape != null && fixedSource.isPlaying
+                && Mathf.Abs(fixedSource.time - escape.Elapsed) > 0.5f && escape.Elapsed < desired.length)
+                fixedSource.time = escape.Elapsed;
+
+            // Faixa que substitui a música da fase (purga, game over, laudo) silencia as camadas; a da sala segura
+            // toca por cima do L0 (o AudioDirector já põe a intensidade em 0 na Zona Segura).
+            if (music != null) music.Muted = desired != null && desired != config.safeRoomMusic;
         }
 
         private void Update()
@@ -82,6 +163,7 @@ namespace SombraDaSanidade.Audio
 
             TargetIntensity = ComputeIntensity(monsterChasing, sleeperMoving);
             if (music != null) music.SetIntensity(TargetIntensity);
+            UpdateFixedTrack();
 
             // Ducking suave em dB.
             float speed = 80f / Mathf.Max(0.01f, config.duckFade) * Time.unscaledDeltaTime;

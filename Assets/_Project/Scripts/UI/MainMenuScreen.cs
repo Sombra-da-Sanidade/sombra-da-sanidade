@@ -39,8 +39,16 @@ namespace SombraDaSanidade.UI
             GameSettings.Apply();
             RefreshContinue();
             // A música do menu foi criada pelo MenuSceneBuilder antes do mixer (#101): liga ao grupo Música aqui.
+            // A faixa do menu vem do AudioConfig (#103): troca o drone antigo da cena sem precisar regerar a cena.
+            var menuMusic = Audio.AudioConfig.Load().menuMusic;
             foreach (var source in FindObjectsByType<AudioSource>(FindObjectsSortMode.None))
+            {
                 if (source.outputAudioMixerGroup == null) Audio.AudioService.Route(source, Audio.AudioBus.Music);
+                if (menuMusic == null || !source.loop || source.clip == menuMusic) continue;
+                source.clip = menuMusic;
+                source.volume = 1f;   // a faixa já sai no volume certo do render (-24 LUFS)
+                source.Play();
+            }
         }
 
         // #45: com checkpoint salvo e a cena da próxima ala no Build Profile, o menu oferece CONTINUAR.
