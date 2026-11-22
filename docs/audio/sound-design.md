@@ -124,6 +124,36 @@ Receitas em `audio-src/{Player,Lux,Monster,SkillCheck,Camera}/`, ligadas no `Res
 
 Ainda não: passos por tipo de piso (as cenas não marcam o piso), respiração cansada.
 
+### Feito na #106
+
+Receitas em `audio-src/World/` e `audio-src/UI/`, no mesmo esquema da #105 (`GameSfx` + `GameSfxHooks`, nenhuma cena muda). Os menus tocam os sons de interface pelo `UiSfx`, porque o Menu não tem `GameSfxHooks`. Teste: **Sombra da Sanidade > Rodar teste dos sons de mundo**.
+
+| Gancho | Som |
+|---|---|
+| `Breaker.StateChanged` / `Burnt` | `disjuntor_liga` (alavanca, relés, lâmpadas piscando até acender), `disjuntor_desliga`, `disjuntor_queima` |
+| `DriveServer.Ejected` / `GameManager.DriveCollected` | `hd_ejeta` (motor e trava), `hd_coleta` (estalo magnético e dois bipes) |
+| `Locker.Opened` | `armario_abre` (3 tomadas); com pilha, também `item_pega` |
+| `AdrenaSynEffect` ligando, `LithiumStabilizer.Applied` (Estabilizador e sedativo) | `item_injecao` |
+| `FlareThrower.Count` subindo / descendo | `item_pega` / `sinalizador_acende`; depois, `sinalizador_queimando` em loop no chão enquanto `SignalFlare.IsBurning`, sumindo no último 1,5 s |
+| `KeypadLock.Unlocked` / `WrongCode` | `teclado_certo`, `teclado_errado` |
+| `Substation.Powered` | `subestacao_liga` |
+| `UpgradeTerminal.Chosen` | `ui_upgrade` |
+| Segurando E (`PlayerInteractor.IsChanneling`) | Loop `hd_ejetando` (volume 0,3); `disjuntor_reparo` (4 s), `armario_forca` (1 s) , `caixa_abre` (caixa de ferramentas do `FlarePickup`, 0,6 s) e `subestacao_reparo` (6 s, descargas a cada 1,5 s junto do ruído do console) tocam uma vez, do tamanho do segurar E. Param ao soltar, andar ou com o progresso pausado |
+| `NeuralModule.Applied` | `modulo_neural` (encaixe, choque e zumbido subindo) |
+| Painel da senha: número digitado ou apagado (`KeypadLock.Entry`) | `teclado_tecla` (3 tomadas) |
+| Terminal da Eclusa: segurando E (3 s) / `ActivatedEvent` | `eclusa_insere` (os três HDs entrando, com bipes subindo) / `eclusa_liga` (trava pesada e console ligando) |
+| Vitória de uma ala (checkpoint salvo) | `ui_salvo` |
+| Vitória final (VOCÊ ESCAPOU) | `vitoria_eclusa` (trava, ar despressurizando e o jingle de homologação Ré–Fá#–Lá–Ré), depois a música do laudo |
+| Menu, pausa (inclusive ao abrir), configurações e tela de fim (teclado e mouse) | `ui_navegar`, `ui_confirmar`, `ui_voltar` |
+
+O aviso de bateria fraca (`bateria_fraca`) virou um piscar de filamento discreto (antes era um zumbido quadrado de 180 Hz que soava como erro). O EMP (`emp_disparo`) foi refeito: carga de 0,2 s, clique do gatilho, estrondo grave, rajada de estática, zap descendo e cauda de faíscas. A lanterna também mudou: liga e desliga viraram clique mecânico (4 tomadas) e o zumbido ficou um chiado abafado, com volume 0,06 no `AudioConfig`.
+
+Respirações: a do Espécime ficou com o rosnado mais leve e uma pausa no fim do ciclo (6 s), com volume 0,4/0,75 no `AudioConfig`; a do Thomas ofegante (`Player/respiracao_ofegante`, gravação CC0 "scared breathing" da Owlish Media, 15 s em loop) é usada pelo `SanityHeartbeat` quando a cena não tem clip próprio: tom até 1,08x e volume 0,08 a 0,35 no `SanityConfig`. Na cena de morte (sanidade travada pela `MonsterKillScene`) e no fim da partida a respiração corta seco e o `GameSfxHooks` silencia os loops (monstro, Sonâmbulo, câmeras, lanterna, segurar E): fica só o som de morte ou de vitória. O sussurro da alucinação sonora (`Sanity/alucinacao_sussurro`, 3 tomadas, sílabas soltas com bandas de voz) substitui o ruído pulsando a 14,8 Hz do `SanityAudioHallucination`, que soava como algo arrastando; volume 0,75 → 0,5.
+
+Morte pelo Espécime (`especime_ataque`, 3,5 s = animação da `MonsterKillScene`): o bote e o rugido sintéticos de antes, mais gravações CC0 (agarrar, três mordidas e um baque no fim, da Owlish Media; grito masculino do Thomas, baixo e abafado, do OpenGameArt). A respiração corta quando o monstro pega.
+
+Ainda não: som da transição CRT (entra depois da #94), eventos aleatórios de ambiente por fase.
+
 ## 6. Mix e níveis
 
 | Grupo | Alvo da fonte (normalizar antes de importar) |
