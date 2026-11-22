@@ -1,0 +1,229 @@
+{
+  "kind": "music",
+  "duration": 50,
+  "seed": 1073,
+  "loop": true,
+  "loop_crossfade": 2,
+  "lufs": -21,
+  "peak": -8,
+  "music_set": "Eclusa",
+  "layer": 2,
+  "bass_harmonics": 1.4,
+  "reverb": {
+    "mix": 0.25,
+    "decay": 1.5
+  },
+  "layers": [
+    {
+      "type": "pulse",
+      "bpm": 75,
+      "gain": 0.85,
+      "start": 0.0,
+      "hit": {
+        "type": "sample",
+        "file": "../Raw/OwlishMedia/tambor.flac",
+        "pitch": 0.45,
+        "length": 0.8,
+        "filter": {
+          "type": "lowpass",
+          "freq": 1000
+        }
+      },
+      "accent_every": 4
+    },
+    {
+      "type": "pulse",
+      "bpm": 150,
+      "gain": 0.12,
+      "start": 0.0,
+      "hit": {
+        "type": "noise",
+        "color": "white",
+        "length": 0.015,
+        "filter": {
+          "type": "bandpass",
+          "freq": [
+            2500,
+            7000
+          ]
+        },
+        "env": [
+          [
+            0,
+            1
+          ],
+          [
+            0.015,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "type": "pulse",
+      "bpm": 75,
+      "gain": 0.25,
+      "start": 0.4,
+      "hit": {
+        "type": "sample",
+        "file": "../Raw/Kenney/metalClick.ogg",
+        "pitch": 0.5,
+        "length": 0.6,
+        "filter": {
+          "type": "lowpass",
+          "freq": 3000
+        }
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 73.42,
+      "gain": 0.15,
+      "delay": 0,
+      "length": 12.6,
+      "tremolo": {
+        "rate": 1.25,
+        "depth": 0.7
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.6,
+          1
+        ],
+        [
+          12,
+          1
+        ],
+        [
+          12.6,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 116.54,
+      "gain": 0.15,
+      "delay": 12,
+      "length": 12.6,
+      "tremolo": {
+        "rate": 1.25,
+        "depth": 0.7
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.6,
+          1
+        ],
+        [
+          12,
+          1
+        ],
+        [
+          12.6,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 98.0,
+      "gain": 0.15,
+      "delay": 24,
+      "length": 12.6,
+      "tremolo": {
+        "rate": 1.25,
+        "depth": 0.7
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.6,
+          1
+        ],
+        [
+          12,
+          1
+        ],
+        [
+          12.6,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 110.0,
+      "gain": 0.15,
+      "delay": 36,
+      "length": 12.6,
+      "tremolo": {
+        "rate": 1.25,
+        "depth": 0.7
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.6,
+          1
+        ],
+        [
+          12,
+          1
+        ],
+        [
+          12.6,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 73.42,
+      "gain": 0.15,
+      "delay": 48,
+      "length": 12.6,
+      "tremolo": {
+        "rate": 1.25,
+        "depth": 0.7
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.6,
+          1
+        ],
+        [
+          12,
+          1
+        ],
+        [
+          12.6,
+          0
+        ]
+      ]
+    }
+  ]
+}

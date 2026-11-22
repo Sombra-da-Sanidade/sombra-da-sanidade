@@ -1,0 +1,174 @@
+{
+  "kind": "music",
+  "duration": 50,
+  "seed": 1044,
+  "loop": true,
+  "loop_crossfade": 2,
+  "lufs": -18,
+  "peak": -7,
+  "music_set": "Medica",
+  "layer": 3,
+  "reverb": {
+    "mix": 0.25,
+    "decay": 1.5
+  },
+  "layers": [
+    {
+      "type": "pulse",
+      "bpm": 100,
+      "gain": 0.6,
+      "start": 0.0,
+      "hit": {
+        "type": "sample",
+        "file": "../Raw/Kenney/impactMetal_heavy_000.ogg",
+        "pitch": 0.8,
+        "length": 0.4
+      },
+      "accent_every": 4
+    },
+    {
+      "type": "pulse",
+      "bpm": 50,
+      "gain": 0.7,
+      "start": 0.3,
+      "hit": {
+        "type": "sample",
+        "file": "../Raw/OwlishMedia/tambor.flac",
+        "pitch": 0.55,
+        "length": 0.6
+      }
+    },
+    {
+      "type": "pulse",
+      "bpm": 200,
+      "gain": 0.1,
+      "start": 0.0,
+      "hit": {
+        "type": "noise",
+        "color": "white",
+        "length": 0.025,
+        "filter": {
+          "type": "bandpass",
+          "freq": [
+            5000,
+            10000
+          ]
+        },
+        "env": [
+          [
+            0,
+            1
+          ],
+          [
+            0.025,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/OwlishMedia/raspar_3.flac",
+      "gain": 0.35,
+      "pitch": 0.7,
+      "delay": 0.0,
+      "filter": [
+        {
+          "type": "lowpass",
+          "freq": 4000
+        }
+      ],
+      "repeat": {
+        "every": 4.8,
+        "count": 11
+      }
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/OwlishMedia/raspar_1.flac",
+      "gain": 0.3,
+      "pitch": 0.6,
+      "delay": 2.4,
+      "filter": [
+        {
+          "type": "lowpass",
+          "freq": 4000
+        }
+      ],
+      "repeat": {
+        "every": 4.8,
+        "count": 11
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 146.83,
+      "gain": 0.08,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          200,
+          2000
+        ]
+      },
+      "tremolo": {
+        "rate": 6,
+        "depth": 0.5
+      },
+      "vibrato": {
+        "rate": 5,
+        "depth": 0.01
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 155.56,
+      "gain": 0.06,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          200,
+          2000
+        ]
+      },
+      "tremolo": {
+        "rate": 5.3,
+        "depth": 0.5
+      },
+      "vibrato": {
+        "rate": 4.4,
+        "depth": 0.012
+      }
+    },
+    {
+      "type": "pulse",
+      "bpm": 50,
+      "gain": 0.5,
+      "start": 0.0,
+      "hit": {
+        "type": "tone",
+        "wave": "sine",
+        "freq": 55,
+        "freq_end": 30,
+        "length": 0.4,
+        "env": [
+          [
+            0,
+            0
+          ],
+          [
+            0.004,
+            1
+          ],
+          [
+            0.4,
+            0
+          ]
+        ]
+      },
+      "accent_every": 2
+    }
+  ]
+}

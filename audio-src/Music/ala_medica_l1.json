@@ -1,0 +1,406 @@
+{
+  "kind": "music",
+  "duration": 50,
+  "seed": 1042,
+  "loop": true,
+  "loop_crossfade": 2,
+  "lufs": -20,
+  "peak": -6,
+  "music_set": "Medica",
+  "layer": 1,
+  "bass_harmonics": 1.2,
+  "reverb": {
+    "mix": 0.35,
+    "decay": 3.5
+  },
+  "layers": [
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 36.71,
+      "gain": 0.4,
+      "tremolo": {
+        "rate": 0.0625,
+        "depth": 0.2
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 73.42,
+      "gain": 0.25,
+      "tremolo": {
+        "rate": 0.0625,
+        "depth": 0.2
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 146.243,
+      "gain": 0.05,
+      "vibrato": {
+        "rate": 0.13,
+        "depth": 0.002
+      },
+      "filter": [
+        {
+          "type": "lowpass",
+          "freq": 700
+        },
+        {
+          "type": "highpass",
+          "freq": 60
+        }
+      ],
+      "tremolo": {
+        "rate": 0.0625,
+        "depth": 0.3
+      },
+      "env": [
+        [
+          0,
+          0.5
+        ],
+        [
+          12,
+          1
+        ],
+        [
+          24,
+          0.6
+        ],
+        [
+          36,
+          1
+        ],
+        [
+          50,
+          0.5
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 147.417,
+      "gain": 0.05,
+      "vibrato": {
+        "rate": 0.13,
+        "depth": 0.002
+      },
+      "filter": [
+        {
+          "type": "lowpass",
+          "freq": 700
+        },
+        {
+          "type": "highpass",
+          "freq": 60
+        }
+      ],
+      "tremolo": {
+        "rate": 0.0625,
+        "depth": 0.3
+      },
+      "env": [
+        [
+          0,
+          0.5
+        ],
+        [
+          12,
+          1
+        ],
+        [
+          24,
+          0.6
+        ],
+        [
+          36,
+          1
+        ],
+        [
+          50,
+          0.5
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 219.12,
+      "gain": 0.05,
+      "vibrato": {
+        "rate": 0.16,
+        "depth": 0.002
+      },
+      "filter": [
+        {
+          "type": "lowpass",
+          "freq": 700
+        },
+        {
+          "type": "highpass",
+          "freq": 60
+        }
+      ],
+      "tremolo": {
+        "rate": 0.09375,
+        "depth": 0.3
+      },
+      "env": [
+        [
+          0,
+          0.5
+        ],
+        [
+          12,
+          1
+        ],
+        [
+          24,
+          0.6
+        ],
+        [
+          36,
+          1
+        ],
+        [
+          50,
+          0.5
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 220.88,
+      "gain": 0.05,
+      "vibrato": {
+        "rate": 0.16,
+        "depth": 0.002
+      },
+      "filter": [
+        {
+          "type": "lowpass",
+          "freq": 700
+        },
+        {
+          "type": "highpass",
+          "freq": 60
+        }
+      ],
+      "tremolo": {
+        "rate": 0.09375,
+        "depth": 0.3
+      },
+      "env": [
+        [
+          0,
+          0.5
+        ],
+        [
+          12,
+          1
+        ],
+        [
+          24,
+          0.6
+        ],
+        [
+          36,
+          1
+        ],
+        [
+          50,
+          0.5
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 328.311,
+      "gain": 0.05,
+      "vibrato": {
+        "rate": 0.19,
+        "depth": 0.002
+      },
+      "filter": [
+        {
+          "type": "lowpass",
+          "freq": 700
+        },
+        {
+          "type": "highpass",
+          "freq": 60
+        }
+      ],
+      "tremolo": {
+        "rate": 0.125,
+        "depth": 0.3
+      },
+      "env": [
+        [
+          0,
+          0.5
+        ],
+        [
+          12,
+          1
+        ],
+        [
+          24,
+          0.6
+        ],
+        [
+          36,
+          1
+        ],
+        [
+          50,
+          0.5
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 330.949,
+      "gain": 0.05,
+      "vibrato": {
+        "rate": 0.19,
+        "depth": 0.002
+      },
+      "filter": [
+        {
+          "type": "lowpass",
+          "freq": 700
+        },
+        {
+          "type": "highpass",
+          "freq": 60
+        }
+      ],
+      "tremolo": {
+        "rate": 0.125,
+        "depth": 0.3
+      },
+      "env": [
+        [
+          0,
+          0.5
+        ],
+        [
+          12,
+          1
+        ],
+        [
+          24,
+          0.6
+        ],
+        [
+          36,
+          1
+        ],
+        [
+          50,
+          0.5
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 173.912,
+      "gain": 0.035,
+      "vibrato": {
+        "rate": 0.13,
+        "depth": 0.002
+      },
+      "filter": [
+        {
+          "type": "lowpass",
+          "freq": 600
+        },
+        {
+          "type": "highpass",
+          "freq": 60
+        }
+      ],
+      "tremolo": {
+        "rate": 0.0625,
+        "depth": 0.3
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          16,
+          0
+        ],
+        [
+          28,
+          1
+        ],
+        [
+          40,
+          0
+        ],
+        [
+          50,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 175.308,
+      "gain": 0.035,
+      "vibrato": {
+        "rate": 0.13,
+        "depth": 0.002
+      },
+      "filter": [
+        {
+          "type": "lowpass",
+          "freq": 600
+        },
+        {
+          "type": "highpass",
+          "freq": 60
+        }
+      ],
+      "tremolo": {
+        "rate": 0.0625,
+        "depth": 0.3
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          16,
+          0
+        ],
+        [
+          28,
+          1
+        ],
+        [
+          40,
+          0
+        ],
+        [
+          50,
+          0
+        ]
+      ]
+    }
+  ]
+}
