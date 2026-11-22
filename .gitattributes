@@ -28,3 +28,5 @@
 *.ttf  binary
 *.otf  binary
 *.pdf  binary
+*.flac binary
+*.mid  binary
