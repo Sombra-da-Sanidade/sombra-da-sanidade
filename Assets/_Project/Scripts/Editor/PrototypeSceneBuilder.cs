@@ -654,7 +654,7 @@ namespace SombraDaSanidade.EditorTools
         internal static void EnsurePropArt()
         {
             foreach (var n in new[] { "lockers", "breaker_panel", "wall_lamp", "smoke", "corpses", "desk_recorder", "flare",
-                         "furniture", "furniture_side", "clutter", "siren", "toolbox" })
+                         "furniture", "furniture_side", "clutter", "siren", "toolbox", "security_camera" })
                 MonsterPrefabBuilder.EnsureArtImport($"{PropsDir}/{n}.png");
         }
 
