@@ -71,6 +71,29 @@ Cada fase tem 4 stems em loop de mesmo tamanho:
 
 Regras de mix: L3 entra em 0,3 s e sai em 4 s (recuo lento, curva dente-de-serra do GDD 7). A música segue a linha de visão: se o monstro vem pelas costas, só L2 sobe, nunca L3 (Alien: Isolation). Na Zona Segura, tudo cai para L0 e entra "Sala segura".
 
+#### Como ficou (#104)
+
+Receitas em `audio-src/Music/ala_<ala>_l0..l3.json` e `eclusa_l0..l3.json`. As melodias são camadas `tone`, então não precisam do fluidsynth, e a percussão e as texturas usam gravações CC0 (`docs/audio/fontes.md`). Saída em `Assets/_Project/Audio/Music/`. O builder monta os `MusicSet` `Medica`, `Energia`, `Executiva` e `Eclusa` e liga cada um no `AudioConfig`.
+
+- **Loop:** todos os stems têm exatamente 48 s (2.116.800 amostras). Isso dá 40 batidas a 50 bpm, 48 a 60, 60 a 75, 96 a 120 e 120 a 150, então o loop emenda na batida e as 4 camadas nunca saem de sincronia.
+- **Volume por camada:** cada stem tem alvo próprio de loudness (`"lufs"`): L0 -21, L1 -20, L2 -21, L3 -18. Somadas e com o `layerVolume` 0,8:
+  - exploração: cerca de -19,5 LUFS
+  - perseguição: cerca de -16,5 LUFS
+- **Teto de pico:** cada stem tem teto de pico menor (`"peak"`, de -6 a -8 dBTP), porque as batidas das camadas caem no mesmo instante. Somadas, as 4 ficam perto de 0 dBFS.
+- **Sem cena alterada:** o `AudioDirector` cria a `MusicLayers` em runtime pela ala do `WingCheckpoint`.
+- **Game Over:** `MusicLayers.Cut()` faz o corte seco.
+- **Convivência com os sons de jogo (#106):**
+  - **Pulso:** o L2 não usa batimento de coração. O coração é do `SanityHeartbeat` (65 a 160 bpm), e dois corações em ritmos diferentes brigavam. O pulso das fases é tambor grave, chapa de metal e relé.
+  - **Vitória:** na tela "Ala concluída", a música cai para só o ambiente.
+  - **Vitória final:** o jingle de vitória (4,5 s) toca sozinho e só depois entra o laudo (`AudioConfig.laudoDelay`).
+
+| Fase | L0 Ambiente | L1 Drone | L2 Pulso | L3 Perseguição |
+|---|---|---|---|---|
+| Médica | Ventilação, lâmpada baixa, gotas, chapa de metal assentando ao longe | Grave em Ré + pad Ré-Lá-Mi, Fá entrando no meio | Tambor grave a 50 bpm e chapa de metal a cada 2 batidas | Metal gravado a 100 bpm, tambor grave, raspados de metal, cordas em Ré e Ré# |
+| Energia | Transformador (60 e 120 Hz em senoide), sino de metal gemendo bem grave, relés estalando | Pad aberto Ré-Lá-Dó e dois "fios cantando" agudos que vêm e vão | Relé (clique gravado) e chapa de metal a 60 bpm, grave longo a cada 4 s | Baixo saturado Ré-Ré-Ré-Ré-Fá-Ré-Sol#-Ré a 120 bpm, bumbo, metal nos tempos 2 e 4, raspado |
+| Executiva | Ar-condicionado, relógio gravado, jingle Aethelgard baixinho no alto-falante a cada 24 s | Grave + pad Ré menor + jingle meio tom abaixo com wow de fita | Tambor a 50 bpm e relé a 60 bpm defasados (coincidem a cada 6 s) | Metal, bumbo, raspado, cordas e o bipe Hipnos (Ré6–Sol#5) a cada 2 s |
+| Eclusa | Rugido grave da câmara, chiado de pressurização antes de cada troca de acorde, sino grave, Hipnos ao longe a cada 16 s | Progressão de 12 em 12 s: Ré m, Sib, Sol m, Lá maior (termina em suspense e recomeça), com sino na troca e grave seguindo a tônica | Tambor a 75 bpm e tique de contagem a 150 bpm (a saída está perto) | Baixo sincopado seguindo os acordes, tambores a 150 bpm, cordas em trêmolo, subida de ruído até cada troca, Hipnos a cada 1,6 s |
+
 ### Faixas fixas
 
 Feitas na #103: receitas em `audio-src/Music/`, motivos em `audio-src/Music/Motivos/*.mid` (gerados por `tools/audio/motifs.py`), saída em `Assets/_Project/Audio/Music/`. Todas em -16 LUFS.
