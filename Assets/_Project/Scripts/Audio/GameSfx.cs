@@ -114,6 +114,12 @@ namespace SombraDaSanidade.Audio
         [Tooltip("Transição CRT: tubo ligando na cena nova e ao abrir o jogo.")]
         public SoundEvent crtOn;
 
+        [Header("Narrativa (#107)")]
+        [Tooltip("Fita rasgando ao entrar e sair de uma memória (CutscenePlayer, transição Glitch).")]
+        public SoundEvent memoryGlitch;
+        [Tooltip("Cela da Vance destravando e abrindo (VanceCell.Opened).")]
+        public SoundEvent vanceCellOpen;
+
         private static GameSfx cached;
 
         public static GameSfx Load()

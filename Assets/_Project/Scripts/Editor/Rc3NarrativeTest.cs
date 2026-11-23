@@ -94,6 +94,20 @@ namespace SombraDaSanidade.EditorTools
                 }
             }
 
+            // Som das cutscenes (#107): elevador na C0, glitch das memórias, cela da Vance e Thomas uma oitava abaixo.
+            var c0 = Resources.Load<Cutscene>("Narrative/Cutscenes/C0_Abertura");
+            var sfx = SombraDaSanidade.Audio.GameSfx.Load();
+            bool soundOk = c0 != null && c0.shots.Length > 0 && c0.shots[0].sound != null
+                && c0.shots[0].sound.name == "elevador"
+                && sfx != null && sfx.memoryGlitch != null && sfx.memoryGlitch.HasClips
+                && sfx.vanceCellOpen != null && sfx.vanceCellOpen.HasClips
+                && Mathf.Approximately(InnerVoiceLine.ThomasPitch * 2f, 1.15f);
+            if (!soundOk)
+            {
+                Debug.LogError("[RC3] Som das cutscenes incompleto (C0 sem elevador, GameSfx sem glitch ou cela, ou pitch do Thomas).");
+                errors++;
+            }
+
             if (errors == 0)
                 Debug.Log("[RC3] SUCESSO: Todas as 20 falas do Thomas e as 11 cutscenes (planos, trilhas e flags) estão válidas!");
             else

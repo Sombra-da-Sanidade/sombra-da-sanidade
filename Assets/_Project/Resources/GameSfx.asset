@@ -77,3 +77,5 @@ MonoBehaviour:
   uiSaved: {fileID: 11400000, guid: 2ca4c78ba06b9e042bf1d3456b2362ef, type: 2}
   crtOff: {fileID: 11400000, guid: e8e85cba6b3bac2419f9eb9760e48c01, type: 2}
   crtOn: {fileID: 11400000, guid: 0b17d0b62f34c914498c790de8c229a8, type: 2}
+  memoryGlitch: {fileID: 11400000, guid: 7f2febedbd2211634a939ac264d3c0c3, type: 2}
+  vanceCellOpen: {fileID: 11400000, guid: 66de972baf653f07192e2de28a2a0280, type: 2}

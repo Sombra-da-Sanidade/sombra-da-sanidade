@@ -405,6 +405,10 @@ namespace SombraDaSanidade.Audio
             System.Action<Vector2> dose = at => Play(sfx.injection, at);
             Sanity.LithiumStabilizer.Applied += dose;
             unhook.Add(() => Sanity.LithiumStabilizer.Applied -= dose);
+
+            System.Action<VanceCell> cell = c => Play(sfx.vanceCellOpen, c.transform.position);
+            VanceCell.Opened += cell;
+            unhook.Add(() => VanceCell.Opened -= cell);
         }
 
         // Armário: a porta sempre; a pilha tem o som de pegar. O sedativo toca a injeção pelo Estabilizador e o
