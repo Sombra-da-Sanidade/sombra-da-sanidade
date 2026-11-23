@@ -14,6 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Audio.GameSfx
   footstepWalk: {fileID: 11400000, guid: c481790ffaea667c4a3378680c61823f, type: 2}
   footstepRun: {fileID: 11400000, guid: 95688c9a51e2693ac97b3b9ccb7e4e66, type: 2}
+  footstepWalkMetal: {fileID: 11400000, guid: 822d0ae102372f3b9824014a73c7194a, type: 2}
+  footstepRunMetal: {fileID: 11400000, guid: c20d36e9dba0440edaa59efeeaffe473, type: 2}
+  footstepWalkCarpet: {fileID: 11400000, guid: 79a5d2a4c7b847756adc515c2f10c7a3, type: 2}
+  footstepRunCarpet: {fileID: 11400000, guid: 868699ae66a40c2f7bcac45b94c418d4, type: 2}
   playerPanting: {fileID: 11400000, guid: e082aefa54bae5f419ebcb4dcd848edf, type: 2}
   hallucinationWhisper: {fileID: 11400000, guid: a4f3b3c4407cedb40bb23d3b9fa3a688, type: 2}
   flashlightOn: {fileID: 11400000, guid: 556bd3e1ea58a37be949dbb06c64030b, type: 2}
