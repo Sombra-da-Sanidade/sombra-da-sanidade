@@ -49,3 +49,6 @@ docs/referencias/*
 CLAUDE.md
 CLAUDE.local.md
 .claude/
+AGENTS.md
+opencode.json
+.opencode/
