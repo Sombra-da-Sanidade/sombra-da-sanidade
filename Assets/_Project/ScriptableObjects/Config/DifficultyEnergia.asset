@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: DifficultyEnergia
   m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Core.DifficultyProfile
   wing: Energia
+  sleepwalkerSpeed: 5.0
   monsterSpeed: 3.85
   monsterHearingRadius: 6
   monsterBehaviours: 7

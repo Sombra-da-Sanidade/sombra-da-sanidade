@@ -169,7 +169,9 @@ namespace SombraDaSanidade.EditorTools
         // sons do Espécime atrás das paredes e o apagão do HD-02.
         private static void CheckRc(PlayerController player)
         {
-            Check("Sonâmbulo na ala", Object.FindAnyObjectByType<SleepwalkerController>() != null);
+            var walker = Object.FindAnyObjectByType<SleepwalkerController>();
+            Check($"Sonâmbulo na ala, a 5.0 m/s no escuro (#80; veio {(walker != null ? walker.Speed : 0f)})",
+                walker != null && Mathf.Approximately(walker.Speed, 5f));
             var cams = Object.FindObjectsByType<SecurityCamera>();
             Check($"2 a 3 câmeras (veio {cams.Length})", cams.Length >= 2 && cams.Length <= 3);
             float firstCam = cams.Length == 0 ? float.MaxValue

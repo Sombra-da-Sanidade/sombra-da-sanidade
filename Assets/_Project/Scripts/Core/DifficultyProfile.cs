@@ -18,7 +18,7 @@ namespace SombraDaSanidade.Core
             GameManager.Instance != null ? GameManager.Instance.ActiveProfile : null;
 
         [Header("Monstro")]
-        [Tooltip("Velocidade ao andar, em m/s (Proposta 1: 3.5 / 3.85 / 4.2 / 4.6). Substitui o bônus por HD do " +
+        [Tooltip("Velocidade ao andar, em m/s (planejamento-rc 1: 3.2 / 3.85 / 3.8 / 4.6). Substitui o bônus por HD do " +
                  "MonsterConfig, que somaria duas vezes o mesmo aumento.")]
         public float monsterSpeed = 3.5f;
         [Tooltip("Escuta qualquer ruído a até esta distância (Proposta 1: 5 / 6 / 7 / 9).")]
@@ -27,6 +27,11 @@ namespace SombraDaSanidade.Core
         public MonsterBehaviour monsterBehaviours = MonsterWingBehaviours.Medica;
         [Tooltip("Segundos até o monstro aparecer. 0 = presente desde a entrada. A Médica usa o WingIntro.")]
         [Min(0f)] public float monsterDelaySeconds;
+
+        [Header("Sonâmbulo (#80)")]
+        [Tooltip("Velocidade do Sonâmbulo no escuro, em m/s (planejamento-rc 1: Energia 5.0, Executiva 5.5, Eclusa 6.0). " +
+                 "0 = a do SleepwalkerConfig.")]
+        [Min(0f)] public float sleepwalkerSpeed;
 
         [Header("Câmeras de segurança (#79)")]
         [Tooltip("Ligado: o alarme da câmera também chama o Espécime até o Thomas (planejamento-rc 3: fase 3 e Eclusa).")]

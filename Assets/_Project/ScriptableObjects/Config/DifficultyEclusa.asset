@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: DifficultyEclusa
   m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Core.DifficultyProfile
   wing: Eclusa
+  sleepwalkerSpeed: 6.0
   camerasCallSpecimen: 1
   monsterSpeed: 4.6
   monsterHearingRadius: 9
