@@ -1,0 +1,74 @@
+{
+  "duration": 0.14,
+  "takes": 1,
+  "seed": 403,
+  "layers": [
+    {
+      "type": "tone",
+      "wave": "square",
+      "freq": 1400,
+      "gain": 0.3,
+      "delay": 0,
+      "length": 0.05,
+      "filter": {
+        "type": "lowpass",
+        "freq": 4000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.004,
+          1
+        ],
+        [
+          0.03,
+          0.7
+        ],
+        [
+          0.05,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "square",
+      "freq": 900,
+      "gain": 0.3,
+      "delay": 0.06,
+      "length": 0.07,
+      "filter": {
+        "type": "lowpass",
+        "freq": 4000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.004,
+          1
+        ],
+        [
+          0.042,
+          0.7
+        ],
+        [
+          0.07,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": false,
+    "volume": [
+      0.55,
+      0.55
+    ]
+  }
+}

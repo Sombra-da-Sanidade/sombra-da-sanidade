@@ -179,7 +179,7 @@ namespace SombraDaSanidade.Sanity
                     selectedClip = whisperClip;
                     duration = 2.5f;
                     audioSource.pitch = Random.Range(0.9f, 1.0f);
-                    audioSource.volume = 0.75f;
+                    audioSource.volume = 0.5f;
                     break;
             }
 
@@ -254,6 +254,14 @@ namespace SombraDaSanidade.Sanity
                 ownsBangClip = true;
             }
 
+            // Sem clip na cena: o sussurro da pipeline de áudio (GameSfx, #106). O sintético abaixo pulsava a 14,8 Hz
+            // e soava como algo arrastando no playtest; fica só como reserva.
+            if (whisperClip == null)
+            {
+                var sfx = Audio.GameSfx.Load();
+                if (sfx != null && sfx.hallucinationWhisper != null && sfx.hallucinationWhisper.HasClips)
+                    whisperClip = sfx.hallucinationWhisper.clips[Random.Range(0, sfx.hallucinationWhisper.clips.Length)];
+            }
             if (whisperClip == null)
             {
                 whisperClip = CreateProceduralWhisperClip();

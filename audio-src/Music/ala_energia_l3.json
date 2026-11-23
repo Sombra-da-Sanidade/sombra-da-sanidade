@@ -1,0 +1,383 @@
+{
+  "kind": "music",
+  "duration": 50,
+  "seed": 1054,
+  "loop": true,
+  "loop_crossfade": 2,
+  "lufs": -18,
+  "peak": -7,
+  "music_set": "Energia",
+  "layer": 3,
+  "reverb": {
+    "mix": 0.2,
+    "decay": 1.2
+  },
+  "layers": [
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 73.42,
+      "gain": 0.25,
+      "delay": 0.0,
+      "length": 0.225,
+      "drive": 2.5,
+      "filter": {
+        "type": "lowpass",
+        "freq": 900
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.005,
+          1
+        ],
+        [
+          0.125,
+          0.6
+        ],
+        [
+          0.225,
+          0
+        ]
+      ],
+      "repeat": {
+        "every": 2.0,
+        "count": 26
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 73.42,
+      "gain": 0.25,
+      "delay": 0.25,
+      "length": 0.225,
+      "drive": 2.5,
+      "filter": {
+        "type": "lowpass",
+        "freq": 900
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.005,
+          1
+        ],
+        [
+          0.125,
+          0.6
+        ],
+        [
+          0.225,
+          0
+        ]
+      ],
+      "repeat": {
+        "every": 2.0,
+        "count": 26
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 146.83,
+      "gain": 0.25,
+      "delay": 0.5,
+      "length": 0.225,
+      "drive": 2.5,
+      "filter": {
+        "type": "lowpass",
+        "freq": 900
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.005,
+          1
+        ],
+        [
+          0.125,
+          0.6
+        ],
+        [
+          0.225,
+          0
+        ]
+      ],
+      "repeat": {
+        "every": 2.0,
+        "count": 26
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 73.42,
+      "gain": 0.25,
+      "delay": 0.75,
+      "length": 0.225,
+      "drive": 2.5,
+      "filter": {
+        "type": "lowpass",
+        "freq": 900
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.005,
+          1
+        ],
+        [
+          0.125,
+          0.6
+        ],
+        [
+          0.225,
+          0
+        ]
+      ],
+      "repeat": {
+        "every": 2.0,
+        "count": 26
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 87.31,
+      "gain": 0.25,
+      "delay": 1.0,
+      "length": 0.225,
+      "drive": 2.5,
+      "filter": {
+        "type": "lowpass",
+        "freq": 900
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.005,
+          1
+        ],
+        [
+          0.125,
+          0.6
+        ],
+        [
+          0.225,
+          0
+        ]
+      ],
+      "repeat": {
+        "every": 2.0,
+        "count": 26
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 73.42,
+      "gain": 0.25,
+      "delay": 1.25,
+      "length": 0.225,
+      "drive": 2.5,
+      "filter": {
+        "type": "lowpass",
+        "freq": 900
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.005,
+          1
+        ],
+        [
+          0.125,
+          0.6
+        ],
+        [
+          0.225,
+          0
+        ]
+      ],
+      "repeat": {
+        "every": 2.0,
+        "count": 26
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 103.83,
+      "gain": 0.25,
+      "delay": 1.5,
+      "length": 0.225,
+      "drive": 2.5,
+      "filter": {
+        "type": "lowpass",
+        "freq": 900
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.005,
+          1
+        ],
+        [
+          0.125,
+          0.6
+        ],
+        [
+          0.225,
+          0
+        ]
+      ],
+      "repeat": {
+        "every": 2.0,
+        "count": 26
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 73.42,
+      "gain": 0.25,
+      "delay": 1.75,
+      "length": 0.225,
+      "drive": 2.5,
+      "filter": {
+        "type": "lowpass",
+        "freq": 900
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.005,
+          1
+        ],
+        [
+          0.125,
+          0.6
+        ],
+        [
+          0.225,
+          0
+        ]
+      ],
+      "repeat": {
+        "every": 2.0,
+        "count": 26
+      }
+    },
+    {
+      "type": "pulse",
+      "bpm": 120,
+      "gain": 0.7,
+      "start": 0.0,
+      "hit": {
+        "type": "tone",
+        "wave": "sine",
+        "freq": 70,
+        "freq_end": 36,
+        "length": 0.3,
+        "env": [
+          [
+            0,
+            0
+          ],
+          [
+            0.004,
+            1
+          ],
+          [
+            0.3,
+            0
+          ]
+        ]
+      },
+      "accent_every": 4
+    },
+    {
+      "type": "pulse",
+      "bpm": 60,
+      "gain": 0.55,
+      "start": 0.5,
+      "hit": {
+        "type": "sample",
+        "file": "../Raw/Kenney/impactMetal_heavy_002.ogg",
+        "pitch": 0.75,
+        "length": 0.4
+      }
+    },
+    {
+      "type": "pulse",
+      "bpm": 240,
+      "gain": 0.08,
+      "start": 0.0,
+      "hit": {
+        "type": "noise",
+        "color": "white",
+        "length": 0.02,
+        "filter": {
+          "type": "bandpass",
+          "freq": [
+            5000,
+            10000
+          ]
+        },
+        "env": [
+          [
+            0,
+            1
+          ],
+          [
+            0.02,
+            0
+          ]
+        ]
+      },
+      "accent_every": 2
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/OwlishMedia/raspar_2.flac",
+      "gain": 0.3,
+      "pitch": 0.5,
+      "delay": 1.0,
+      "filter": [
+        {
+          "type": "lowpass",
+          "freq": 3000
+        }
+      ],
+      "repeat": {
+        "every": 4.0,
+        "count": 13
+      }
+    }
+  ]
+}

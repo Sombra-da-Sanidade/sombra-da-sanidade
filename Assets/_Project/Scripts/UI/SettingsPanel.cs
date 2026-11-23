@@ -6,13 +6,14 @@ namespace SombraDaSanidade.UI
     // Página de configurações com o kit CRT, usada pela pausa e pelo menu inicial.
     // Teclado: W/S ou setas escolhem, A/D ou setas ajustam, Enter/Espaço confirmam, Esc volta. Mouse: clique. Issue #64.
     // Volumes de música, efeitos e voz por grupo do mixer (#101).
+    // Modo seguro (#48): encostar no monstro empurra e drena sanidade em vez de matar. Frente 5.
     public class SettingsPanel
     {
         private const int Sliders = 5;              // volume, música, efeitos, voz, brilho
-        private const int FullscreenRow = 5, BackRow = 6, Rows = 7;
+        private const int FullscreenRow = 5, SafeModeRow = 6, BackRow = 7, Rows = 8;
         private const float Step = 0.1f;
         private const int RowHeight = 18;
-        public const int PanelWidth = 256, PanelHeight = 160;
+        public const int PanelWidth = 256, PanelHeight = 178;
 
         private static readonly string[] Labels = { "VOLUME", "MÚSICA", "EFEITOS", "VOZ", "BRILHO" };
 
@@ -45,15 +46,17 @@ namespace SombraDaSanidade.UI
         public bool HandleKeyboard(Keyboard kb)
         {
             if (kb == null) return false;
-            if (kb.escapeKey.wasPressedThisFrame) return Close();
-            if (kb.wKey.wasPressedThisFrame || kb.upArrowKey.wasPressedThisFrame) selected = (selected + Rows - 1) % Rows;
-            if (kb.sKey.wasPressedThisFrame || kb.downArrowKey.wasPressedThisFrame) selected = (selected + 1) % Rows;
+            if (kb.escapeKey.wasPressedThisFrame) { Audio.UiSfx.Back(); return Close(); }
+            if (kb.wKey.wasPressedThisFrame || kb.upArrowKey.wasPressedThisFrame) { selected = (selected + Rows - 1) % Rows; Audio.UiSfx.Move(); }
+            if (kb.sKey.wasPressedThisFrame || kb.downArrowKey.wasPressedThisFrame) { selected = (selected + 1) % Rows; Audio.UiSfx.Move(); }
             int dir = (kb.dKey.wasPressedThisFrame || kb.rightArrowKey.wasPressedThisFrame ? 1 : 0)
                 - (kb.aKey.wasPressedThisFrame || kb.leftArrowKey.wasPressedThisFrame ? 1 : 0);
-            if (dir != 0) Adjust(dir);
+            if (dir != 0) { Adjust(dir); Audio.UiSfx.Move(); }
             if (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame)
             {
-                if (selected == FullscreenRow) GameSettings.Fullscreen = !GameSettings.Fullscreen;
+                if (selected == BackRow) Audio.UiSfx.Back();
+                else Audio.UiSfx.Confirm();
+                if (IsToggle(selected)) Toggle(selected);
                 if (selected == BackRow) return Close();
             }
             return false;
@@ -62,7 +65,18 @@ namespace SombraDaSanidade.UI
         private void Adjust(int dir)
         {
             if (selected < Sliders) Set(selected, Get(selected) + dir * Step);
-            else if (selected == FullscreenRow) GameSettings.Fullscreen = !GameSettings.Fullscreen;
+            else if (IsToggle(selected)) Toggle(selected);
+        }
+
+        private static bool IsToggle(int row) => row == FullscreenRow || row == SafeModeRow;
+
+        private static bool ToggleValue(int row) =>
+            row == FullscreenRow ? GameSettings.Fullscreen : Monster.MonsterSafeMode.Enabled;
+
+        private static void Toggle(int row)
+        {
+            if (row == FullscreenRow) GameSettings.Fullscreen = !GameSettings.Fullscreen;
+            else Monster.MonsterSafeMode.Enabled = !Monster.MonsterSafeMode.Enabled;
         }
 
         private bool Close()
@@ -88,16 +102,19 @@ namespace SombraDaSanidade.UI
                 if (selected < Sliders && PixelHud.MouseOver(sliderX - 4, RowY(selected), sliderW + 8, RowHeight - 2))
                 {
                     Set(selected, Mathf.Clamp01((e.mousePosition.x / PixelHud.Px - sliderX) / sliderW));
+                    Audio.UiSfx.Move();
                     e.Use();
                 }
-                else if (selected == FullscreenRow && PixelHud.MouseOver(x + 8, RowY(FullscreenRow), PanelWidth - 16, RowHeight - 2))
+                else if (IsToggle(selected) && PixelHud.MouseOver(x + 8, RowY(selected), PanelWidth - 16, RowHeight - 2))
                 {
-                    GameSettings.Fullscreen = !GameSettings.Fullscreen;
+                    Toggle(selected);
+                    Audio.UiSfx.Confirm();
                     e.Use();
                 }
                 else if (selected == BackRow && PixelHud.MouseOver(backX, RowY(BackRow) + 4, 96, 11))
                 {
                     e.Use();
+                    Audio.UiSfx.Back();
                     return Close();
                 }
             }
@@ -111,7 +128,13 @@ namespace SombraDaSanidade.UI
                 PixelHud.Slider(sliderX, RowY(i), sliderW, Get(i), selected == i);
             }
             Row("TELA CHEIA", FullscreenRow, x, RowY(FullscreenRow));
-            PixelHud.Sprite("screens", GameSettings.Fullscreen ? "check_on" : "check_off", sliderX - 3, RowY(FullscreenRow));
+            PixelHud.Sprite("screens", ToggleValue(FullscreenRow) ? "check_on" : "check_off", sliderX - 3, RowY(FullscreenRow));
+            Row("MODO SEGURO", SafeModeRow, x, RowY(SafeModeRow));
+            bool safe = ToggleValue(SafeModeRow);
+            PixelHud.Sprite("screens", safe ? "check_on" : "check_off", sliderX - 3, RowY(SafeModeRow));
+            // Explica o que a opção faz, porque o monstro que empurra parece bug para quem não sabe.
+            PixelHud.Text(safe ? "EMPURRA, NÃO MATA" : "MATA NO CONTATO",
+                sliderX + 14, RowY(SafeModeRow) + 6, safe ? PixelHud.Ambar2 : PixelHud.Fosforo3);
             PixelHud.Button("VOLTAR", backX, RowY(BackRow) + 2, 96, selected == BackRow);
             return false;
         }

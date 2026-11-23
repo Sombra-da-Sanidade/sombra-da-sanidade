@@ -1,0 +1,161 @@
+{
+  "duration": 1.6,
+  "takes": 1,
+  "seed": 452,
+  "bass_harmonics": 0.4,
+  "reverb": {
+    "mix": 0.15,
+    "decay": 1.0
+  },
+  "layers": [
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/impactMetal_medium_000.ogg",
+      "gain": 0.9,
+      "delay": 0.0,
+      "pitch": 0.55
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 70,
+      "freq_end": 35,
+      "gain": 0.8,
+      "length": 0.4,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.4,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 600,
+      "gain": 0.25,
+      "delay": 0.2,
+      "length": 0.12,
+      "filter": {
+        "type": "lowpass",
+        "freq": 6000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.004,
+          1
+        ],
+        [
+          0.072,
+          0.7
+        ],
+        [
+          0.12,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 900,
+      "gain": 0.25,
+      "delay": 0.32,
+      "length": 0.12,
+      "filter": {
+        "type": "lowpass",
+        "freq": 6000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.004,
+          1
+        ],
+        [
+          0.072,
+          0.7
+        ],
+        [
+          0.12,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 1200,
+      "gain": 0.25,
+      "delay": 0.44,
+      "length": 0.35,
+      "filter": {
+        "type": "lowpass",
+        "freq": 6000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.004,
+          1
+        ],
+        [
+          0.21,
+          0.7
+        ],
+        [
+          0.35,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 60,
+      "freq_end": 110,
+      "gain": 0.14,
+      "delay": 0.15,
+      "length": 1.4,
+      "filter": {
+        "type": "lowpass",
+        "freq": 700
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.4,
+          1
+        ],
+        [
+          1.4,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": true,
+    "volume": [
+      0.9,
+      0.95
+    ]
+  }
+}

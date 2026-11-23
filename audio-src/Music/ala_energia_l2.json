@@ -1,0 +1,78 @@
+{
+  "kind": "music",
+  "duration": 50,
+  "seed": 1053,
+  "loop": true,
+  "loop_crossfade": 2,
+  "lufs": -21,
+  "peak": -8,
+  "music_set": "Energia",
+  "layer": 2,
+  "bass_harmonics": 1.3,
+  "reverb": {
+    "mix": 0.25,
+    "decay": 1.8
+  },
+  "layers": [
+    {
+      "type": "pulse",
+      "bpm": 60,
+      "gain": 0.6,
+      "start": 0.0,
+      "hit": {
+        "type": "sample",
+        "file": "../Raw/Kenney/metalClick.ogg",
+        "pitch": 0.6,
+        "length": 0.6,
+        "filter": {
+          "type": "lowpass",
+          "freq": 4000
+        }
+      },
+      "accent_every": 4
+    },
+    {
+      "type": "pulse",
+      "bpm": 60,
+      "gain": 0.5,
+      "start": 0.0,
+      "hit": {
+        "type": "sample",
+        "file": "../Raw/Kenney/impactPlate_heavy_000.ogg",
+        "pitch": 0.45,
+        "length": 1.0,
+        "filter": {
+          "type": "lowpass",
+          "freq": 1200
+        }
+      },
+      "accent_every": 4
+    },
+    {
+      "type": "pulse",
+      "bpm": 15,
+      "gain": 0.5,
+      "start": 0.0,
+      "hit": {
+        "type": "tone",
+        "wave": "sine",
+        "freq": 73.42,
+        "length": 3.5,
+        "env": [
+          [
+            0,
+            0
+          ],
+          [
+            0.05,
+            1
+          ],
+          [
+            3.5,
+            0
+          ]
+        ]
+      }
+    }
+  ]
+}

@@ -119,7 +119,9 @@ namespace SombraDaSanidade.Narrative
             int index = (GameManager.Instance != null ? GameManager.Instance.TotalDrives : count) - 1;
             if (index < 0 || index >= driveLogs.Length || driveLogs[index] == null) return;
             // O log do HD tem prioridade sobre um terminal ou fala interna; dois HDs seguidos entram na fila.
-            if (IsPlaying && (Source != null || Current.isInternalThought)) Stop();
+            // O log do HD tem prioridade sobre um terminal e sobre uma fala do Thomas (#89); dois HDs seguidos
+            // entram na fila.
+            if (IsPlaying && (Source != null || !Current.tape || Current.isInternalThought)) Stop();
             Play(driveLogs[index]);
         }
 
@@ -138,7 +140,7 @@ namespace SombraDaSanidade.Narrative
             Source = source;
             hearingRadius = radius;
             SetSignalLost(false);
-            if (!log.isInternalThought)
+            if (log.tape && !log.isInternalThought)
             {
                 babble.PlayOneShot(clickClip);
                 hiss.volume = Config.tapeHissVolume;
@@ -242,7 +244,7 @@ namespace SombraDaSanidade.Narrative
         {
             var log = Current;
             Stop();
-            if (!log.isInternalThought) AudioLogArchive.Add(log);
+            if (log.tape && !log.isInternalThought) AudioLogArchive.Add(log);
             Completed?.Invoke(log);
             if (queue.Count > 0) Play(queue.Dequeue());
         }

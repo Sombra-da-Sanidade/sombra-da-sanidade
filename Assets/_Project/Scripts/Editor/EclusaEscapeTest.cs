@@ -5,6 +5,7 @@ using SombraDaSanidade.Interaction;
 using SombraDaSanidade.Level;
 using SombraDaSanidade.Monster;
 using SombraDaSanidade.Player;
+using SombraDaSanidade.UI;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -41,6 +42,8 @@ namespace SombraDaSanidade.EditorTools
         {
             if (!batch && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
             TestScenes.Remember();
+            endingSeen = false;
+            PlayerPrefs.DeleteKey(VanceChoice.AchievementKey);   // a conquista precisa ser liberada pelo teste
             EditorSceneManager.OpenScene(AlfaSceneBuilder.EclusaScenePath);
             SessionState.SetBool(RunningKey, true);
             SessionState.SetBool(BatchKey, batch);
@@ -80,6 +83,7 @@ namespace SombraDaSanidade.EditorTools
                     Check("Purga parada antes do terminal", !escape.Active && !monster.IsFurious);
                     Check($"Purga em config dentro de 2-3 min ({escape.Duration:0} s)", escape.Duration >= 120f && escape.Duration <= 180f);
                     Check("Terminal aceita os HDs", terminal.CanInteract);
+                    CheckRc(player, door);
                     // Encostar na porta trancada não vence.
                     Teleport(player, door.transform.position + Vector3.up * 0.3f);
                     Next();
@@ -109,6 +113,7 @@ namespace SombraDaSanidade.EditorTools
                     Check($"Velocidade da fúria (coluna Eclusa {cfg.furySpeed}): {monster.CurrentSpeed:0.00}",
                         Mathf.Approximately(cfg.furySpeed, 4.6f) && Mathf.Abs(monster.CurrentSpeed - expected) < 0.01f);
                     Check("Porta destravada depois do terminal", door.IsUnlocked);
+                    CheckSaveVance(terminal);
                     Next();
                     break;
 
@@ -118,8 +123,24 @@ namespace SombraDaSanidade.EditorTools
                         furyChecked = true;
                         Check($"Na purga persegue o jogador mesmo com a lanterna apagada ({monster.State})", monster.State == MonsterState.Chase);
                     }
+                    if (CutscenePlayer.IsPlaying)
+                    {
+                        if (!endingSeen) Check($"Porta toca o final antes do laudo ({CutscenePlayer.Instance.Current?.id})",
+                            CutscenePlayer.Instance.Current != null && CutscenePlayer.Instance.Current.id == "C4");
+                        endingSeen = true;
+                        CutscenePlayer.Skip();
+                        return;
+                    }
                     if (gm.IsPlaying && t < 3f) return;
                     Check("Chegar à porta destravada vence", gm.State == GameState.Victory);
+                    Check($"Final Testemunha no laudo ({VanceChoice.Title(VanceChoice.Ending)})", VanceChoice.Ending == Ending.Witness
+                        && VanceChoice.Title(VanceChoice.Ending) == "TESTEMUNHA");
+                    Check("Conquista A Verdade Corporativa liberada", VanceChoice.HasAchievement && EndingDirector.AchievementJustUnlocked);
+                    var rank = RankConfig.Load();
+                    float baseScore = rank.Score(gm.RunTime, gm.TotalDrivesRequired, gm.AverageSanity, gm.RunEmps, gm.Deaths);
+                    Check($"Bônus no rank ({baseScore:0.00} -> {gm.RankScore:0.00})",
+                        gm.RankScore >= Mathf.Min(1f, baseScore + rank.witnessBonus) - 0.001f);
+                    PlayerPrefs.DeleteKey(VanceChoice.AchievementKey);
                     gm.Restart();
                     Next();
                     break;
@@ -130,6 +151,10 @@ namespace SombraDaSanidade.EditorTools
                     if (TensionDirector.Instance != null) TensionDirector.Instance.enabled = false;
                     monster.gameObject.SetActive(false);   // a causa da morte tem que ser a purga
                     terminal.CompleteInteract();
+                    Check("Reiniciar pede a escolha de novo", VanceChoiceTerminal.IsOpen && VanceChoice.Decision == VanceDecision.None);
+                    terminal.GetComponent<VanceChoiceTerminal>().Choose(0);
+                    Check("Deixar a Vance: final Amostra e cela trancada", VanceChoice.Ending == Ending.Sample
+                        && !Object.FindAnyObjectByType<VanceCell>().CanInteract && Time.timeScale > 0f);
                     escape.SetRemaining(0.5f);
                     Check("Faltando pouco, ainda em jogo", gm.IsPlaying && escape.Active);
                     Next();
@@ -142,6 +167,34 @@ namespace SombraDaSanidade.EditorTools
                     Finish();
                     break;
             }
+        }
+
+        private static bool endingSeen;
+
+        // Escolha "salvar" (#95) e a cela (#82): 6 s, 2 skill checks, câmeras ligadas na abertura; solta, abre o
+        // atalho e desliga as câmeras do caminho.
+        private static void CheckSaveVance(EclusaTerminal terminal)
+        {
+            Check("Os HDs abrem a escolha e pausam o jogo", VanceChoiceTerminal.IsOpen && Time.timeScale == 0f);
+            terminal.GetComponent<VanceChoiceTerminal>().Choose(1);
+            Check("Escolher 2 salva a Vance e despausa", VanceChoice.Decision == VanceDecision.Save
+                && !VanceChoiceTerminal.IsOpen && Time.timeScale > 0f);
+            var cell = Object.FindAnyObjectByType<VanceCell>();
+            var skill = cell.SkillCheckConfig;
+            Check($"Cela: segurar E por 6 s com 2 skill checks ({cell.HoldDuration} s, {skill?.skillCheckMinPerDrive}-{skill?.skillCheckMaxPerDrive})",
+                cell.CanInteract && Mathf.Approximately(cell.HoldDuration, 6f)
+                && skill != null && skill.skillCheckMinPerDrive == 2 && skill.skillCheckMaxPerDrive == 2);
+            int near = 0;
+            foreach (var c in SecurityCamera.All)
+                if (Vector2.Distance(c.transform.position, cell.transform.position) < 15f && c.State != SecurityCameraState.Off) near++;
+            Check($"Câmeras da cela ligadas durante a abertura ({near})", near >= 1);
+            cell.CompleteInteract();
+            var gates = Object.FindObjectsByType<ShortcutGate>();
+            Check("Vance solta abre o atalho", VanceChoice.Released && gates.Length == 1 && gates[0].IsOpen
+                && !gates[0].GetComponent<BoxCollider2D>().enabled);
+            int off = 0;
+            foreach (var c in SecurityCamera.All) if (c.State == SecurityCameraState.Off) off++;
+            Check($"Vance desliga as câmeras do caminho ({off} de {SecurityCamera.All.Count})", off >= 1 && off < SecurityCamera.All.Count);
         }
 
         private static void Teleport(PlayerController player, Vector2 position)
@@ -158,6 +211,25 @@ namespace SombraDaSanidade.EditorTools
         }
 
         private static bool furyChecked;
+
+        // Dois caminhos da escolha (planejamento-rc 3, #86): cela da Vance do outro lado, atalho fechado até ela ser
+        // solta, câmeras e os dois monstros. O Sonâmbulo sai da cena depois: o teste da purga é sobre o Espécime.
+        private static void CheckRc(PlayerController player, ExitDoor door)
+        {
+            var cell = LevelMarker.Find("cela_eclusa_1");
+            float fromStart = cell == null ? 0f : Vector2.Distance(cell.transform.position, player.transform.position);
+            Check($"Cela da Vance do outro lado do mapa ({fromStart:0} m do início)", cell != null && fromStart >= 60f);
+            var gates = Object.FindObjectsByType<ShortcutGate>();
+            Check("Atalho fechado no começo", gates.Length == 1 && !gates[0].IsOpen
+                && gates[0].GetComponent<BoxCollider2D>().enabled);
+            var vanceCell = Object.FindAnyObjectByType<VanceCell>();
+            Check("Cela da Vance trancada antes da escolha", vanceCell != null && !vanceCell.CanInteract);
+            int cams = Object.FindObjectsByType<SecurityCamera>().Length;
+            Check($"Câmeras ativas na Eclusa (veio {cams})", cams >= 3);
+            var walkers = Object.FindObjectsByType<SleepwalkerController>();
+            Check("Sonâmbulo na Eclusa", walkers.Length == 1);
+            foreach (var w in walkers) w.gameObject.SetActive(false);
+        }
 
         private static void Check(string label, bool ok)
         {

@@ -1,0 +1,144 @@
+{
+  "duration": 3.2,
+  "takes": 1,
+  "seed": 312,
+  "layers": [
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.9,
+      "delay": 0,
+      "length": 0.015,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          600,
+          3000
+        ]
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.015,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 70,
+      "freq_end": 40,
+      "gain": 1.0,
+      "delay": 0,
+      "length": 0.3,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.3,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.35,
+      "delay": 0.3,
+      "length": 0.006,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          2000,
+          6000
+        ]
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.006,
+          0
+        ]
+      ],
+      "repeat": {
+        "every": 0.16,
+        "count": 6
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "saw",
+      "freq": 40,
+      "freq_end": 120,
+      "gain": 0.4,
+      "delay": 0.2,
+      "length": 2.9,
+      "filter": {
+        "type": "lowpass",
+        "freq": 900
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          1.6,
+          1
+        ],
+        [
+          2.5,
+          0.8
+        ],
+        [
+          2.9,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "pink",
+      "gain": 0.12,
+      "delay": 0.4,
+      "length": 2.6,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          800,
+          3000
+        ]
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          1.2,
+          1
+        ],
+        [
+          2.6,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": true,
+    "volume": [
+      0.95,
+      1.0
+    ]
+  }
+}

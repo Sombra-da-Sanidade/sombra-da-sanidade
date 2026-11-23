@@ -51,7 +51,7 @@ namespace SombraDaSanidade.EditorTools
 
         // Marcadores sem desenho próprio (desenhados como o vizinho da esquerda): os da introdução e as pistas
         // da Ala Executiva (d = dígito da senha, z = pista da entrada).
-        private const string NeighborMarkers = IntroMarkers + "dz";
+        private const string NeighborMarkers = IntroMarkers + "dz" + RcFloorMarkers;
 
         [MenuItem("Sombra da Sanidade/Gerar cena Alfa (tiles)", priority = 2)]
         public static void BuildFromMenu()
@@ -114,6 +114,18 @@ namespace SombraDaSanidade.EditorTools
             cso.FindProperty("nextWing").stringValue = "Executiva";
             cso.ApplyModifiedPropertiesWithoutUndo();
 
+            // Fase 2 do RC (#84): o Espécime fica adormecido o tempo todo (só se ouve atrás das paredes, '~') e
+            // o HD-02 derruba as luzes da ala.
+            var intro = go.AddComponent<SombraDaSanidade.Level.WingIntro>();
+            var iso = new SerializedObject(intro);
+            iso.FindProperty("monster").objectReferenceValue = UnityEngine.Object.FindAnyObjectByType<MonsterController>();
+            iso.FindProperty("neverWakes").boolValue = true;
+            iso.ApplyModifiedPropertiesWithoutUndo();
+            go.AddComponent<SombraDaSanidade.Level.WingOpening>().Setup("I1");
+            AddSleepwalkerReveal();
+            go.AddComponent<SombraDaSanidade.Level.WingBlackout>().Setup(
+                AssetDatabase.LoadAssetAtPath<SombraDaSanidade.Audio.SoundEvent>(Root + "/ScriptableObjects/Audio/Camera/camera_apagao.asset"));
+
             var substation = ctx.Objectives.GetComponentInChildren<Substation>();
             var server = ctx.Objectives.GetComponentInChildren<DriveServer>();
             if (substation == null || server == null) Debug.LogError("Ala de Energia: falta a subestação (U) ou o servidor (S) na planta.");
@@ -170,6 +182,7 @@ namespace SombraDaSanidade.EditorTools
                 var so = new SerializedObject(gm);
                 so.FindProperty("priorDrives").intValue = 3;   // chega com os 3 HDs das alas
                 so.ApplyModifiedPropertiesWithoutUndo();
+                AddVanceCell(ctx.Objectives);   // #82 e #95: cela, escolha e finais
             });
         }
 
@@ -205,6 +218,10 @@ namespace SombraDaSanidade.EditorTools
             cso.FindProperty("wing").stringValue = "Executiva";
             cso.FindProperty("nextWing").stringValue = "Eclusa";
             cso.ApplyModifiedPropertiesWithoutUndo();
+
+            // C3 (planejamento-rc 4): a revelação toca depois do HD-03.
+            go.AddComponent<SombraDaSanidade.Level.DriveCutscene>().Setup(FindCutscene("C3"));
+            go.AddComponent<SombraDaSanidade.Level.WingOpening>().Setup("I2");
 
             // Trava de senha: o teclado (X) libera o servidor da ala.
             var keypad = UnityEngine.Object.FindAnyObjectByType<KeypadLock>();
@@ -262,6 +279,8 @@ namespace SombraDaSanidade.EditorTools
             variants.arraySize = 2;
             WriteVariant(ctx.Map, variants.GetArrayElementAtIndex(0), "Enfermaria", "123", 'x');
             WriteVariant(ctx.Map, variants.GetArrayElementAtIndex(1), "Laboratorio", "456", 'y');
+            so.FindProperty("wakeCutscene").objectReferenceValue = FindCutscene("C1");
+            go.AddComponent<SombraDaSanidade.Level.WingOpening>().Setup("C0");
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -328,6 +347,7 @@ namespace SombraDaSanidade.EditorTools
             PrototypeSceneBuilder.GetOrCreatePlaceholderSprite();
             DriveServerPrefabBuilder.GetOrBuild();
             PrototypeSceneBuilder.EnsurePropArt();
+            if (CutsceneAssetBuilder.Load("C0") == null) CutsceneAssetBuilder.Build();   // #91: gatilhos acham pelo id
             int wallLayer = PrototypeSceneBuilder.EnsureLayer(PrototypeSceneBuilder.WallLayerName);
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -404,6 +424,7 @@ namespace SombraDaSanidade.EditorTools
             PrototypeSceneBuilder.CreateHud(player.GetComponent<FlashlightController>());
             PrototypeSceneBuilder.CreateSanityEffects(player.GetComponent<SanityController>(), square, wallLayer);
             PrototypeSceneBuilder.CreateMonster(monsterSpawn, patrol);
+            AddRcElements(map, objectives, wingAt);
 
             extras?.Invoke(new BuildContext
             {
@@ -422,6 +443,7 @@ namespace SombraDaSanidade.EditorTools
         {
             public int Width, Height;
             public char[,] Cells;   // [x, y], y = 0 embaixo
+            public List<string[]> Directives = new List<string[]>();   // linhas "# @..." (AlfaSceneBuilder.Rc)
             public char this[int x, int y] => x < 0 || y < 0 || x >= Width || y >= Height ? '#' : Cells[x, y];
             public bool IsFloor(int x, int y) => FloorChars.IndexOf(this[x, y]) >= 0;
         }
@@ -435,13 +457,14 @@ namespace SombraDaSanidade.EditorTools
                 return null;
             }
             // Linhas de comentário começam com "# " (com espaço); as do mapa não têm espaço.
-            var rows = File.ReadAllLines(path).Where(l => l.Length > 0 && !l.Contains(' ')).ToList();
+            var lines = File.ReadAllLines(path);
+            var rows = lines.Where(l => l.Length > 0 && !l.Contains(' ')).ToList();
             int w = rows.Max(r => r.Length), h = rows.Count;
             var cells = new char[w, h];
             for (int row = 0; row < h; row++)
                 for (int x = 0; x < w; x++)
                     cells[x, h - 1 - row] = x < rows[row].Length ? rows[row][x] : '#';
-            return new Layout { Width = w, Height = h, Cells = cells };
+            return new Layout { Width = w, Height = h, Cells = cells, Directives = ParseDirectives(lines) };
         }
 
         private static string Wing(int x, int width)

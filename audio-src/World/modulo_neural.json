@@ -1,0 +1,118 @@
+{
+  "duration": 1.3,
+  "takes": 2,
+  "seed": 411,
+  "vary": {
+    "pitch": 0.04
+  },
+  "bass_harmonics": 0.3,
+  "layers": [
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/metalClick.ogg",
+      "gain": 0.5,
+      "delay": 0.0,
+      "pitch": 1.4,
+      "end": 0.12,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.096,
+          1
+        ],
+        [
+          0.12,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.35,
+      "delay": 0.08,
+      "length": 0.25,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          2500,
+          8000
+        ]
+      },
+      "tremolo": {
+        "rate": 40,
+        "depth": 0.9
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.25,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 90,
+      "freq_end": 50,
+      "gain": 0.5,
+      "delay": 0.08,
+      "length": 0.2,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.2,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 300,
+      "freq_end": 1800,
+      "gain": 0.08,
+      "delay": 0.2,
+      "length": 0.9,
+      "vibrato": {
+        "rate": 7,
+        "depth": 0.02
+      },
+      "filter": {
+        "type": "lowpass",
+        "freq": 3000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.3,
+          1
+        ],
+        [
+          0.9,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": false,
+    "volume": [
+      0.7,
+      0.7
+    ]
+  }
+}

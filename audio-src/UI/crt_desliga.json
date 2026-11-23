@@ -1,0 +1,170 @@
+{
+  "duration": 0.75,
+  "takes": 2,
+  "seed": 941,
+  "vary": {
+    "pitch": 0.03
+  },
+  "bass_harmonics": 0.4,
+  "layers": [
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/metalClick.ogg",
+      "gain": 0.35,
+      "pitch": 0.6,
+      "end": 0.15,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.12,
+          1
+        ],
+        [
+          0.15,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 9000,
+      "freq_end": 1800,
+      "gain": 0.06,
+      "length": 0.36,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.36,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 220,
+      "freq_end": 40,
+      "gain": 0.5,
+      "length": 0.38,
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.02,
+          1
+        ],
+        [
+          0.38,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.25,
+      "length": 0.34,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          1500,
+          7000
+        ]
+      },
+      "tremolo": {
+        "rate": 60,
+        "depth": 0.6
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.34,
+          0.2
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.7,
+      "delay": 0.34,
+      "length": 0.008,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          1500,
+          7000
+        ]
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.008,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 70,
+      "freq_end": 35,
+      "gain": 0.6,
+      "delay": 0.34,
+      "length": 0.15,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.15,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "pink",
+      "gain": 0.08,
+      "delay": 0.35,
+      "length": 0.4,
+      "filter": {
+        "type": "lowpass",
+        "freq": 3000
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.4,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": false,
+    "volume": [
+      0.55,
+      0.55
+    ]
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "duration": 0.5,
+  "takes": 1,
+  "seed": 310,
+  "bass_harmonics": 0,
+  "layers": [
+    {
+      "type": "tone",
+      "wave": "square",
+      "freq": 1200,
+      "gain": 0.3,
+      "delay": 0,
+      "length": 0.07,
+      "filter": {
+        "type": "lowpass",
+        "freq": 4000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.004,
+          1
+        ],
+        [
+          0.042,
+          0.7
+        ],
+        [
+          0.07,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "square",
+      "freq": 1600,
+      "gain": 0.3,
+      "delay": 0.09,
+      "length": 0.09,
+      "filter": {
+        "type": "lowpass",
+        "freq": 4000
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.004,
+          1
+        ],
+        [
+          0.054,
+          0.7
+        ],
+        [
+          0.09,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.6,
+      "delay": 0.26,
+      "length": 0.01,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          900,
+          4000
+        ]
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.01,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 140,
+      "freq_end": 100,
+      "gain": 0.4,
+      "delay": 0.26,
+      "length": 0.06,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.06,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": true,
+    "volume": [
+      0.75,
+      0.75
+    ]
+  }
+}

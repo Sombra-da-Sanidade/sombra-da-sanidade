@@ -79,6 +79,7 @@ namespace SombraDaSanidade.EditorTools
                     if (failed) { Finish(); return; }
                     CheckProfile(gm, monster, sanity);
                     CheckLayout(gm, keypad);
+                    CheckRc(monster, player);
                     Next();
                     break;
 
@@ -90,6 +91,7 @@ namespace SombraDaSanidade.EditorTools
                     Check("Cada pista mostra a posição do seu dígito (\"SENHA _ 7 _ _\")", clues.All(c => c.Text == Expected(keypad, c.Index)));
                     player.enabled = false;
                     monster.gameObject.SetActive(false);   // comportamento do monstro tem teste próprio; aqui ele atrapalharia
+                    foreach (var w in Object.FindObjectsByType<SleepwalkerController>()) w.gameObject.SetActive(false);
                     sanityBefore = sanity.Value;
                     var module = Object.FindObjectsByType<NeuralModule>().First();
                     module.CompleteInteract();
@@ -129,7 +131,7 @@ namespace SombraDaSanidade.EditorTools
                     Check($"HD-03 completa os 3 HDs (partida: {gm.TotalDrives}, ala: {gm.DrivesCollected}/{gm.DrivesRequired})", gm.TotalDrives == 3 && gm.HasAllDrives);
                     // Com perfil, a velocidade é a da ala: o bônus por HD já está na tabela (docs/dificuldade.md).
                     Check($"Velocidade continua a da ala depois do HD ({monster.CurrentSpeed})",
-                        monster.State == MonsterState.Chase || Mathf.Approximately(monster.CurrentSpeed, 4.2f));
+                        monster.State == MonsterState.Chase || Mathf.Approximately(monster.CurrentSpeed, 3.8f));
                     var terminal = player.GetComponent<UpgradeTerminal>();
                     Check("Escolha de upgrade é a do HD-03", terminal != null && terminal.DriveNumber == 3);
                     if (terminal != null) terminal.Choose(0);
@@ -145,13 +147,13 @@ namespace SombraDaSanidade.EditorTools
             var p = gm.ActiveProfile;
             Check("Perfil da Executiva no GameManager", p != null && p.wing == "Executiva" && DifficultyProfile.Active == p);
             if (p == null) return;
-            Check($"Tabela: velocidade 4.2, raio 7, dreno 2.0, bateria 45%, alucinação 15-25 s, 2 disjuntores",
-                Mathf.Approximately(p.monsterSpeed, 4.2f) && Mathf.Approximately(p.monsterHearingRadius, 7f)
+            Check($"Tabela: velocidade 3.8, raio 7, dreno 2.0, bateria 45%, alucinação 15-25 s, 2 disjuntores",
+                Mathf.Approximately(p.monsterSpeed, 3.8f) && Mathf.Approximately(p.monsterHearingRadius, 7f)
                 && Mathf.Approximately(p.darknessDrain, 2f) && Mathf.Approximately(p.batteryChance, 0.45f)
                 && p.hallucinations && p.hallucinationInterval == new Vector2(15f, 25f) && p.breakersAvailable == 2
                 && p.monsterDelaySeconds == 0f);
             Check($"Monstro com a velocidade e o raio da ala ({monster.CurrentSpeed} / {monster.HearingRadius})",
-                Mathf.Approximately(monster.CurrentSpeed, 4.2f) && Mathf.Approximately(monster.HearingRadius, 7f));
+                Mathf.Approximately(monster.CurrentSpeed, 3.8f) && Mathf.Approximately(monster.HearingRadius, 7f));
             Check($"Monstro com os comportamentos da Executiva ({monster.Behaviours})", monster.Behaviours == MonsterWingBehaviours.Executiva);
             Check("Monstro presente desde a entrada (ativo e visível)", monster.isActiveAndEnabled
                 && monster.GetComponentsInChildren<Renderer>().Any(r => r.enabled));
@@ -226,6 +228,28 @@ namespace SombraDaSanidade.EditorTools
         {
             step++;
             stepStart = Time.time;
+        }
+
+        // Beats da fase 3 (planejamento-rc 1): os dois monstros longe um do outro, 4 a 5 câmeras, M3 com sanidade
+        // baixa e C3 depois do HD-03.
+        private static void CheckRc(MonsterController monster, PlayerController player)
+        {
+            var walker = Object.FindAnyObjectByType<SleepwalkerController>();
+            float apart = walker == null ? 0f : Vector2.Distance(walker.transform.position, monster.transform.position);
+            Check($"Espécime e Sonâmbulo longe um do outro ({apart:0} m)", walker != null && apart >= 25f);
+            int cams = Object.FindObjectsByType<SecurityCamera>().Length;
+            Check($"4 a 5 câmeras (veio {cams})", cams >= 4 && cams <= 5);
+            if (walker != null)
+            {
+                var wa = walker.GetComponent<UnityEngine.AI.NavMeshAgent>();
+                var ma = monster.GetComponent<UnityEngine.AI.NavMeshAgent>();
+                Check($"Sonâmbulo a 5.5 m/s no escuro (#80; veio {walker.Speed})", Mathf.Approximately(walker.Speed, 5.5f));
+                Check($"Prioridades de desvio diferentes, um não trava o outro ({wa.avoidancePriority} x {ma.avoidancePriority})",
+                    wa.avoidancePriority != ma.avoidancePriority);
+            }
+            var m3 = GameObject.Find("CutsceneTrigger_M3");
+            Check("Gatilho da M3 só com sanidade baixa", m3 != null);
+            Check("C3 montada para depois do HD-03", Object.FindAnyObjectByType<DriveCutscene>() != null);
         }
 
         private static void Check(string label, bool ok)

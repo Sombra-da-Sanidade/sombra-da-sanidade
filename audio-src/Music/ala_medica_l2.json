@@ -1,0 +1,61 @@
+{
+  "kind": "music",
+  "duration": 50,
+  "seed": 1043,
+  "loop": true,
+  "loop_crossfade": 2,
+  "lufs": -21,
+  "peak": -8,
+  "music_set": "Medica",
+  "layer": 2,
+  "bass_harmonics": 1.4,
+  "reverb": {
+    "mix": 0.2,
+    "decay": 1.5
+  },
+  "layers": [
+    {
+      "type": "pulse",
+      "bpm": 50,
+      "gain": 0.9,
+      "start": 0.0,
+      "hit": {
+        "type": "sample",
+        "file": "../Raw/OwlishMedia/tambor.flac",
+        "pitch": 0.4,
+        "length": 0.8,
+        "filter": {
+          "type": "lowpass",
+          "freq": 900
+        }
+      },
+      "accent_every": 4
+    },
+    {
+      "type": "pulse",
+      "bpm": 25,
+      "gain": 0.3,
+      "start": 0.6,
+      "hit": {
+        "type": "sample",
+        "file": "../Raw/Kenney/impactPlate_heavy_000.ogg",
+        "pitch": 0.5,
+        "length": 1.2,
+        "filter": {
+          "type": "lowpass",
+          "freq": 1500
+        }
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 73.42,
+      "gain": 0.12,
+      "tremolo": {
+        "rate": 0.8333333333333334,
+        "depth": 0.7
+      }
+    }
+  ]
+}

@@ -49,6 +49,7 @@ namespace SombraDaSanidade.UI
             // Na cutscene o Esc é segurado para pular (#88).
             if (CutscenePlayer.IsPlaying) return;
             if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) return;
+            Audio.UiSfx.Confirm();
             IsOpen = true;
             inSettings = false;
             selected = 0;
@@ -81,10 +82,10 @@ namespace SombraDaSanidade.UI
                 if (settings.HandleKeyboard(kb)) inSettings = false;
                 return;
             }
-            if (kb.escapeKey.wasPressedThisFrame) { Close(); return; }
-            if (kb.wKey.wasPressedThisFrame || kb.upArrowKey.wasPressedThisFrame) selected = (selected + Items.Length - 1) % Items.Length;
-            if (kb.sKey.wasPressedThisFrame || kb.downArrowKey.wasPressedThisFrame) selected = (selected + 1) % Items.Length;
-            if (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame) Activate(selected);
+            if (kb.escapeKey.wasPressedThisFrame) { Audio.UiSfx.Back(); Close(); return; }
+            if (kb.wKey.wasPressedThisFrame || kb.upArrowKey.wasPressedThisFrame) { selected = (selected + Items.Length - 1) % Items.Length; Audio.UiSfx.Move(); }
+            if (kb.sKey.wasPressedThisFrame || kb.downArrowKey.wasPressedThisFrame) { selected = (selected + 1) % Items.Length; Audio.UiSfx.Move(); }
+            if (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame) { Audio.UiSfx.Confirm(); Activate(selected); }
         }
 
         private void Activate(int index)
@@ -101,12 +102,12 @@ namespace SombraDaSanidade.UI
                 case 2:
                     Close();
                     if (GameManager.Instance != null) GameManager.Instance.Restart();
-                    else SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                    else CrtTransition.LoadScene(SceneManager.GetActiveScene().name);
                     break;
                 default:
                     Close();
                     Time.timeScale = 1f;
-                    if (Application.CanStreamedLevelBeLoaded(MenuScene)) SceneManager.LoadScene(MenuScene);
+                    if (Application.CanStreamedLevelBeLoaded(MenuScene)) CrtTransition.LoadScene(MenuScene);
                     else Application.Quit();
                     break;
             }
@@ -140,6 +141,7 @@ namespace SombraDaSanidade.UI
                 if (e.type == EventType.MouseDown && e.button == 0)
                 {
                     e.Use();
+                    Audio.UiSfx.Confirm();
                     Activate(i);
                     return;
                 }
@@ -147,14 +149,9 @@ namespace SombraDaSanidade.UI
             if (e.type != EventType.Repaint) return;
 
             PixelHud.Panel(x, y, PanelW, PanelH);
-            PixelHud.TextCentered("PAUSADO", x + PanelW / 2, y + 10, PixelHud.Fosforo5, 1f, 2);
-
-            // Crachá do Thomas reativo à sanidade (roteiro-rc.md seção 4, #89)
-            bool shaken = cachedSanity != null && (cachedSanity.Value < 35f || cachedSanity.IsRevealForced);
-            string badge = shaken ? "VOL-08 / HIPNOS" : "T. REIS / AUDITORIA";
-            Color badgeCol = shaken ? PixelHud.Fosforo4 : PixelHud.Concreto6;
-            PixelHud.TextCentered(badge, x + PanelW / 2, y + 26, badgeCol);
-
+            // Crachá do Thomas (#89): muda com a sanidade baixa.
+            ThomasBadge.Draw(x - 32 * 2 - 10, y + 4, 2);
+            PixelHud.TextCentered("PAUSADO", x + PanelW / 2, y + 14, PixelHud.Fosforo5, 1f, 2);
             for (int i = 0; i < Items.Length; i++) PixelHud.Button(Items[i], bx, ButtonY(i), ButtonW, i == selected);
         }
     }

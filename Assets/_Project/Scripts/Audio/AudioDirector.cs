@@ -41,6 +41,7 @@ namespace SombraDaSanidade.Audio
         private AudioSource fixedSource;
         private AudioClip pendingClip;
         private GameManager gm;
+        private float victoryAt = -1f;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void HookSceneLoads()
@@ -70,7 +71,11 @@ namespace SombraDaSanidade.Audio
 
         private void OnDestroy()
         {
-            if (gm != null) gm.GameOverTriggered -= OnGameOver;
+            if (gm != null)
+            {
+                gm.GameOverTriggered -= OnGameOver;
+                gm.VictoryTriggered -= OnVictory;
+            }
             if (Instance != this) return;
             Instance = null;
             AudioService.SetDuck(AudioBus.Ambience, 0f);
@@ -80,12 +85,17 @@ namespace SombraDaSanidade.Audio
         private void Start()
         {
             music = FindAnyObjectByType<MusicLayers>();
+            if (music == null) music = CreateWingMusic();
             sanity = FindAnyObjectByType<SanityController>();
             monster = FindAnyObjectByType<MonsterController>();
             sleepwalker = FindAnyObjectByType<SleepwalkerController>();
             cam = Camera.main;
             gm = GameManager.Instance;
-            if (gm != null) gm.GameOverTriggered += OnGameOver;
+            if (gm != null)
+            {
+                gm.GameOverTriggered += OnGameOver;
+                gm.VictoryTriggered += OnVictory;
+            }
 
             fixedSource = gameObject.AddComponent<AudioSource>();
             fixedSource.playOnAwake = false;
@@ -94,10 +104,23 @@ namespace SombraDaSanidade.Audio
             AudioService.Route(fixedSource, AudioBus.Music);
         }
 
+        // Nenhuma cena de ala tem MusicLayers: a música da fase (#104) é criada aqui, pela ala do WingCheckpoint
+        // (ou pelo nome da cena), com o MusicSet ligado no AudioConfig. Cena sem ala (Alfa, sandboxes): sem música.
+        private MusicLayers CreateWingMusic()
+        {
+            var checkpoint = Level.WingCheckpoint.Instance;
+            string wing = checkpoint != null ? checkpoint.Wing : WingFlow.WingForScene(gameObject.scene.name);
+            var set = config.WingMusic(wing);
+            if (set == null || set.Count == 0) return null;
+            var layers = new GameObject("WingMusic (" + wing + ")").AddComponent<MusicLayers>();
+            layers.SetMusic(set);
+            return layers;
+        }
+
         // Game Over é corte seco (sound-design.md seção 4): sem fade, a música da fase some no mesmo quadro.
         private void OnGameOver(DeathCause cause)
         {
-            if (music != null) music.Muted = true;
+            if (music != null) music.Cut();
             if (fixedSource == null || config.gameOverSting == null) return;
             pendingClip = null;
             fixedSource.Stop();
@@ -107,16 +130,26 @@ namespace SombraDaSanidade.Audio
             fixedSource.Play();
         }
 
+        private void OnVictory() => victoryAt = Time.unscaledTime;
+
+        // Vitória da última fase: o jingle de vitória toca sozinho, depois entra o laudo.
+        private bool FinalVictory
+        {
+            get
+            {
+                if (gm == null || gm.State != GameState.Victory) return false;
+                var wing = Level.WingCheckpoint.Instance;
+                return wing == null || wing.IsFinal;
+            }
+        }
+
         // Qual faixa fixa deveria tocar agora. null: só a música da fase.
         private AudioClip DesiredFixed(out bool loop)
         {
             loop = true;
             if (gm != null && gm.State == GameState.GameOver) { loop = false; return config.gameOverSting; }
-            if (gm != null && gm.State == GameState.Victory)
-            {
-                var wing = Level.WingCheckpoint.Instance;
-                return wing == null || wing.IsFinal ? config.laudoMusic : null;
-            }
+            if (FinalVictory)
+                return victoryAt >= 0f && Time.unscaledTime - victoryAt < config.laudoDelay ? null : config.laudoMusic;
             if (CutsceneActive && CutsceneTrack != null) return CutsceneTrack;
             var escape = Level.EscapeSequence.Instance;
             if (escape != null && escape.Active) { loop = false; return config.purgeMusic; }
@@ -155,7 +188,8 @@ namespace SombraDaSanidade.Audio
 
             // Faixa que substitui a música da fase (purga, game over, laudo) silencia as camadas; a da sala segura
             // toca por cima do L0 (o AudioDirector já põe a intensidade em 0 na Zona Segura).
-            if (music != null) music.Muted = desired != null && desired != config.safeRoomMusic;
+            // Na vitória final a música da fase também fica muda durante o jingle.
+            if (music != null) music.Muted = desired != null && desired != config.safeRoomMusic || FinalVictory;
         }
 
         private void Update()
@@ -179,6 +213,8 @@ namespace SombraDaSanidade.Audio
 
         private int ComputeIntensity(bool monsterChasing, bool sleeperMoving)
         {
+            // Fim da partida (tela "Ala concluída"): só o ambiente, mesmo se o monstro estava perseguindo.
+            if (gm != null && gm.State != GameState.Playing) return 0;
             if (CutsceneActive || (sanity != null && sanity.InSafeZone)) return 0;
             bool onScreen = (monsterChasing && OnScreen(monster.transform.position))
                             || (sleeperMoving && OnScreen(sleepwalker.transform.position));

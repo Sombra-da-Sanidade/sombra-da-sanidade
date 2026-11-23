@@ -2,43 +2,76 @@ using UnityEngine;
 
 namespace SombraDaSanidade.Narrative
 {
-    // Fala interna do Thomas por faixa de sanidade (docs/narrativa/roteiro-rc.md seção 2, issue #89).
-    // Estável: sanidade 100 a 40 (Lúcido/Ansioso). Abalado: sanidade 39 a 1 (Alucinando/Colapsado).
+    public enum InnerVoiceTrigger
+    {
+        WingStart,          // começo da ala, depois da cutscene de abertura
+        FirstDarkness,      // primeira vez no escuro total
+        Area,               // entrar no LevelMarker de id = arg
+        FirstBreaker,       // primeiro disjuntor consertado
+        AfterCutscene,      // fim da cutscene de id = arg
+        DriveCollected,     // HD da ala ejetado
+        CameraSeen,         // primeira câmera de segurança vista
+        CameraCall,         // primeira câmera que chama o Espécime
+        SubstationPowered,  // subestação religada
+        NeuralModule,       // Módulo Neural usado
+        ClueRead,           // primeira pista da senha revelada perto do Thomas
+        ChoiceSave,         // escolha na Eclusa: salvar a Vance
+        ChoiceLeave,        // escolha na Eclusa: deixar a Vance
+    }
+
+    // Monólogo do Thomas (roteiro-rc 2, #89): uma fala com versão Estável (sanidade 40 a 100) e Abalado (abaixo de
+    // 40). Toca uma vez por ala, com a legenda e a voz de bipes do AudioLogPlayer uma oitava abaixo da Vance.
+    // Gerado pelo InnerVoiceAssetBuilder a partir do roteiro; não editar o asset à mão.
     [CreateAssetMenu(fileName = "InnerVoiceLine", menuName = "Sombra da Sanidade/Narrativa/Fala do Thomas")]
     public class InnerVoiceLine : ScriptableObject
     {
-        [Tooltip("Identificador estável (T1-1, T2-4...). Cada fala toca uma única vez por partida.")]
+        public const float ShakenBelow = 40f;   // GDD 4: Alucinando e Colapsado (39 a 1)
+        public const float ThomasPitch = 0.575f;   // metade do bipe da Vance (1.15): uma oitava abaixo
+
+        [Tooltip("Id do roteiro (T1-1, T2-3...).")]
         public string id = "T1-1";
+        [Tooltip("Ala onde a fala vale (Medica, Energia, Executiva, Eclusa).")]
+        public string wing = "Medica";
+        public InnerVoiceTrigger trigger;
+        [Tooltip("Argumento do gatilho: id do LevelMarker (Area) ou da cutscene (AfterCutscene).")]
+        public string arg = "";
+        [TextArea(1, 3)] public string stable = "";
+        [TextArea(1, 3)] public string shaken = "";
 
-        [Tooltip("Nome exibido na legenda.")]
-        public string speaker = "THOMAS";
+        public string TextFor(float sanity) => sanity < ShakenBelow && shaken.Length > 0 ? shaken : stable;
 
-        [Tooltip("Tom dos bipes: uma oitava abaixo do da Vance (1.15 -> 0.575).")]
-        [Range(0.35f, 1.5f)] public float babblePitch = 0.575f;
+        // Compatibilidade com as versões de asset antigas: o player legado usa os vetores estáveis/abalados.
+        [HideInInspector] [TextArea(1, 3)] public string[] stableLines = new string[0];
+        [HideInInspector] [TextArea(1, 3)] public string[] shakenLines = new string[0];
 
-        [Tooltip("Texto quando a sanidade está Estável (40 a 100).")]
-        [TextArea(1, 3)]
-        public string[] stableLines = new string[0];
-
-        [Tooltip("Texto quando a sanidade está Abalada (abaixo de 40).")]
-        [TextArea(1, 3)]
-        public string[] shakenLines = new string[0];
-
-        public string[] PickLines(bool shaken)
-        {
-            if (shaken && shakenLines != null && shakenLines.Length > 0) return shakenLines;
-            return stableLines != null && stableLines.Length > 0 ? stableLines : shakenLines;
-        }
+        public string[] PickLines(bool shaken) =>
+            shaken && shakenLines != null && shakenLines.Length > 0 ? shakenLines
+            : stableLines != null && stableLines.Length > 0 ? stableLines
+            : new[] { TextFor(shaken ? 20f : 80f) };
 
         public AudioLog ToRuntimeLog(bool shaken)
         {
             var log = CreateInstance<AudioLog>();
             log.hideFlags = HideFlags.DontSave;
             log.id = id;
-            log.speaker = speaker;
-            log.babblePitch = babblePitch;
+            log.speaker = "THOMAS";
+            log.babblePitch = ThomasPitch;
             log.lines = PickLines(shaken);
             log.isInternalThought = true;
+            log.tape = false;
+            return log;
+        }
+
+        // Fita de uma linha para o AudioLogPlayer: sem clique nem chiado, fora da lista de logs ouvidos.
+        public AudioLog ToLog(float sanity)
+        {
+            var log = CreateInstance<AudioLog>();
+            log.name = id;
+            log.id = id;
+            log.speaker = "THOMAS";
+            log.babblePitch = ThomasPitch;
+            log.tape = false;
+            log.lines = new[] { TextFor(sanity) };
             return log;
         }
     }

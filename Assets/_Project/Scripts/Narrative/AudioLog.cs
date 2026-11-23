@@ -22,6 +22,8 @@ namespace SombraDaSanidade.Narrative
         [Tooltip("Tom da voz de bipes: 1 é neutro, acima é mais agudo. Cada personagem pode ter o seu.")]
         [Range(0.5f, 2f)] public float babblePitch = 1.15f;
 
+        [Tooltip("Fita gravada: clique, chiado e entra na lista de logs ouvidos. Desligado nas falas do Thomas (#89).")]
+        public bool tape = true;
         [Tooltip("Uma legenda por linha, na ordem em que são faladas.")]
         [TextArea(2, 4)]
         public string[] lines = new string[0];

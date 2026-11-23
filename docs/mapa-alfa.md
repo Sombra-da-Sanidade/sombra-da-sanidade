@@ -58,6 +58,7 @@ Cena `Assets/_Project/Scenes/Wings/AlaMedica.unity`, gerada pelo mesmo builder a
 - **Introdução (Proposta 4 do v1.1, `Level/WingIntro`):** o monstro começa adormecido (invisível, parado, sem colisão). Depois de 60 s, quando o jogador entra na Enfermaria (gatilho `x`) ou no Laboratório (`y`), ele acorda no corredor norte e passa pelo fundo da sala, perto da lâmpada, até o Salão central (rota `1 2 3` ou `4 5 6`). Se o jogador demorar 100 s ou pegar o HD antes, ele acorda na rota mais longe do jogador.
 - **Primeiro encontro:** na rota ele ignora ruído. Se for iluminado, dá o grito de estática e vai investigar onde o jogador estava, sem Perseguição; depois de 4 s a luz volta a valer a regra normal. Sem luz, termina a rota e começa a patrulha.
 - **Checkpoint (#45, Proposta 2):** ao abrir a porta com o HD-01, `Level/WingCheckpoint` salva `checkpoint.json` em `Application.persistentDataPath` (no WebGL, IndexedDB) e a tela de vitória mostra **ALA MÉDICA CONCLUÍDA** e **PROGRESSO SALVO**. Carregar o checkpoint fica para as outras alas (`Checkpoint.TryLoad` já existe).
+- **Fase 1 do RC (#83):** M1 no corredor oeste, antes da Enfermaria (`?`); C1 toca quando o monstro acorda (`WingIntro.wakeCutscene`); fala da enfermaria (`"`, T1-3) e 2 objetos de sanidade (`%`, pulseira e prontuário). Sem Sonâmbulo e sem câmeras. Legenda abaixo, em "Elementos do RC".
 - **Duração:** a meta de 3 a 5 min (GDD 7) precisa ser medida no playtest (o tempo aparece na tela de vitória). A introdução já garante pelo menos 1 min. Se ficar curta, alongar os corredores do anel no `.txt`; se passar de 5 min, reduzir `calmSeconds` do `WingIntro` no builder.
 
 Teste em batch:
@@ -145,3 +146,40 @@ Unity -batchmode -projectPath . -executeMethod SombraDaSanidade.EditorTools.Smok
 ## Pendências
 
 - **Zona Segura do disjuntor (Frente 4):** a lâmpada de teto é só desenho até o `Breaker` acender a luz e ligar o `MonsterRepellent`.
+
+## Ala de Energia no RC (#84)
+
+- O Espécime não está no mapa: fica adormecido a ala toda (`WingIntro.neverWakes`) e só se ouve atrás das paredes (`~`).
+- C2 (`!`) na entrada do Controle B, com o Sonâmbulo (`Z`) dentro. M2 (`?`) no Controle A, o escritório.
+- 3 câmeras (`C`): a 1ª na Antessala, ao lado do disjuntor (área segura para aprender), e uma na Casa de Máquinas e outra nos Transformadores.
+- Apagão final (`Level/WingBlackout`): 1,5 s depois do HD-02, todos os disjuntores caem (`Breaker.Cut`). Dá para religar.
+- Fala do escritório (`"`, T2-4) e a foto na mesa da Vance (`%`).
+
+## Ala Executiva no RC (#85)
+
+- Espécime na Diretoria (norte) e Sonâmbulo (`Z`) na Sala de Reuniões (sudoeste), a cerca de 40 m um do outro.
+- 4 câmeras (`C`): Reuniões, RH, Escritórios e Diretoria. Chamar o Espécime no alarme vem do perfil da ala (RC1).
+- M3 (`?`, `# @cutscene ? M3 35`) no RH: só toca com sanidade < 35.
+- C3 toca 1 s depois do HD-03 (`Level/DriveCutscene`), na fila do `CutscenePlayer`.
+- Senha, pistas e Módulo Neural sem mudança. Fala do espelho (`"`, T3-3) e o espelho (`%`).
+
+## Elementos do RC nas plantas
+
+Issues #83 a #87. Código em `Scripts/Editor/AlfaSceneBuilder.Rc.cs`.
+
+| Caractere | O que cria |
+|---|---|
+| `Z` | Sonâmbulo adormecido (prefab do `SleepwalkerPrefabBuilder`) |
+| `C` | Câmera de segurança na parede, olhando para o chão vizinho (sul, leste, oeste, norte). Desliga no disjuntor mais perto |
+| `!` `?` `&` | `CutsceneTrigger` cobrindo todas as células do caractere. A cutscene vem da diretiva `# @cutscene ? M1` (com sanidade: `# @cutscene ? M3 35`) |
+| `~` | Som do Espécime atrás da parede (`Level/WallNoise`), numa célula de parede. Toca com o Thomas a até 12 m |
+| `*` | Pista em fósforo (sanidade < 35). Texto pela diretiva `# @pista <TEXTO>`, na ordem de leitura da planta (`\n` quebra a linha) |
+| `"` | Área de uma fala do Thomas (`LevelMarker` `fala_<ala>_<n>`, gatilho `Area` da `InnerVoiceLine`). As outras falas são por evento |
+| `%` | Objeto que muda com a sanidade (`SanityObject`). Qual objeto vem de `# @objeto <nome>`, na ordem de leitura |
+| `V` | `LevelMarker` da cela da Vance (células vizinhas viram um marcador só, com área) |
+| `=` | `LevelMarker` do atalho da Eclusa |
+
+- A numeração dos marcadores segue a leitura da planta: de cima para baixo, da esquerda para a direita.
+- A cutscene é achada pelo campo `id` do asset, em qualquer pasta. Sem o asset, o gatilho é criado vazio (aviso no console): depois da #91, basta gerar a cena de novo.
+- Outras frentes encaixam o sistema no marcador com `LevelMarker.Find("fala_medica_1")`, sem editar a planta.
+- `# @falas <Ala>` põe o `InnerVoiceDirector` com as falas do Thomas da ala (#89).

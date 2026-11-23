@@ -86,18 +86,16 @@ namespace SombraDaSanidade.EditorTools
                     CheckMap(player);
                     Check("Porta abre com 1 HD nesta ala", gm.DrivesRequired == 1);
                     Check($"Sem checkpoint, a ala conta o HD-01 da Médica (anteriores: {gm.PriorDrives})", gm.PriorDrives == 1);
-                    Check("Monstro presente desde a entrada", monster.isActiveAndEnabled
-                        && Object.FindAnyObjectByType<WingIntro>() == null);
+                    // Fase 2 do RC (#84): o Espécime só se ouve atrás das paredes; o Sonâmbulo e as câmeras são a ameaça.
+                    Check("Espécime fora do mapa: adormecido a ala toda (WingIntro.neverWakes)", !monster.enabled
+                        && Object.FindAnyObjectByType<WingIntro>() != null);
+                    CheckRc(player);
                     Check("Servidor do HD-02 sem energia antes da subestação", !server.IsPowered && !server.CanInteract);
                     Next();
                     break;
 
                 case 1:
                     if (t < 0.5f) return;
-                    var shortcut = Object.FindAnyObjectByType<MonsterShortcut>();
-                    Check("Atalho do monstro existe e está ligado na Energia",
-                        shortcut != null && shortcut.GetComponent<NavMeshLink>().enabled);
-
                     // Reparo da subestação de verdade: segura E parado em frente ao console.
                     player.enabled = false;
                     // O monstro começa na sala da subestação: sem isto ele às vezes alcança o jogador antes do EMP
@@ -145,7 +143,6 @@ namespace SombraDaSanidade.EditorTools
             // O perfil é lido direto pelos sistemas (DifficultyProfile.Active); os configs compartilhados não mudam.
             Check($"Monstro: velocidade 3.85 e raio auditivo 6 (veio {monster.CurrentSpeed} / {monster.HearingRadius})",
                 Mathf.Approximately(monster.CurrentSpeed, 3.85f) && Mathf.Approximately(monster.HearingRadius, 6f));
-            Check("Monstro: checa disjuntores e usa atalhos", monster.Has(MonsterBehaviour.BreakerCheck) && monster.Has(MonsterBehaviour.Shortcuts));
             Check($"Sanidade: dreno 1.5/s no escuro e alucinação a cada 20-30 s (veio {sanity.DarknessDrain}, {p.hallucinationInterval.x}-{p.hallucinationInterval.y})",
                 Mathf.Approximately(sanity.DarknessDrain, 1.5f) && p.hallucinations
                 && Mathf.Approximately(p.hallucinationInterval.x, 20f) && Mathf.Approximately(p.hallucinationInterval.y, 30f));
@@ -166,9 +163,28 @@ namespace SombraDaSanidade.EditorTools
             float nearest = breakers.Length == 0 ? float.MaxValue
                 : breakers.Min(b => Vector2.Distance(b.transform.position, player.transform.position));
             Check($"Disjuntor ao lado da entrada para o primeiro reparo sem pressão ({nearest:0.0} m)", nearest <= 4f);
-            var monster = Object.FindAnyObjectByType<MonsterController>();
-            Check($"Monstro começa longe da entrada ({Vector2.Distance(monster.transform.position, player.transform.position):0} m)",
-                Vector2.Distance(monster.transform.position, player.transform.position) > 25f);
+        }
+
+        // Beats da fase 2 (planejamento-rc 1): Sonâmbulo, 2 a 3 câmeras (a 1ª na área segura da entrada), C2 e M2,
+        // sons do Espécime atrás das paredes e o apagão do HD-02.
+        private static void CheckRc(PlayerController player)
+        {
+            var walker = Object.FindAnyObjectByType<SleepwalkerController>();
+            Check($"Sonâmbulo na ala, a 5.0 m/s no escuro (#80; veio {(walker != null ? walker.Speed : 0f)})",
+                walker != null && Mathf.Approximately(walker.Speed, 5f));
+            var cams = Object.FindObjectsByType<SecurityCamera>();
+            Check($"2 a 3 câmeras (veio {cams.Length})", cams.Length >= 2 && cams.Length <= 3);
+            float firstCam = cams.Length == 0 ? float.MaxValue
+                : cams.Min(c => Vector2.Distance(c.transform.position, player.transform.position));
+            Check($"1ª câmera perto da entrada, em área segura ({firstCam:0.0} m)", firstCam <= 8f);
+            Check("Gatilhos da C2 e da M2", GameObject.Find("CutsceneTrigger_C2") && GameObject.Find("CutsceneTrigger_M2"));
+            var c2 = Object.FindObjectsByType<CutsceneTrigger>().FirstOrDefault(t => t.name == "CutsceneTrigger_C2");
+            Check("Gatilho da C2 com a cutscene (#91)", c2 != null && c2.Cutscene != null && c2.Cutscene.id == "C2");
+            Check("Marcador c2_lampada com a luz do Sonâmbulo", CutsceneMarker.Find("c2_lampada") != null
+                && CutsceneMarker.Find("c2_lampada").GetComponent<SleepwalkerReveal>() != null);
+            Check("I1 abre a ala", Object.FindAnyObjectByType<WingOpening>()?.CutsceneId == "I1");
+            Check("Sons do Espécime atrás das paredes", Object.FindObjectsByType<WallNoise>().Length >= 2);
+            Check("Apagão final montado", Object.FindAnyObjectByType<WingBlackout>() != null);
         }
 
         // HD-02: log VANCE-02 e escolha de upgrade do 2º HD; vitória salva o checkpoint para a Executiva.
@@ -187,6 +203,14 @@ namespace SombraDaSanidade.EditorTools
                 Check($"Escolha de upgrade do HD-02 (veio: HD {(terminal != null ? terminal.DriveNumber : 0)})",
                     terminal != null && terminal.DriveNumber == 2);
                 if (terminal != null && UpgradeTerminal.IsOpen) terminal.Choose(0);
+
+                var blackout = Object.FindAnyObjectByType<WingBlackout>();
+                Check("HD-02 dispara o apagão final", blackout != null && blackout.Triggered);
+                var lit = Object.FindObjectsByType<Breaker>().First();
+                lit.CompleteInteract();
+                Check("Disjuntor ligado antes do apagão", lit.IsActive);
+                if (blackout != null) blackout.CutAll();
+                Check("Apagão desliga todos os disjuntores", Object.FindObjectsByType<Breaker>().All(b => !b.IsActive));
 
                 gm.TriggerVictory();
                 var wing = WingCheckpoint.Instance;

@@ -1,0 +1,170 @@
+{
+  "kind": "music",
+  "duration": 50,
+  "seed": 1071,
+  "loop": true,
+  "loop_crossfade": 2,
+  "lufs": -21,
+  "peak": -6,
+  "music_set": "Eclusa",
+  "layer": 0,
+  "reverb": {
+    "mix": 0.5,
+    "decay": 4.0
+  },
+  "layers": [
+    {
+      "type": "sample",
+      "file": "../Raw/OwlishMedia/terremoto.flac",
+      "gain": 0.3,
+      "pitch": 0.7,
+      "delay": 0.0,
+      "filter": [
+        {
+          "type": "lowpass",
+          "freq": 220
+        }
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "brown",
+      "gain": 0.25,
+      "filter": {
+        "type": "lowpass",
+        "freq": 300
+      }
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.12,
+      "delay": 10.5,
+      "length": 4.5,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          2000,
+          8000
+        ]
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          1.5,
+          1
+        ],
+        [
+          4.5,
+          0
+        ]
+      ],
+      "repeat": {
+        "every": 12,
+        "count": 4
+      }
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/impactBell_heavy_000.ogg",
+      "gain": 0.2,
+      "pitch": 0.25,
+      "delay": 5.0,
+      "filter": [
+        {
+          "type": "lowpass",
+          "freq": 800
+        }
+      ],
+      "repeat": {
+        "every": 9.7,
+        "count": 5
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 1174.66,
+      "gain": 0.035,
+      "delay": 7.0,
+      "length": 0.18,
+      "vibrato": {
+        "rate": 0.9,
+        "depth": 0.0
+      },
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          600,
+          6000
+        ]
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.01,
+          1
+        ],
+        [
+          0.054,
+          0.6
+        ],
+        [
+          0.18,
+          0
+        ]
+      ],
+      "repeat": {
+        "every": 16,
+        "count": 3
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 830.61,
+      "gain": 0.035,
+      "delay": 7.5,
+      "length": 0.18,
+      "vibrato": {
+        "rate": 0.9,
+        "depth": 0.0
+      },
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          600,
+          6000
+        ]
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.01,
+          1
+        ],
+        [
+          0.054,
+          0.6
+        ],
+        [
+          0.18,
+          0
+        ]
+      ],
+      "repeat": {
+        "every": 16,
+        "count": 3
+      }
+    }
+  ]
+}

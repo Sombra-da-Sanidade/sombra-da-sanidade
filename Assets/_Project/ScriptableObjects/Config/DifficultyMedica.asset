@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DifficultyMedica
   m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Core.DifficultyProfile
   wing: Medica
-  monsterSpeed: 3.5
+  monsterSpeed: 3.2
   monsterHearingRadius: 5
   monsterBehaviours: 1
   monsterDelaySeconds: 0

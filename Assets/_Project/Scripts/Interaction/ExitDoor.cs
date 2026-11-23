@@ -42,7 +42,12 @@ namespace SombraDaSanidade.Interaction
             if (doorRenderer != null) doorRenderer.color = unlocked ? unlockedColor : lockedColor;
             // Conferido aqui e não no OnTriggerStay2D: parado na porta, o Rigidbody2D dorme e o Stay para de vir.
             // Assim, se o jogador já estiver na porta quando ela destravar, vence do mesmo jeito.
-            if (unlocked && playersInside > 0) gm.TriggerVictory();
+            if (unlocked && playersInside > 0)
+            {
+                // Eclusa do RC: o final (C4/C5) toca antes do laudo (#95).
+                if (terminal != null && Level.EndingDirector.Instance != null) Level.EndingDirector.Instance.Reach();
+                else gm.TriggerVictory();
+            }
         }
 
         private void OnTriggerEnter2D(Collider2D other)

@@ -1,0 +1,97 @@
+{
+  "duration": 0.3,
+  "takes": 3,
+  "seed": 307,
+  "vary": {
+    "pitch": 0.06,
+    "gain": 0.05
+  },
+  "bass_harmonics": 0,
+  "layers": [
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.5,
+      "delay": 0,
+      "length": 0.005,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          3000,
+          9000
+        ]
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.005,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 2400,
+      "gain": 0.3,
+      "length": 0.16,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.16,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 3700,
+      "gain": 0.15,
+      "delay": 0.01,
+      "length": 0.1,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.1,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 300,
+      "freq_end": 240,
+      "gain": 0.2,
+      "delay": 0,
+      "length": 0.04,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.04,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": true,
+    "volume": [
+      0.6,
+      0.7
+    ]
+  }
+}

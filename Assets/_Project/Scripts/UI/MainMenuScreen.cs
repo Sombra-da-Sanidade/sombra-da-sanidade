@@ -75,13 +75,13 @@ namespace SombraDaSanidade.UI
                     if (settings.HandleKeyboard(kb)) page = Page.Main;
                     break;
                 case Page.Briefing:
-                    if (kb.escapeKey.wasPressedThisFrame) page = Page.Main;
-                    else if (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame) StartGame();
+                    if (kb.escapeKey.wasPressedThisFrame) { Audio.UiSfx.Back(); page = Page.Main; }
+                    else if (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame) { Audio.UiSfx.Confirm(); StartGame(); }
                     break;
                 default:
-                    if (kb.wKey.wasPressedThisFrame || kb.upArrowKey.wasPressedThisFrame) selected = (selected + items.Length - 1) % items.Length;
-                    if (kb.sKey.wasPressedThisFrame || kb.downArrowKey.wasPressedThisFrame) selected = (selected + 1) % items.Length;
-                    if (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame) Activate(selected);
+                    if (kb.wKey.wasPressedThisFrame || kb.upArrowKey.wasPressedThisFrame) { selected = (selected + items.Length - 1) % items.Length; Audio.UiSfx.Move(); }
+                    if (kb.sKey.wasPressedThisFrame || kb.downArrowKey.wasPressedThisFrame) { selected = (selected + 1) % items.Length; Audio.UiSfx.Move(); }
+                    if (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame) { Audio.UiSfx.Confirm(); Activate(selected); }
                     break;
             }
         }
@@ -112,7 +112,7 @@ namespace SombraDaSanidade.UI
         private static void Load(string scene)
         {
             RunStats.StartRun();
-            SceneManager.LoadScene(scene);
+            CrtTransition.LoadScene(scene);
         }
 
         private void OnGUI()
@@ -147,7 +147,7 @@ namespace SombraDaSanidade.UI
             {
                 if (!PixelHud.MouseOver(bx, ButtonY(i) + 2, bw, 11)) continue;
                 selected = i;
-                if (e.type == EventType.MouseDown && e.button == 0) { e.Use(); Activate(i); return; }
+                if (e.type == EventType.MouseDown && e.button == 0) { e.Use(); Audio.UiSfx.Confirm(); Activate(i); return; }
             }
             if (e.type != EventType.Repaint) return;
 
@@ -170,7 +170,7 @@ namespace SombraDaSanidade.UI
             int x = cx - pw / 2, y = (h - ph) / 2;
             int bx = cx - 56, by = y + ph - 28;
             bool over = PixelHud.MouseOver(bx, by + 2, 112, 11);
-            if (over && e.type == EventType.MouseDown && e.button == 0) { e.Use(); StartGame(); return; }
+            if (over && e.type == EventType.MouseDown && e.button == 0) { e.Use(); Audio.UiSfx.Confirm(); StartGame(); return; }
             if (e.type != EventType.Repaint) return;
 
             PixelHud.Panel(x, y, pw, ph);

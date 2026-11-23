@@ -71,6 +71,29 @@ Cada fase tem 4 stems em loop de mesmo tamanho:
 
 Regras de mix: L3 entra em 0,3 s e sai em 4 s (recuo lento, curva dente-de-serra do GDD 7). A música segue a linha de visão: se o monstro vem pelas costas, só L2 sobe, nunca L3 (Alien: Isolation). Na Zona Segura, tudo cai para L0 e entra "Sala segura".
 
+#### Como ficou (#104)
+
+Receitas em `audio-src/Music/ala_<ala>_l0..l3.json` e `eclusa_l0..l3.json`. As melodias são camadas `tone`, então não precisam do fluidsynth, e a percussão e as texturas usam gravações CC0 (`docs/audio/fontes.md`). Saída em `Assets/_Project/Audio/Music/`. O builder monta os `MusicSet` `Medica`, `Energia`, `Executiva` e `Eclusa` e liga cada um no `AudioConfig`.
+
+- **Loop:** todos os stems têm exatamente 48 s (2.116.800 amostras). Isso dá 40 batidas a 50 bpm, 48 a 60, 60 a 75, 96 a 120 e 120 a 150, então o loop emenda na batida e as 4 camadas nunca saem de sincronia.
+- **Volume por camada:** cada stem tem alvo próprio de loudness (`"lufs"`): L0 -21, L1 -20, L2 -21, L3 -18. Somadas e com o `layerVolume` 0,8:
+  - exploração: cerca de -19,5 LUFS
+  - perseguição: cerca de -16,5 LUFS
+- **Teto de pico:** cada stem tem teto de pico menor (`"peak"`, de -6 a -8 dBTP), porque as batidas das camadas caem no mesmo instante. Somadas, as 4 ficam perto de 0 dBFS.
+- **Sem cena alterada:** o `AudioDirector` cria a `MusicLayers` em runtime pela ala do `WingCheckpoint`.
+- **Game Over:** `MusicLayers.Cut()` faz o corte seco.
+- **Convivência com os sons de jogo (#106):**
+  - **Pulso:** o L2 não usa batimento de coração. O coração é do `SanityHeartbeat` (65 a 160 bpm), e dois corações em ritmos diferentes brigavam. O pulso das fases é tambor grave, chapa de metal e relé.
+  - **Vitória:** na tela "Ala concluída", a música cai para só o ambiente.
+  - **Vitória final:** o jingle de vitória (4,5 s) toca sozinho e só depois entra o laudo (`AudioConfig.laudoDelay`).
+
+| Fase | L0 Ambiente | L1 Drone | L2 Pulso | L3 Perseguição |
+|---|---|---|---|---|
+| Médica | Ventilação, lâmpada baixa, gotas, chapa de metal assentando ao longe | Grave em Ré + pad Ré-Lá-Mi, Fá entrando no meio | Tambor grave a 50 bpm e chapa de metal a cada 2 batidas | Metal gravado a 100 bpm, tambor grave, raspados de metal, cordas em Ré e Ré# |
+| Energia | Transformador (60 e 120 Hz em senoide), sino de metal gemendo bem grave, relés estalando | Pad aberto Ré-Lá-Dó e dois "fios cantando" agudos que vêm e vão | Relé (clique gravado) e chapa de metal a 60 bpm, grave longo a cada 4 s | Baixo saturado Ré-Ré-Ré-Ré-Fá-Ré-Sol#-Ré a 120 bpm, bumbo, metal nos tempos 2 e 4, raspado |
+| Executiva | Ar-condicionado, relógio gravado, jingle Aethelgard baixinho no alto-falante a cada 24 s | Grave + pad Ré menor + jingle meio tom abaixo com wow de fita | Tambor a 50 bpm e relé a 60 bpm defasados (coincidem a cada 6 s) | Metal, bumbo, raspado, cordas e o bipe Hipnos (Ré6–Sol#5) a cada 2 s |
+| Eclusa | Rugido grave da câmara, chiado de pressurização antes de cada troca de acorde, sino grave, Hipnos ao longe a cada 16 s | Progressão de 12 em 12 s: Ré m, Sib, Sol m, Lá maior (termina em suspense e recomeça), com sino na troca e grave seguindo a tônica | Tambor a 75 bpm e tique de contagem a 150 bpm (a saída está perto) | Baixo sincopado seguindo os acordes, tambores a 150 bpm, cordas em trêmolo, subida de ruído até cada troca, Hipnos a cada 1,6 s |
+
 ### Faixas fixas
 
 Feitas na #103: receitas em `audio-src/Music/`, motivos em `audio-src/Music/Motivos/*.mid` (gerados por `tools/audio/motifs.py`), saída em `Assets/_Project/Audio/Music/`. Todas em -16 LUFS.
@@ -123,6 +146,37 @@ Receitas em `audio-src/{Player,Lux,Monster,SkillCheck,Camera}/`, ligadas no `Res
 | Câmera (#79, ainda sem gancho) | servo, detecção, alarme, apagão, curto do EMP |
 
 Ainda não: passos por tipo de piso (as cenas não marcam o piso), respiração cansada.
+
+### Feito na #106
+
+Receitas em `audio-src/World/` e `audio-src/UI/`, no mesmo esquema da #105 (`GameSfx` + `GameSfxHooks`, nenhuma cena muda). Os menus tocam os sons de interface pelo `UiSfx`, porque o Menu não tem `GameSfxHooks`. Teste: **Sombra da Sanidade > Rodar teste dos sons de mundo**.
+
+| Gancho | Som |
+|---|---|
+| `Breaker.StateChanged` / `Burnt` | `disjuntor_liga` (alavanca, relés, lâmpadas piscando até acender), `disjuntor_desliga`, `disjuntor_queima` |
+| `DriveServer.Ejected` / `GameManager.DriveCollected` | `hd_ejeta` (motor e trava), `hd_coleta` (estalo magnético e dois bipes) |
+| `Locker.Opened` | `armario_abre` (3 tomadas); com pilha, também `item_pega` |
+| `AdrenaSynEffect` ligando, `LithiumStabilizer.Applied` (Estabilizador e sedativo) | `item_injecao` |
+| `FlareThrower.Count` subindo / descendo | `item_pega` / `sinalizador_acende`; depois, `sinalizador_queimando` em loop no chão enquanto `SignalFlare.IsBurning`, sumindo no último 1,5 s |
+| `KeypadLock.Unlocked` / `WrongCode` | `teclado_certo`, `teclado_errado` |
+| `Substation.Powered` | `subestacao_liga` |
+| `UpgradeTerminal.Chosen` | `ui_upgrade` |
+| Segurando E (`PlayerInteractor.IsChanneling`) | Loop `hd_ejetando` (volume 0,3); `disjuntor_reparo` (4 s), `armario_forca` (1 s) , `caixa_abre` (caixa de ferramentas do `FlarePickup`, 0,6 s) e `subestacao_reparo` (6 s, descargas a cada 1,5 s junto do ruído do console) tocam uma vez, do tamanho do segurar E. Param ao soltar, andar ou com o progresso pausado |
+| `NeuralModule.Applied` | `modulo_neural` (encaixe, choque e zumbido subindo) |
+| Painel da senha: número digitado ou apagado (`KeypadLock.Entry`) | `teclado_tecla` (3 tomadas) |
+| Terminal da Eclusa: segurando E (3 s) / `ActivatedEvent` | `eclusa_insere` (os três HDs entrando, com bipes subindo) / `eclusa_liga` (trava pesada e console ligando) |
+| Vitória de uma ala (checkpoint salvo) | `ui_salvo` |
+| Vitória final (VOCÊ ESCAPOU) | `vitoria_eclusa` (trava, ar despressurizando e o jingle de homologação Ré–Fá#–Lá–Ré), depois a música do laudo |
+| Menu, pausa (inclusive ao abrir), configurações e tela de fim (teclado e mouse) | `ui_navegar`, `ui_confirmar`, `ui_voltar` |
+| Transição CRT (`CrtTransition`): troca de cena / cena nova e abrir o jogo | `crt_desliga` (relé, chiado agudo caindo, a imagem sugando no grave e um pop) / `crt_liga` (o "tum" da desmagnetização, estática e o chiado subindo). O apagão do Game Over fica mudo: tocam o grito e o sting |
+
+O aviso de bateria fraca (`bateria_fraca`) virou um piscar de filamento discreto (antes era um zumbido quadrado de 180 Hz que soava como erro). O EMP (`emp_disparo`) foi refeito: carga de 0,2 s, clique do gatilho, estrondo grave, rajada de estática, zap descendo e cauda de faíscas. A lanterna também mudou: liga e desliga viraram clique mecânico (4 tomadas) e o zumbido ficou um chiado abafado, com volume 0,06 no `AudioConfig`.
+
+Respirações: a do Espécime ficou com o rosnado mais leve e uma pausa no fim do ciclo (6 s), com volume 0,4/0,75 no `AudioConfig`; a do Thomas ofegante (`Player/respiracao_ofegante`, gravação CC0 "scared breathing" da Owlish Media, 15 s em loop) é usada pelo `SanityHeartbeat` quando a cena não tem clip próprio: tom até 1,08x e volume 0,08 a 0,35 no `SanityConfig`. Na cena de morte (sanidade travada pela `MonsterKillScene`) e no fim da partida a respiração corta seco e o `GameSfxHooks` silencia os loops (monstro, Sonâmbulo, câmeras, lanterna, segurar E): fica só o som de morte ou de vitória. O sussurro da alucinação sonora (`Sanity/alucinacao_sussurro`, 3 tomadas, sílabas soltas com bandas de voz) substitui o ruído pulsando a 14,8 Hz do `SanityAudioHallucination`, que soava como algo arrastando; volume 0,75 → 0,5.
+
+Morte pelo Espécime (`especime_ataque`, 3,5 s = animação da `MonsterKillScene`): o bote e o rugido sintéticos de antes, mais gravações CC0 (agarrar, três mordidas e um baque no fim, da Owlish Media; grito masculino do Thomas, baixo e abafado, do OpenGameArt). A respiração corta quando o monstro pega.
+
+Ainda não: som da transição CRT (entra depois da #94), eventos aleatórios de ambiente por fase.
 
 ## 6. Mix e níveis
 

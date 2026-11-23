@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using SombraDaSanidade.Core;
 using SombraDaSanidade.Monster;
+using SombraDaSanidade.UI;
 using UnityEngine;
 
 namespace SombraDaSanidade.Level
@@ -28,6 +29,11 @@ namespace SombraDaSanidade.Level
         [Tooltip("Se o jogador não passar por nenhum gatilho até aqui, o monstro acorda mesmo assim.")]
         [SerializeField, Min(0f)] private float maxCalmSeconds = 100f;
         [SerializeField] private RouteVariant[] variants = Array.Empty<RouteVariant>();
+        [Tooltip("Cutscene no motor tocada quando o monstro acorda (C1, planejamento-rc 4). Vazio: só a rota.")]
+        [SerializeField] private Cutscene wakeCutscene;
+        [Tooltip("O monstro nunca acorda nesta ala (fase 2, só o Sonâmbulo). Ele fica na cena adormecido para os " +
+                 "sistemas que o procuram (lanterna, sanidade, tensão) seguirem funcionando.")]
+        [SerializeField] private bool neverWakes;
 
         public bool Awakened { get; private set; }
         public string Variant { get; private set; } = "";
@@ -45,6 +51,13 @@ namespace SombraDaSanidade.Level
         private void Awake()
         {
             if (monster == null) monster = FindAnyObjectByType<MonsterController>();
+            if (monster != null && neverWakes)
+            {
+                Sleep();
+                Awakened = false;
+                enabled = false;
+                return;
+            }
             if (monster == null || variants.Length == 0)
             {
                 Debug.LogWarning($"{name}: WingIntro sem monstro ou sem rotas; a ala começa normal.", this);
@@ -152,6 +165,9 @@ namespace SombraDaSanidade.Level
             foreach (var b in hidden) if (b != null) b.enabled = true;
             monster.enabled = true;
             pendingRoute = true;
+            // C1: a câmera vai até o Espécime no começo da rota. A cutscene precisa de freezeWorld desligado
+            // para ele andar enquanto ela toca.
+            if (wakeCutscene != null) CutscenePlayer.Play(wakeCutscene);
         }
     }
 }

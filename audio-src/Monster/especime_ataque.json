@@ -1,14 +1,17 @@
 {
-  "duration": 1.2,
-  "takes": 1,
-  "seed": 305,
-  "drive": 2,
+  "duration": 3.5,
+  "takes": 2,
+  "seed": 405,
+  "vary": {
+    "pitch": 0.04
+  },
   "layers": [
     {
       "type": "noise",
       "color": "brown",
-      "gain": 1,
+      "gain": 0.8,
       "length": 0.3,
+      "drive": 2,
       "filter": {
         "type": "lowpass",
         "freq": 1500
@@ -29,9 +32,10 @@
       "wave": "saw",
       "freq": 520,
       "freq_end": 200,
-      "gain": 0.6,
+      "gain": 0.45,
       "delay": 0.05,
       "length": 1.1,
+      "drive": 2,
       "filter": {
         "type": "bandpass",
         "freq": [
@@ -59,7 +63,7 @@
       "wave": "sine",
       "freq": 60,
       "freq_end": 30,
-      "gain": 0.9,
+      "gain": 0.8,
       "length": 0.6,
       "env": [
         [
@@ -68,6 +72,95 @@
         ],
         [
           0.6,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/OwlishMedia/agarrar.flac",
+      "gain": 0.7,
+      "delay": 0.0,
+      "pitch": 1.0,
+      "end": 0.7,
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.5599999999999999,
+          1
+        ],
+        [
+          0.7,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/OpenGameArt/grito_masculino.flac",
+      "gain": 0.7,
+      "delay": 0.15,
+      "pitch": 1.0,
+      "filter": {
+        "type": "lowpass",
+        "freq": 3500
+      }
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/OwlishMedia/esmagar_1.flac",
+      "gain": 0.75,
+      "delay": 0.85,
+      "pitch": 0.8
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/OwlishMedia/pancada.flac",
+      "gain": 0.6,
+      "delay": 0.9,
+      "pitch": 0.7
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/OwlishMedia/esmagar_2.flac",
+      "gain": 0.8,
+      "delay": 1.45,
+      "pitch": 0.75
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/OwlishMedia/esmagar_3.flac",
+      "gain": 0.85,
+      "delay": 2.05,
+      "pitch": 0.7
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/OwlishMedia/pancada.flac",
+      "gain": 0.7,
+      "delay": 2.6,
+      "pitch": 0.6
+    },
+    {
+      "type": "noise",
+      "color": "brown",
+      "gain": 0.35,
+      "delay": 2.6,
+      "length": 0.8,
+      "filter": {
+        "type": "lowpass",
+        "freq": 400
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.8,
           0
         ]
       ]
@@ -83,5 +176,9 @@
       1,
       1
     ]
+  },
+  "reverb": {
+    "mix": 0.12,
+    "decay": 0.7
   }
 }

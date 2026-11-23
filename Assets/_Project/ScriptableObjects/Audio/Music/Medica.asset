@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3c9d30a98654ee6b68d6bc2801ce5b3, type: 3}
+  m_Name: Medica
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Audio.MusicSet
+  layers:
+  - {fileID: 8300000, guid: c028360508abcfd5ba06ff7e7554c52b, type: 3}
+  - {fileID: 8300000, guid: fbc8c8bf0b2775bd6f49cbddd96c7036, type: 3}
+  - {fileID: 8300000, guid: 7430fac657361a3b9308a164fc8da543, type: 3}
+  - {fileID: 8300000, guid: a65f2cbeb4fec4cbc93ca007db54a2dd, type: 3}

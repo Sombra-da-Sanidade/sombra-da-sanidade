@@ -1,0 +1,65 @@
+{
+  "duration": 0.45,
+  "takes": 1,
+  "seed": 311,
+  "bass_harmonics": 0,
+  "layers": [
+    {
+      "type": "tone",
+      "wave": "square",
+      "freq": 180,
+      "gain": 0.25,
+      "length": 0.38,
+      "filter": {
+        "type": "lowpass",
+        "freq": 2000
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.3,
+          1
+        ],
+        [
+          0.38,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "square",
+      "freq": 191,
+      "gain": 0.2,
+      "length": 0.38,
+      "filter": {
+        "type": "lowpass",
+        "freq": 2000
+      },
+      "env": [
+        [
+          0,
+          1
+        ],
+        [
+          0.3,
+          1
+        ],
+        [
+          0.38,
+          0
+        ]
+      ]
+    }
+  ],
+  "event": {
+    "spatial": true,
+    "volume": [
+      0.75,
+      0.75
+    ]
+  }
+}

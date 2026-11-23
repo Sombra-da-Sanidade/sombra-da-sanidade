@@ -168,12 +168,12 @@ namespace SombraDaSanidade.Core
             string next = wing != null ? wing.NextScene : null;
             if (next != null)
             {
-                SceneManager.LoadScene(next);
+                UI.CrtTransition.LoadScene(next);
                 return;
             }
             if (wing != null && !wing.IsFinal)
                 Debug.LogWarning($"[GameManager] A próxima ala '{wing.NextWing}' não está no Build Profile. Voltando ao Menu.");
-            if (Application.CanStreamedLevelBeLoaded(WingFlow.MenuScene)) SceneManager.LoadScene(WingFlow.MenuScene);
+            if (Application.CanStreamedLevelBeLoaded(WingFlow.MenuScene)) UI.CrtTransition.LoadScene(WingFlow.MenuScene);
             else Restart();
         }
 
@@ -219,6 +219,8 @@ namespace SombraDaSanidade.Core
             var config = RankConfig.Load();
             // Tempo ideal pelos HDs da partida inteira: as alas anteriores também contam.
             RankScore = config.Score(RunTime, TotalDrivesRequired, AverageSanity, RunEmps, Deaths);
+            // Final Testemunha (planejamento-rc 3, #95): sair com a Vance soma um bônus.
+            if (VanceChoice.Ending == Ending.Witness) RankScore = Mathf.Min(1f, RankScore + config.witnessBonus);
             FinalRank = config.RankFor(RankScore);
             string scene = SceneManager.GetActiveScene().name;
             var best = BestRank(scene);
@@ -230,12 +232,14 @@ namespace SombraDaSanidade.Core
         {
             Time.timeScale = 1f;
             // A cena precisa estar no Build Profile (os menus de Sandbox e protótipo já adicionam).
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            UI.CrtTransition.LoadScene(SceneManager.GetActiveScene().name);
         }
 
         private void OnGUI()
         {
             if (IsPlaying || UI.CutscenePlayer.IsPlaying) return;
+            // No apagão do Game Over (#94) a tela de fim só aparece quando a linha abre.
+            if (UI.CrtTransition.HidingEndScreen) return;
             // Tela com o kit CRT (UI.ResultScreen); sem a arte, a versão de texto abaixo.
             if (UI.ResultScreen.Draw(this)) return;
             EnsureStyles();

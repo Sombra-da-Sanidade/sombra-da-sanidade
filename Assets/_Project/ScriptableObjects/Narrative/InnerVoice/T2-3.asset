@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f655a14b52704c1eb13a15473a95d488, type: 3}
+  m_Name: T2-3
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Narrative.InnerVoiceLine
+  id: T2-3
+  wing: Energia
+  trigger: 6
+  arg: 
+  stable: "C\xE2meras ligadas num pr\xE9dio sem ningu\xE9m?"
+  shaken: "Algu\xE9m est\xE1 anotando cada passo meu."

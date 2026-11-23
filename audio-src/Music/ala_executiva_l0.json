@@ -1,0 +1,339 @@
+{
+  "kind": "music",
+  "duration": 50,
+  "seed": 1061,
+  "loop": true,
+  "loop_crossfade": 2,
+  "lufs": -21,
+  "peak": -6,
+  "music_set": "Executiva",
+  "layer": 0,
+  "reverb": {
+    "mix": 0.3,
+    "decay": 2.0
+  },
+  "layers": [
+    {
+      "type": "noise",
+      "color": "pink",
+      "gain": 0.3,
+      "filter": {
+        "type": "lowpass",
+        "freq": 1300
+      }
+    },
+    {
+      "type": "noise",
+      "color": "brown",
+      "gain": 0.3,
+      "filter": {
+        "type": "lowpass",
+        "freq": 300
+      }
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/OwlishMedia/relogio.flac",
+      "gain": 0.35,
+      "pitch": 0.996625,
+      "delay": 0.0,
+      "filter": [
+        {
+          "type": "highpass",
+          "freq": 500
+        }
+      ],
+      "repeat": {
+        "every": 4,
+        "count": 13
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 523.25,
+      "gain": 0.05,
+      "delay": 6.0,
+      "length": 0.26785714285714285,
+      "vibrato": {
+        "rate": 0.9,
+        "depth": 0.004
+      },
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          350,
+          3200
+        ]
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.01,
+          1
+        ],
+        [
+          0.08035714285714285,
+          0.6
+        ],
+        [
+          0.26785714285714285,
+          0
+        ]
+      ],
+      "repeat": {
+        "every": 24,
+        "count": 2
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 659.26,
+      "gain": 0.05,
+      "delay": 6.267857142857143,
+      "length": 0.26785714285714285,
+      "vibrato": {
+        "rate": 0.9,
+        "depth": 0.004
+      },
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          350,
+          3200
+        ]
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.01,
+          1
+        ],
+        [
+          0.08035714285714285,
+          0.6
+        ],
+        [
+          0.26785714285714285,
+          0
+        ]
+      ],
+      "repeat": {
+        "every": 24,
+        "count": 2
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 783.99,
+      "gain": 0.05,
+      "delay": 6.535714285714286,
+      "length": 0.26785714285714285,
+      "vibrato": {
+        "rate": 0.9,
+        "depth": 0.004
+      },
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          350,
+          3200
+        ]
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.01,
+          1
+        ],
+        [
+          0.08035714285714285,
+          0.6
+        ],
+        [
+          0.26785714285714285,
+          0
+        ]
+      ],
+      "repeat": {
+        "every": 24,
+        "count": 2
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 880.0,
+      "gain": 0.05,
+      "delay": 6.803571428571429,
+      "length": 0.26785714285714285,
+      "vibrato": {
+        "rate": 0.9,
+        "depth": 0.004
+      },
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          350,
+          3200
+        ]
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.01,
+          1
+        ],
+        [
+          0.08035714285714285,
+          0.6
+        ],
+        [
+          0.26785714285714285,
+          0
+        ]
+      ],
+      "repeat": {
+        "every": 24,
+        "count": 2
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 783.99,
+      "gain": 0.05,
+      "delay": 7.071428571428571,
+      "length": 1.0714285714285714,
+      "vibrato": {
+        "rate": 0.9,
+        "depth": 0.004
+      },
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          350,
+          3200
+        ]
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.01,
+          1
+        ],
+        [
+          0.3214285714285714,
+          0.6
+        ],
+        [
+          1.0714285714285714,
+          0
+        ]
+      ],
+      "repeat": {
+        "every": 24,
+        "count": 2
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 523.25,
+      "gain": 0.05,
+      "delay": 7.071428571428571,
+      "length": 1.0714285714285714,
+      "vibrato": {
+        "rate": 0.9,
+        "depth": 0.004
+      },
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          350,
+          3200
+        ]
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.01,
+          1
+        ],
+        [
+          0.3214285714285714,
+          0.6
+        ],
+        [
+          1.0714285714285714,
+          0
+        ]
+      ],
+      "repeat": {
+        "every": 24,
+        "count": 2
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 659.26,
+      "gain": 0.05,
+      "delay": 7.071428571428571,
+      "length": 1.0714285714285714,
+      "vibrato": {
+        "rate": 0.9,
+        "depth": 0.004
+      },
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          350,
+          3200
+        ]
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.01,
+          1
+        ],
+        [
+          0.3214285714285714,
+          0.6
+        ],
+        [
+          1.0714285714285714,
+          0
+        ]
+      ],
+      "repeat": {
+        "every": 24,
+        "count": 2
+      }
+    }
+  ]
+}

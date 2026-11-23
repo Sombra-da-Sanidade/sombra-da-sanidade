@@ -1,0 +1,154 @@
+{
+  "kind": "music",
+  "duration": 50,
+  "seed": 1041,
+  "loop": true,
+  "loop_crossfade": 2,
+  "lufs": -21,
+  "peak": -6,
+  "music_set": "Medica",
+  "layer": 0,
+  "reverb": {
+    "mix": 0.4,
+    "decay": 3.0
+  },
+  "layers": [
+    {
+      "type": "noise",
+      "color": "brown",
+      "gain": 0.6,
+      "filter": {
+        "type": "lowpass",
+        "freq": 650
+      },
+      "tremolo": {
+        "rate": 0.125,
+        "depth": 0.3
+      }
+    },
+    {
+      "type": "noise",
+      "color": "pink",
+      "gain": 0.08,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          900,
+          2400
+        ]
+      },
+      "tremolo": {
+        "rate": 0.25,
+        "depth": 0.5
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 120,
+      "gain": 0.03,
+      "tremolo": {
+        "rate": 0.5,
+        "depth": 0.4
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 1900,
+      "freq_end": 1045.0,
+      "gain": 0.16,
+      "delay": 1.3,
+      "length": 0.12,
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.003,
+          1
+        ],
+        [
+          0.12,
+          0
+        ]
+      ],
+      "repeat": {
+        "every": 6.7,
+        "count": 7
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 1500,
+      "freq_end": 825.0000000000001,
+      "gain": 0.12,
+      "delay": 3.9,
+      "length": 0.12,
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.003,
+          1
+        ],
+        [
+          0.12,
+          0
+        ]
+      ],
+      "repeat": {
+        "every": 9.1,
+        "count": 5
+      }
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 2300,
+      "freq_end": 1265.0,
+      "gain": 0.08,
+      "delay": 5.2,
+      "length": 0.12,
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.003,
+          1
+        ],
+        [
+          0.12,
+          0
+        ]
+      ],
+      "repeat": {
+        "every": 11.3,
+        "count": 4
+      }
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/impactPlate_heavy_000.ogg",
+      "gain": 0.18,
+      "pitch": 0.45,
+      "delay": 8.5,
+      "filter": [
+        {
+          "type": "lowpass",
+          "freq": 1500
+        }
+      ],
+      "repeat": {
+        "every": 17.3,
+        "count": 3
+      }
+    }
+  ]
+}

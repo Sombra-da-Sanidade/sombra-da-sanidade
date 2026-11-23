@@ -72,6 +72,16 @@ namespace SombraDaSanidade.Monster
             }
         }
 
+        // Velocidade da ala (DifficultyProfile, #80) ou, sem perfil, a do config.
+        public float Speed
+        {
+            get
+            {
+                var p = SombraDaSanidade.Core.DifficultyProfile.Active;
+                return p != null && p.sleepwalkerSpeed > 0f ? p.sleepwalkerSpeed : config.speed;
+            }
+        }
+
         private void Start()
         {
             if (player == null) player = FindAnyObjectByType<PlayerController>();
@@ -82,7 +92,9 @@ namespace SombraDaSanidade.Monster
             {
                 agent.enabled = true;
                 agent.Warp(hit.position);
-                agent.speed = config.speed;
+                agent.speed = Speed;
+                // Prioridade diferente do Espécime (50): na fase 3 um desvia do outro em vez de travarem (#80).
+                agent.avoidancePriority = 60;
                 agent.acceleration = config.acceleration;
                 agent.angularSpeed = 0f;
                 agent.autoBraking = false;
@@ -201,7 +213,7 @@ namespace SombraDaSanidade.Monster
         private void Chase()
         {
             SetState(SleepwalkerState.Moving);
-            agent.speed = config.speed * (MonsterSafeMode.Enabled ? 0.7f : 1f);
+            agent.speed = Speed * (MonsterSafeMode.Enabled ? 0.7f : 1f);
             agent.isStopped = false;
             repathTimer -= Time.deltaTime;
             if (repathTimer > 0f) return;
