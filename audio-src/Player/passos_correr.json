@@ -80,8 +80,8 @@
   "event": {
     "spatial": false,
     "volume": [
-      0.7,
-      0.85
+      0.14,
+      0.17
     ],
     "pitch": [
       0.96,
