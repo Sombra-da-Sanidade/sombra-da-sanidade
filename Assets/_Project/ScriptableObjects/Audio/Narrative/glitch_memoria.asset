@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d04ddb4a18e401093f19a04a74cfd60, type: 3}
+  m_Name: glitch_memoria
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Audio.SoundEvent
+  clips:
+  - {fileID: 8300000, guid: 73d39ead9ddb753f97b3093f3fef4c32, type: 3}
+  - {fileID: 8300000, guid: b1e839cc9c1ebd10b28f3e8b0be2c642, type: 3}
+  - {fileID: 8300000, guid: 67215501526ac7924e8b078634402517, type: 3}
+  muffledClips: []
+  bus: 4
+  volume: {x: 0.75, y: 0.85}
+  pitch: {x: 0.95, y: 1.05}
+  spatial: 0
+  maxDistance: 0
+  noiseRadius: 0
+  cooldown: 0

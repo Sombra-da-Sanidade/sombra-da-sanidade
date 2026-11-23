@@ -139,6 +139,8 @@ namespace SombraDaSanidade.UI
             var shot = Shot;
             if (shot == null) return;
             MemoryEffect.Active = shot.memory;
+            // Glitch de fita ao entrar na memória ou trocar de plano com glitch (#107).
+            if (shot.memory && shot.transition == CutsceneTransition.Glitch) PlayGlitch();
             if (shot.sound != null) AudioService.Play(shot.sound);
             CutsceneMarker.Fire(shot.cue);
         }
@@ -222,10 +224,17 @@ namespace SombraDaSanidade.UI
             if (current == null) return;
             var scene = current;
             var done = onDone;
+            if (Shot != null && Shot.memory) PlayGlitch();   // glitch de saída da memória (#107)
             Restore();
             Finished?.Invoke(scene);
             done?.Invoke();
             Next();
+        }
+
+        private static void PlayGlitch()
+        {
+            var sfx = GameSfx.Load();
+            if (sfx != null) AudioService.Play(sfx.memoryGlitch);
         }
 
         private void Restore()

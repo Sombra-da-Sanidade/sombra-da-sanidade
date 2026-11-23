@@ -362,8 +362,31 @@ namespace SombraDaSanidade.EditorTools
             go.AddComponent<SanityClue>();
         }
 
+        // Som de cada plano (#107, docs/cutscenes.md). Índice = plano; null = sem som. O ambiente vem da música
+        // da cutscene (memórias, C3, C4, C5) ou da faixa da ala abafada pelo AudioDirector (C0, C1, C2, I1, I2).
+        // O glitch de entrada e saída das memórias é do CutscenePlayer.
+        private static readonly System.Collections.Generic.Dictionary<string, string[]> ShotSounds = new()
+        {
+            ["C0_Abertura"] = new[] { "World/elevador", "UI/crt_liga", "Lux/lanterna_liga", "World/eclusa_liga" },
+            ["C1_Especime"] = new[] { "Monster/especime_respiracao", "Monster/especime_estalo", null },
+            ["I1_AlaEnergia"] = new[] { "UI/crt_liga" },
+            ["C2_Sonambulo"] = new[] { "Monster/sonambulo_respiracao", "Camera/camera_apagao", "Monster/sonambulo_rangido" },
+            ["I2_AlaExecutiva"] = new[] { "UI/crt_liga" },
+            ["C3_Revelacao"] = new[] { "UI/crt_liga" },
+        };
+
         private static void SaveCutscene(string assetName, string id, bool freezeWorld, AudioClip music, params CutsceneShot[] shots)
         {
+            if (ShotSounds.TryGetValue(assetName, out var sounds))
+                for (int i = 0; i < sounds.Length && i < shots.Length; i++)
+                {
+                    if (sounds[i] == null) continue;
+                    var ev = AssetDatabase.LoadAssetAtPath<SombraDaSanidade.Audio.SoundEvent>(
+                        $"Assets/_Project/ScriptableObjects/Audio/{sounds[i]}.asset");
+                    if (ev == null) Debug.LogError($"{assetName}: som {sounds[i]} não encontrado (gerar SoundEvents antes).");
+                    shots[i].sound = ev;
+                }
+
             string path = $"{CutscenesDir}/{assetName}.asset";
             var asset = AssetDatabase.LoadAssetAtPath<Cutscene>(path);
             if (asset == null)

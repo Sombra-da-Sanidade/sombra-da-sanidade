@@ -86,6 +86,7 @@ namespace SombraDaSanidade.EditorTools
             ("driveEjecting", "World/hd_ejetando"), ("toolboxOpen", "World/caixa_abre"),
             ("substationRepair", "World/subestacao_reparo"),
             ("neuralModule", "World/modulo_neural"), ("keypadKey", "World/teclado_tecla"),
+            ("memoryGlitch", "Narrative/glitch_memoria"), ("vanceCellOpen", "World/cela_abre"),
             ("eclusaInsert", "World/eclusa_insere"), ("eclusaOn", "World/eclusa_liga"), ("victory", "World/vitoria_eclusa"),
             ("uiMove", "UI/ui_navegar"), ("uiConfirm", "UI/ui_confirmar"), ("uiBack", "UI/ui_voltar"),
             ("uiUpgrade", "UI/ui_upgrade"), ("uiSaved", "UI/ui_salvo"),

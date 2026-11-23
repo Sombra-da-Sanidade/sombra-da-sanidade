@@ -66,5 +66,6 @@ Geradas por **Sombra da Sanidade > Narrativa > Gerar todas as 11 Cutscenes e Pai
 - **C2:** o `WingNarrativeDirector` liga o cue `c2_lampada` na Ala de Energia: a luz pisca e o Sonâmbulo avança 2 passos.
 - **C4 e C5:** o `EndingDirector` toca com `CutscenePlayer.Play(WingNarrativeDirector.LoadCutscene("C4_Testemunha"))`.
 - Depois de gerar as cutscenes, gerar as alas de novo para os gatilhos receberem os assets (o builder das alas gera as cutscenes sozinho se ainda não existirem).
+- **Som (#107):** o som de cada plano fica na tabela `ShotSounds` do `CutsceneRc3Builder` (elevador, CRT e lanterna na C0; respiração e estalo na C1; respiração, apagão e rangido na C2; CRT nos intertítulos e na C3). O ambiente é a música da cutscene ou a faixa da ala abafada. O `CutscenePlayer` toca `glitch_memoria` ao entrar num plano de memória com transição `Glitch` e ao sair da memória. A cela da Vance toca `cela_abre` pelo `GameSfxHooks`. Gerar os SoundEvents antes das cutscenes.
 - O `WingNarrativeDirector` é criado em runtime em cada ala; as cenas não guardam C0, I1, I2, C1, C3 nem os finais.
 - Teste: **Sombra da Sanidade > Narrativa > Validar assets RC3** (`Rc3NarrativeTest`).

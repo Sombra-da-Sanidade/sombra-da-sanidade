@@ -25,7 +25,7 @@ MonoBehaviour:
     duration: 4.2
     speaker: 
     caption: "SUB-N\xCDVEL 4. COMPLEXO EREBUS. 1994."
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: 570d0558a9493ecd3ba679c1c5cf9e5f, type: 2}
     transition: 1
     memory: 0
     cue: 
@@ -38,7 +38,7 @@ MonoBehaviour:
     duration: 4.8
     speaker: 
     caption: 'AUDITOR T. REIS: RECUPERAR OS HDS 01, 02 E 03 DO PROJETO HIPNOS.'
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: 0b17d0b62f34c914498c790de8c229a8, type: 2}
     transition: 0
     memory: 0
     cue: 
@@ -51,7 +51,7 @@ MonoBehaviour:
     duration: 4.5
     speaker: 
     caption: "A BASE EST\xC1 EM CONFINAMENTO. NENHUMA EQUIPE RESPONDE."
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: 556bd3e1ea58a37be949dbb06c64030b, type: 2}
     transition: 0
     memory: 0
     cue: 
@@ -64,7 +64,7 @@ MonoBehaviour:
     duration: 4.2
     speaker: 
     caption: "A AETHELGARD AGRADECE A SUA COLABORA\xC7\xC3O."
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: afa8d6c69965b614e919b8836f642da5, type: 2}
     transition: 1
     memory: 0
     cue: 
