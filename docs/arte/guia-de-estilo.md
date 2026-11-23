@@ -132,10 +132,10 @@ Ver [CONTRIBUTING.md, seção Arte](../../CONTRIBUTING.md#arte). Resumo:
 
 Painéis de tela inteira não passam pelo JSON de texto (57.600 pixels por painel). Ver [ADR 0006](../decisoes/0006-paineis-cutscene-aseprite.md).
 
-1. Desenhe no Aseprite e salve a fonte em `art-src/Cutscenes/<id>_<nn>_<nome>.aseprite` (ex.: `C0_01_elevador`).
-2. Exporte o PNG 320x180 para `Assets/_Project/Art/Cutscenes/` com o mesmo nome.
-3. A importação é a mesma dos sprites: Point, sem compressão, 16 PPU.
-4. Presente usa a paleta da seção 3; memória usa as 4 cores da exceção da seção 3.
+1. Desenhe no Aseprite em modo indexado e salve a fonte em `art-src/Cutscenes/<id>_<nn>_<nome>.aseprite` (ex.: `C0_01_elevador`). Paleta: `art-src/sombra.gpl` no presente, `art-src/memoria.gpl` nas memórias (`M*`).
+2. Deixe a camada como **fundo** (Layer > Convert > Layer to Background). Em camada comum o índice 0 vira transparente e sai com outra cor no PNG.
+3. `python3 tools/art/export_cutscenes.py` exporta o PNG 320x180 para `Assets/_Project/Art/Cutscenes/` e recusa painel com cor fora da paleta ou transparência. `--check` só valida; um prefixo (`C0_01`) exporta só esse painel.
+4. A importação é a mesma dos sprites: Point, sem compressão, 16 PPU.
 
 ## 7. Referências (só links)
 
