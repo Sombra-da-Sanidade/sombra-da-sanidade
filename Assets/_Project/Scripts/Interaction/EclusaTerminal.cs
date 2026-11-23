@@ -28,6 +28,9 @@ namespace SombraDaSanidade.Interaction
         public bool CanInteract => !Activated && HasDrives && (Gm == null || Gm.IsPlaying);
         public float HoldDuration => config != null ? config.insertHoldSeconds : 3f;
 
+        // A Eclusa recomeça do zero ao reiniciar: a escolha da Vance também (#95).
+        private void Awake() => VanceChoice.Reset();
+
         private void Reset()
         {
             GetComponent<Collider2D>().isTrigger = true;
@@ -53,6 +56,13 @@ namespace SombraDaSanidade.Interaction
             Activated = true;
             if (config != null) NoiseBus.Emit(transform.position, config.activationNoiseRadius);
             ActivatedEvent?.Invoke(this);
+            // Com a cela da Vance na cena (Eclusa do RC), os HDs abrem a escolha (planejamento-rc 3, #95).
+            if (FindAnyObjectByType<VanceCell>() != null)
+            {
+                var choice = GetComponent<UI.VanceChoiceTerminal>();
+                if (choice == null) choice = gameObject.AddComponent<UI.VanceChoiceTerminal>();
+                choice.Open();
+            }
         }
     }
 }

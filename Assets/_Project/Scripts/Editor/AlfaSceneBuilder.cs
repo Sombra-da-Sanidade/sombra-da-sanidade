@@ -182,6 +182,7 @@ namespace SombraDaSanidade.EditorTools
                 var so = new SerializedObject(gm);
                 so.FindProperty("priorDrives").intValue = 3;   // chega com os 3 HDs das alas
                 so.ApplyModifiedPropertiesWithoutUndo();
+                AddVanceCell(ctx.Objectives);   // #82 e #95: cela, escolha e finais
             });
         }
 

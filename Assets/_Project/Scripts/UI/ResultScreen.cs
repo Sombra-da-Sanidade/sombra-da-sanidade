@@ -66,8 +66,23 @@ namespace SombraDaSanidade.UI
             }
             else
             {
-                Title("VOCÊ ESCAPOU", x + 52, y + 18, x + w - 14);
-                PixelHud.Text("ECLUSA ABERTA. HDS ENTREGUES À SUPERFÍCIE.", x + 52, y + 36, PixelHud.Fosforo3);
+                // Final do RC (#95): o laudo diz qual final foi alcançado e a conquista de sair com a Vance.
+                var ending = Core.VanceChoice.Ending;
+                if (ending == Core.Ending.None)
+                {
+                    Title("VOCÊ ESCAPOU", x + 52, y + 18, x + w - 14);
+                    PixelHud.Text("ECLUSA ABERTA. HDS ENTREGUES À SUPERFÍCIE.", x + 52, y + 36, PixelHud.Fosforo3);
+                }
+                else
+                {
+                    Title("FINAL: " + Core.VanceChoice.Title(ending), x + 52, y + 18, x + w - 14);
+                    var lines = PixelHud.Wrap(Core.VanceChoice.Line(ending), w - 66 - 50);
+                    for (int l = 0; l < lines.Count && l < 2; l++)
+                        PixelHud.Text(lines[l], x + 52, y + 32 + l * 9, PixelHud.Fosforo3);
+                    if (ending == Core.Ending.Witness)
+                        PixelHud.Text(Level.EndingDirector.AchievementJustUnlocked ? "CONQUISTA: A VERDADE CORPORATIVA"
+                            : "A VERDADE CORPORATIVA (+ RANK)", x + 52, y + 46, PixelHud.Ambar2);
+                }
             }
 
             for (int i = 0; i < gm.TotalDrivesRequired; i++)

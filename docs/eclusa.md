@@ -49,6 +49,16 @@ A fúria fica no `MonsterConfig` (`furySpeed = 4.6`, `furyHearingRadius = 9`).
 - Tempos medidos por BFS na planta. Os dois cabem nos 150 s da purga com folga para se esconder.
 - O NavMesh não conhece a grade: o Espécime pode tentar passar por ela e parar encostado. Em fúria ele persegue o Thomas, então isso só aparece se o Thomas estiver do outro lado da grade.
 
+## Escolha da Vance e finais (#82, #95)
+
+1. Inserir os 3 HDs abre o terminal da escolha (`UI/VanceChoiceTerminal`), com o jogo pausado: **1** segue para a eclusa, **2** vai libertar a Vance.
+2. **Deixar:** a cela fica trancada; a porta externa toca a C5 e o laudo mostra **FINAL: AMOSTRA ENTREGUE**.
+3. **Salvar:** a cela (`Interaction/VanceCell`, marcador `cela_eclusa_1`) abre segurando E por 6 s, com 2 skill checks (`InteractionConfigCelaVance`). Cada segundo faz barulho (raio 8) e as câmeras da sala seguem ligadas. Solta, a Vance sobe pelo duto, o atalho abre e as câmeras perto da linha cela-porta desligam.
+4. Chegar à porta com a Vance solta toca a C4. O laudo mostra **FINAL: TESTEMUNHA**, a conquista **A Verdade Corporativa** (salva em PlayerPrefs) e soma `RankConfig.witnessBonus` (0,1) na nota.
+5. Escolher salvar e fugir sem abrir a cela é Amostra entregue.
+
+Estado em `Core/VanceChoice` (zera quando a Eclusa recomeça). Números novos: `EscapeConfig` (`cellHoldSeconds`, `cellNoiseRadius`, `vanceExitSeconds`) e `RankConfig.witnessBonus`. Sprites: `art-src/Sprites/vance.json` e `art-src/Props/vance_cell.json`.
+
 ## Painel de teste (F1, Beta)
 
 Mostra se a purga está ativa e quanto falta (só no painel). Botões **+3 HDs**, **Iniciar purga** e **Purga em 10 s**; "Ir para" tem o terminal e a porta externa.

@@ -226,6 +226,65 @@ namespace SombraDaSanidade.EditorTools
             go.AddComponent<SleepwalkerReveal>().Setup(light, "C2");
         }
 
+        private const string VanceArt = Root + "/Art/Sprites/vance.png";
+        private const string VanceCellArt = Root + "/Art/Props/vance_cell.png";
+        private const string CellSkillConfig = "InteractionConfigCelaVance";
+
+        // Cela da Vance (#82) no marcador "cela_eclusa_1" (V na planta) e o diretor dos finais (#95).
+        private static void AddVanceCell(Transform objectives)
+        {
+            new GameObject("EndingDirector").AddComponent<EndingDirector>();
+            var marker = LevelMarker.Find("cela_eclusa_1")
+                ?? UnityEngine.Object.FindObjectsByType<LevelMarker>(FindObjectsSortMode.None).FirstOrDefault(m => m.Id == "cela_eclusa_1");
+            if (marker == null)
+            {
+                Debug.LogError("Eclusa: falta a cela da Vance (V) na planta.");
+                return;
+            }
+            MonsterPrefabBuilder.EnsureArtImport(VanceArt);
+            MonsterPrefabBuilder.EnsureArtImport(VanceCellArt);
+            var cellSprites = AssetDatabase.LoadAllAssetsAtPath(VanceCellArt).OfType<Sprite>().ToArray();
+            var vanceSprite = AssetDatabase.LoadAllAssetsAtPath(VanceArt).OfType<Sprite>().FirstOrDefault();
+            if (cellSprites.Length < 2 || vanceSprite == null)
+                Debug.LogWarning("Sprites da Vance/cela não encontrados. Rode python3 tools/art/export_sprites.py.");
+
+            var go = new GameObject("VanceCell");
+            go.transform.SetParent(objectives, false);
+            go.transform.position = marker.transform.position;
+            var box = go.AddComponent<BoxCollider2D>();
+            box.isTrigger = true;
+            box.size = new Vector2(3.6f, 2.8f);
+
+            var vance = new GameObject("Vance").AddComponent<SpriteRenderer>();
+            vance.transform.SetParent(go.transform, false);
+            vance.sprite = vanceSprite;
+            vance.sortingOrder = 8;
+            var art = new GameObject("Grade").AddComponent<SpriteRenderer>();
+            art.transform.SetParent(go.transform, false);
+            art.sortingOrder = 9;
+            Sprite closed = cellSprites.FirstOrDefault(s => s.name.EndsWith("closed")) ?? cellSprites.FirstOrDefault();
+            Sprite open = cellSprites.FirstOrDefault(s => s.name.EndsWith("open"));
+            art.sprite = closed;
+
+            var skill = AssetDatabase.LoadAssetAtPath<SombraDaSanidade.Interaction.InteractionConfig>($"{Root}/ScriptableObjects/Config/{CellSkillConfig}.asset");
+            if (skill == null)
+            {
+                // Planejamento-rc 3: 2 skill checks em 6 s. Começa cedo e sempre faz os 2.
+                skill = PrototypeSceneBuilder.GetOrCreateConfig<SombraDaSanidade.Interaction.InteractionConfig>(CellSkillConfig);
+                skill.skillCheckStartDelay = 0.6f;
+                skill.skillCheckChancePerSecond = 0.8f;
+                skill.skillCheckMinPerDrive = 2;
+                skill.skillCheckMaxPerDrive = 2;
+                skill.skillCheckWarning = 0.4f;
+                EditorUtility.SetDirty(skill);
+                AssetDatabase.SaveAssets();
+            }
+            var escape = PrototypeSceneBuilder.GetOrCreateConfig<EscapeConfig>("EscapeConfig");
+            var exit = UnityEngine.Object.FindAnyObjectByType<SombraDaSanidade.Interaction.ExitDoor>();
+            go.AddComponent<SombraDaSanidade.Interaction.VanceCell>()
+                .Setup(escape, skill, art, closed, open, vance, exit != null ? exit.transform : null);
+        }
+
         private static Rect RectOf(List<Vector2Int> cells)
         {
             int x0 = cells.Min(c => c.x), y0 = cells.Min(c => c.y);
