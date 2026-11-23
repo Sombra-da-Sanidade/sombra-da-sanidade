@@ -80,6 +80,7 @@ namespace SombraDaSanidade.EditorTools
                     Check("Purga parada antes do terminal", !escape.Active && !monster.IsFurious);
                     Check($"Purga em config dentro de 2-3 min ({escape.Duration:0} s)", escape.Duration >= 120f && escape.Duration <= 180f);
                     Check("Terminal aceita os HDs", terminal.CanInteract);
+                    CheckRc(player, door);
                     // Encostar na porta trancada não vence.
                     Teleport(player, door.transform.position + Vector3.up * 0.3f);
                     Next();
@@ -158,6 +159,28 @@ namespace SombraDaSanidade.EditorTools
         }
 
         private static bool furyChecked;
+
+        // Dois caminhos da escolha (planejamento-rc 3, #86): cela da Vance do outro lado, atalho fechado até ela ser
+        // solta, câmeras e os dois monstros. O Sonâmbulo sai da cena depois: o teste da purga é sobre o Espécime.
+        private static void CheckRc(PlayerController player, ExitDoor door)
+        {
+            var cell = LevelMarker.Find("cela_eclusa_1");
+            float fromStart = cell == null ? 0f : Vector2.Distance(cell.transform.position, player.transform.position);
+            Check($"Cela da Vance do outro lado do mapa ({fromStart:0} m do início)", cell != null && fromStart >= 60f);
+            var gates = Object.FindObjectsByType<ShortcutGate>();
+            Check("Atalho fechado no começo", gates.Length == 1 && !gates[0].IsOpen
+                && gates[0].GetComponent<BoxCollider2D>().enabled);
+            if (gates.Length == 1)
+            {
+                ShortcutGate.OpenAll();
+                Check("Vance solta abre o atalho", gates[0].IsOpen && !gates[0].GetComponent<BoxCollider2D>().enabled);
+            }
+            int cams = Object.FindObjectsByType<SecurityCamera>().Length;
+            Check($"Câmeras ativas na Eclusa (veio {cams})", cams >= 3);
+            var walkers = Object.FindObjectsByType<SleepwalkerController>();
+            Check("Sonâmbulo na Eclusa", walkers.Length == 1);
+            foreach (var w in walkers) w.gameObject.SetActive(false);
+        }
 
         private static void Check(string label, bool ok)
         {
