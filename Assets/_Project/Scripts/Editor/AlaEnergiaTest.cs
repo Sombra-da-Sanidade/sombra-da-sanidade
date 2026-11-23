@@ -143,8 +143,8 @@ namespace SombraDaSanidade.EditorTools
             // O perfil é lido direto pelos sistemas (DifficultyProfile.Active); os configs compartilhados não mudam.
             Check($"Monstro: velocidade 3.85 e raio auditivo 6 (veio {monster.CurrentSpeed} / {monster.HearingRadius})",
                 Mathf.Approximately(monster.CurrentSpeed, 3.85f) && Mathf.Approximately(monster.HearingRadius, 6f));
-            Check($"Sanidade: dreno 1.5/s no escuro e alucinação a cada 20-30 s (veio {sanity.DarknessDrain}, {p.hallucinationInterval.x}-{p.hallucinationInterval.y})",
-                Mathf.Approximately(sanity.DarknessDrain, 1.5f) && p.hallucinations
+            Check($"Sanidade: dreno 1.8/s no escuro e alucinação a cada 20-30 s (veio {sanity.DarknessDrain}, {p.hallucinationInterval.x}-{p.hallucinationInterval.y})",
+                Mathf.Approximately(sanity.DarknessDrain, 1.8f) && p.hallucinations
                 && Mathf.Approximately(p.hallucinationInterval.x, 20f) && Mathf.Approximately(p.hallucinationInterval.y, 30f));
             Check("Assets compartilhados não mudam com o perfil",
                 !Mathf.Approximately(AssetDatabase.LoadAssetAtPath<MonsterConfig>("Assets/_Project/ScriptableObjects/Config/MonsterConfig.asset").baseSpeed, 3.85f));
@@ -170,16 +170,19 @@ namespace SombraDaSanidade.EditorTools
         private static void CheckRc(PlayerController player)
         {
             var walker = Object.FindAnyObjectByType<SleepwalkerController>();
-            Check($"Sonâmbulo na ala, a 5.0 m/s no escuro (#80; veio {(walker != null ? walker.Speed : 0f)})",
-                walker != null && Mathf.Approximately(walker.Speed, 5f));
+            Check($"Sonâmbulo na ala, a 6 m/s no escuro (#80; veio {(walker != null ? walker.Speed : 0f)})",
+                walker != null && Mathf.Approximately(walker.Speed, 6f));
             var cams = Object.FindObjectsByType<SecurityCamera>();
             Check($"2 a 3 câmeras (veio {cams.Length})", cams.Length >= 2 && cams.Length <= 3);
             float firstCam = cams.Length == 0 ? float.MaxValue
                 : cams.Min(c => Vector2.Distance(c.transform.position, player.transform.position));
             Check($"1ª câmera perto da entrada, em área segura ({firstCam:0.0} m)", firstCam <= 8f);
-            Check("Gatilhos da C2 e da M2", GameObject.Find("CutsceneTrigger_C2") && GameObject.Find("CutsceneTrigger_M2"));
-            var c2 = Object.FindObjectsByType<CutsceneTrigger>().FirstOrDefault(t => t.name == "CutsceneTrigger_C2");
-            Check("Gatilho da C2 com a cutscene (#91)", c2 != null && c2.Cutscene != null && c2.Cutscene.id == "C2");
+            Check("Gatilho da M2", GameObject.Find("CutsceneTrigger_M2"));
+            // C2 sem gatilho: o Sonâmbulo dorme na Subestação e é revelado ao ejetar o HD-02 (encontro obrigatório).
+            var server = Object.FindAnyObjectByType<DriveServer>();
+            float toServer = walker != null && server != null ? Vector2.Distance(walker.transform.position, server.transform.position) : 99f;
+            Check($"Sonâmbulo rondando a partir da Subestação, perto do HD-02 ({toServer:0.0} m), sem gatilho da C2",
+                walker != null && walker.StartMode == SleepwalkerStart.Roaming && toServer < 10f && !GameObject.Find("CutsceneTrigger_C2"));
             Check("Fala do escritório (T2-4) por área", Object.FindObjectsByType<SombraDaSanidade.Narrative.InnerVoiceTrigger>().Length == 1);
             Check("Foto que muda com a sanidade", Object.FindObjectsByType<SanitySpriteSwap>().Length == 1);
             Check("Sons do Espécime atrás das paredes", Object.FindObjectsByType<WallNoise>().Length >= 2);

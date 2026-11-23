@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using SombraDaSanidade.Audio;
 using SombraDaSanidade.Level;
+using SombraDaSanidade.Monster;
 using SombraDaSanidade.UI;
 using UnityEditor;
 using UnityEngine;
@@ -58,13 +59,25 @@ namespace SombraDaSanidade.EditorTools
             if (root.childCount == 0) UnityEngine.Object.DestroyImmediate(root.gameObject);
         }
 
+        // Diretiva "# @sonambulo ronda": já começa rondando no escuro. "# @sonambulo revelacao": dorme até a cutscene
+        // (WingNarrativeDirector o acorda). Sem diretiva: adormecido até o Thomas o ver (config).
         private static void AddSleepwalkers(Layout map, Transform root)
         {
+            var mode = map.Directives.FirstOrDefault(d => d[0] == "sonambulo" && d.Length > 1)?[1];
             foreach (var cell in Find(map, 'Z'))
             {
                 var go = (GameObject)PrefabUtility.InstantiatePrefab(SleepwalkerPrefabBuilder.GetOrBuild());
                 go.transform.SetParent(root, false);
                 go.transform.position = new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f);
+                var sw = go.GetComponent<SleepwalkerController>();
+                var so = new SerializedObject(sw);
+                if (mode == "ronda") so.FindProperty("startMode").enumValueIndex = (int)SleepwalkerStart.Roaming;
+                else if (mode == "revelacao")
+                {
+                    so.FindProperty("startMode").enumValueIndex = (int)SleepwalkerStart.Dormant;
+                    so.FindProperty("wakeOnlyByScript").boolValue = true;
+                }
+                so.ApplyModifiedPropertiesWithoutUndo();
             }
         }
 

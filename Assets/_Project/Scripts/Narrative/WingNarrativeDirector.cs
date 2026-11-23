@@ -91,6 +91,8 @@ namespace SombraDaSanidade.Narrative
             if (string.IsNullOrEmpty(wing) && DifficultyProfile.Active != null) wing = DifficultyProfile.Active.wing;
 
             EnsureC2LampCue();
+            HookC2Reveal();
+            HookTutorials();
             EnsureRuntimeReactiveProps();
             EnsureVanceRescueChoice();
             if (IsAutoSuppressed) return;
@@ -349,12 +351,118 @@ namespace SombraDaSanidade.Narrative
             if (IsAutoSuppressed) return;
             int total = GameManager.Instance != null ? GameManager.Instance.TotalDrives : count;
             if (wing == "Medica" && total >= 1) PlayVoice("T1-6");
-            else if (wing == "Energia") PlayVoice("T2-6");
+            else if (wing == "Energia") StartCoroutine(PlayC2RevealRoutine());
             else if (wing == "Executiva" && !pendingC3)
             {
                 pendingC3 = true;
                 StartCoroutine(PlayC3AfterVanceRoutine());
             }
+        }
+
+        // Tutoriais no motor: a primeira câmera que dispara (TC_Camera, foco nela) e o primeiro sinalizador pego
+        // (TS_Sinalizador). Uma vez por sessão; esperam outra cutscene acabar.
+        private bool tutorialPending;
+
+        private void HookTutorials()
+        {
+            foreach (var cam in FindObjectsByType<SecurityCamera>(FindObjectsSortMode.None))
+            {
+                var c = cam;
+                c.AlarmRaised += _ => OnFirstCameraAlarm(c);
+            }
+            var thrower = FindAnyObjectByType<FlareThrower>();
+            if (thrower != null)
+            {
+                int last = thrower.Count;
+                thrower.CountChanged += n =>
+                {
+                    if (n > last) OnFlarePicked();
+                    last = n;
+                };
+            }
+        }
+
+        private void OnFirstCameraAlarm(SecurityCamera cam)
+        {
+            if (IsAutoSuppressed || CutscenePlayer.HasPlayed("TC") || tutorialPending || cam == null) return;
+            var marker = CutsceneMarker.Find("camera_alarme");
+            if (marker == null)
+            {
+                marker = new GameObject("Cue_Camera_Alarme").AddComponent<CutsceneMarker>();
+                marker.Setup("camera_alarme");
+            }
+            // Foco no desenho da câmera (na parede), não na raiz.
+            var art = cam.transform.Find("Art");
+            marker.transform.position = art != null ? art.position : cam.transform.position;
+            StartCoroutine(PlayTutorialRoutine("TC_Camera"));
+        }
+
+        private void OnFlarePicked()
+        {
+            if (IsAutoSuppressed || CutscenePlayer.HasPlayed("TS") || tutorialPending) return;
+            StartCoroutine(PlayTutorialRoutine("TS_Sinalizador"));
+        }
+
+        private IEnumerator PlayTutorialRoutine(string asset)
+        {
+            tutorialPending = true;
+            while (CutscenePlayer.IsPlaying || UpgradeTerminal.IsOpen || ModalScreen.IsOpen) yield return null;
+            yield return new WaitForSeconds(0.2f);
+            tutorialPending = false;
+            var scene = LoadCutscene(asset);
+            if (scene != null && !CutscenePlayer.HasPlayed(scene.id)) CutscenePlayer.Play(scene);
+        }
+
+        // Fase 2: o Sonâmbulo ronda no escuro a partir da Subestação (sala obrigatória: console e HD-02).
+        // A C2 (revelação e tutorial dele) toca quando o Thomas o encontra, com ele na tela. Se o Thomas ejetar o HD-02
+        // sem tê-lo encontrado, ele surge no escuro atrás do Thomas e a C2 toca ali: o encontro é obrigatório.
+        private SleepwalkerController c2Walker;
+
+        private void HookC2Reveal()
+        {
+            if (wing != "Energia") return;
+            c2Walker = FindAnyObjectByType<SleepwalkerController>();
+            if (c2Walker != null) c2Walker.Encountered += OnSleepwalkerHunt;
+        }
+
+        private void OnSleepwalkerHunt()
+        {
+            if (IsAutoSuppressed) return;
+            var c2 = LoadCutscene("C2_Sonambulo");
+            if (c2 != null && !CutscenePlayer.HasPlayed(c2.id)) CutscenePlayer.Play(c2);
+        }
+
+        private IEnumerator PlayC2RevealRoutine()
+        {
+            yield return null;
+            while (UpgradeTerminal.IsOpen || ModalScreen.IsOpen) yield return null;
+            yield return new WaitForSeconds(0.3f);
+            var c2 = LoadCutscene("C2_Sonambulo");
+            if (c2 == null || CutscenePlayer.HasPlayed(c2.id) || c2Walker == null)
+            {
+                PlayVoice("T2-6");
+                yield break;
+            }
+            var player = FindAnyObjectByType<PlayerController>();
+            // 5,5 m: a própria C2 (cue c2_lampada) o avança 2 m durante a cena.
+            if (player != null) c2Walker.Ambush(BehindPlayer(player, 5.5f));
+            if (!CutscenePlayer.HasPlayed(c2.id)) CutscenePlayer.Play(c2);
+        }
+
+        // Ponto no NavMesh atrás do Thomas (contra o lado para onde ele olha), sem parede no meio.
+        private static Vector2 BehindPlayer(PlayerController player, float distance)
+        {
+            Vector2 from = player.transform.position;
+            Vector2 back = -player.Facing;
+            if (back.sqrMagnitude < 0.01f) back = Vector2.down;
+            int walls = LayerMask.GetMask("Walls");
+            for (float d = distance; d >= 1.5f; d -= 0.5f)
+            {
+                Vector2 p = from + back.normalized * d;
+                if (Physics2D.Linecast(from, p, walls)) continue;
+                if (UnityEngine.AI.NavMesh.SamplePosition(p, out var hit, 0.8f, UnityEngine.AI.NavMesh.AllAreas)) return hit.position;
+            }
+            return from + back.normalized * 1.5f;
         }
 
         // Garante que UpgradeTerminal e VANCE-03 terminem antes da cutscene C3 Revelação (#91).

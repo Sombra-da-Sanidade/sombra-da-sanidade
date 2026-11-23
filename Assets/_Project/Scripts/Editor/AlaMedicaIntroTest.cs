@@ -77,7 +77,7 @@ namespace SombraDaSanidade.EditorTools
                     Check("Cena tem monstro, jogador, lanterna, introdução, checkpoint e GameManager",
                         monster && player && flashlight && intro && WingCheckpoint.Instance && gm);
                     if (failed) { Finish(); return; }
-                    Check($"Introdução começa com ~1 min de calma ({intro.CalmSeconds:0} s)", intro.CalmSeconds >= 55f);
+                    Check($"Introdução começa com ~35 s de calma ({intro.CalmSeconds:0} s)", intro.CalmSeconds >= 30f);
                     Check("Monstro adormecido: controller desligado", !monster.isActiveAndEnabled);
                     Check("Monstro adormecido: invisível", !AnyEnabled(monster.GetComponentsInChildren<Renderer>()));
                     Check("Monstro adormecido: sem colisão", !AnyEnabled(monster.GetComponentsInChildren<Collider2D>()));

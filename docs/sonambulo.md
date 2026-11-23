@@ -14,6 +14,30 @@ A luz atrai o Espécime e prende o Sonâmbulo, então segurar um com a lanterna 
 | **Travado** | Lanterna nele, ou na folga de 1,5 s depois de acordar | Para na hora e mostra uma pose sorteada. A menos de 3 m, a pose é sempre o bote. | A luz sai dele (com 0,12 s de atraso) |
 | **Andando** | Sem a lanterna nele | Corre a 7,5 m/s até o jogador pelo NavMesh. O jogador anda a 4 m/s. | A lanterna volta a pegar nele |
 
+## Ronda e câmeras
+
+Acordado, ele tem dois modos:
+- **Rondando:** só antes de encontrar o Thomas. Anda devagar pelo escuro, entre pontos sorteados em volta da origem, e para um pouco em cada um. Evita Zonas Seguras acesas.
+- **Perseguindo:** depois de encontrar o Thomas, persegue para sempre, como antes. Não volta mais a rondar.
+
+| Gatilho | O que acontece |
+|---|---|
+| Vê o Thomas de perto, sem parede no meio, ou é notado por ele | **Encontro** (`HasFoundPlayer`): passa a perseguir até o fim |
+| Alarme de uma câmera de segurança (`SecurityCamera.AlarmRaised`) a até 20 m, antes do encontro | Vai até o ponto do alarme. Se encontrar o Thomas no caminho, persegue; se chegar lá e não o vir, volta a rondar dali |
+
+- **Luz:** a lanterna e o sinalizador travam o Sonâmbulo nos dois modos, como antes.
+- **Cutscenes:** durante qualquer cutscene ele fica parado.
+- **Ajustes:** os números ficam no `SleepwalkerConfig` (`roamSpeed`, `roamRadius`, `detectDistance`, `cameraLureDistance`).
+
+**Como ele começa em cada cena:** depende de `SleepwalkerController.startMode`, definido pela diretiva da planta.
+
+| Diretiva | Cena | Comportamento |
+|---|---|---|
+| `# @sonambulo ronda` | Ala de Energia | Ronda a partir da Subestação, a sala obrigatória do console e do HD-02. A C2 (revelação e tutorial) toca no encontro, quando ele já está perseguindo e aparece na tela (`Encountered`). Se o Thomas ejetar o HD-02 sem tê-lo encontrado, ele surge no escuro atrás do Thomas (`Ambush`) e a C2 toca ali (`WingNarrativeDirector`). O encontro é obrigatório. |
+| `# @sonambulo ronda` | Executiva, Eclusa | Começa rondando. |
+| `# @sonambulo revelacao` | (disponível) | Dorme e só acorda por script (`wakeOnlyByScript`), para uma revelação roteirizada. |
+| sem diretiva | Beta | Adormecido até o Thomas o ver. Depois, caça. |
+
 ## Luz e visão
 
 - **O que o trava:** a lanterna ligada, com o cone em pelo menos uma das três alturas testadas (pés, tronco e cabeça; `sampleHeights`). Vale `FlashlightController.IsPointInCone`, com o alcance, o ângulo e as paredes da lanterna. Lanterna apagada ou sem bateria não trava.
@@ -84,3 +108,11 @@ O ponto precisa estar no NavMesh. Como ele começa adormecido, a sala onde ele f
 ```bash
 Unity -batchmode -projectPath . -executeMethod SombraDaSanidade.EditorTools.SleepwalkerTest.RunBatch
 ```
+
+**Sombra da Sanidade > Rodar teste da ronda do Sonâmbulo** (`SleepwalkerRoamTest`) confere:
+- que ele começa rondando devagar;
+- que o da revelação não acorda ao ser visto;
+- que o alarme de uma câmera o chama até o ponto;
+- que, sem ver o Thomas ali, ele volta a rondar;
+- que encontra o Thomas por perto;
+- que, depois disso, persegue para sempre, mesmo com o Thomas longe.

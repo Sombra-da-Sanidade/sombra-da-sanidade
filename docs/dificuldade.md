@@ -4,20 +4,25 @@ Frente 5, issue #30. Um `DifficultyProfile` por ala, com os valores da [Proposta
 
 ## Assets
 
+Em 23/11 as duas primeiras fases ficaram mais difíceis:
+- **Médica:** o Espécime ficou mais rápido e com o ouvido melhor, o escuro drena mais a sanidade, os armários dão menos bateria e ele acorda depois de 35 s (antes, 60 s). Ao pegar o HD-01 antes do encontro, ele surge na mesma sala, atrás do Thomas, e a patrulha dele não se afasta mais de 14 m do Thomas (`monsterLeashDistance`).
+- **Energia:** o Sonâmbulo ficou mais rápido, o escuro drena mais e os armários dão menos bateria.
+
 Ficam em `Assets/_Project/ScriptableObjects/Config/`. Ajustar um número é só editar o asset no Inspector.
 
 | Campo | `DifficultyMedica` | `DifficultyEnergia` | `DifficultyExecutiva` | `DifficultyEclusa` |
 |---|---|---|---|---|
-| `monsterSpeed` | 3.2 | 3.85 (dorme) | 3.8 | 4.6 |
-| `sleepwalkerSpeed` | - | 5.0 | 5.5 | 6.0 |
-| `monsterHearingRadius` | 5 | 6 | 7 | 9 |
+| `monsterSpeed` | 3.6 | 3.85 (dorme) | 3.8 | 4.6 |
+| `sleepwalkerSpeed` | - | 6.0 | 5.5 | 6.0 |
+| `monsterHearingRadius` | 6.5 | 6 | 7 | 9 |
+| `monsterLeashDistance` (m) | 14 | 0 (livre) | 0 | 0 |
 | `monsterBehaviours` | Médica | Energia | Executiva | Executiva |
-| `darknessDrain` (/s) | 1.0 | 1.5 | 2.0 | 2.0 |
+| `darknessDrain` (/s) | 1.3 | 1.8 | 2.0 | 2.0 |
 | `hallucinations` | não | sim | sim | sim |
 | `hallucinationInterval` (s) | | 20-30 | 15-25 | 10-15 |
-| `lootTable` | `LootTable_Medica` (70% bateria) | `LootTable_Energia` (60%) | `LootTable_Executiva` (45%) | `LootTable_Eclusa` (0%) |
+| `lootTable` | `LootTable_Medica` (55% bateria) | `LootTable_Energia` (45%) | `LootTable_Executiva` (45%) | `LootTable_Eclusa` (0%) |
 | `wing` | Medica | Energia | Executiva | Eclusa |
-| `batteryChance` | 0.7 | 0.6 | 0.45 | 0 |
+| `batteryChance` | 0.55 | 0.45 | 0.45 | 0 |
 | `breakersAvailable` | 3 | 3 | 2 | 0 |
 | `monsterDelaySeconds` | 0 | 0 | 0 | 0 |
 

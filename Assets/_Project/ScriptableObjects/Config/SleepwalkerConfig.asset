@@ -15,16 +15,23 @@ MonoBehaviour:
   speed: 7.5
   acceleration: 80
   repathInterval: 0.15
-  viewAngle: 110
-  viewDistance: 9
   sampleHeights:
   - 0.3
   - 1.6
   - 3
+  viewAngle: 110
+  viewDistance: 9
   startsDormant: 1
   wakeGrace: 1.5
   unseenDelay: 0.12
+  roamSpeed: 3
+  roamRadius: 9
+  roamPause: {x: 1.2, y: 3.5}
+  detectDistance: 7.5
+  cameraLureDistance: 20
   lungePoseDistance: 3
+  killFps: 12
+  killHold: 0.8
   safeZoneMargin: 0.6
   safeModeSanityDamage: 20
   safeModePushDistance: 2.5

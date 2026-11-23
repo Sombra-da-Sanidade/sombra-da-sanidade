@@ -11,8 +11,8 @@ namespace SombraDaSanidade.Level
     // invisível, parado e sem colisão, mas com o GameObject ativo (lanterna, sanidade e diretor de tensão o
     // procuram com FindAnyObjectByType e ignoram enquanto o controller estiver desligado). Depois de
     // calmSeconds, quando o jogador entra no gatilho de uma variante, ele acorda no início da rota e passa
-    // ao fundo (MonsterController.FollowRoute). Se o jogador demorar demais ou pegar o HD antes, acorda na
-    // variante mais longe dele. Montado pelo AlfaSceneBuilder a partir dos marcadores da planta.
+    // ao fundo (MonsterController.FollowRoute). Se o jogador demorar demais, acorda na
+    // variante mais longe dele; se pegar o HD antes, surge atrás dele na mesma sala. Montado pelo AlfaSceneBuilder a partir dos marcadores da planta.
     public class WingIntro : MonoBehaviour
     {
         [Serializable]
@@ -25,9 +25,9 @@ namespace SombraDaSanidade.Level
 
         [SerializeField] private MonsterController monster;
         [Tooltip("Tempo mínimo sem monstro (GDD v1.1, Proposta 4: ~1 min).")]
-        [SerializeField, Min(0f)] private float calmSeconds = 60f;
+        [SerializeField, Min(0f)] private float calmSeconds = 35f;
         [Tooltip("Se o jogador não passar por nenhum gatilho até aqui, o monstro acorda mesmo assim.")]
-        [SerializeField, Min(0f)] private float maxCalmSeconds = 100f;
+        [SerializeField, Min(0f)] private float maxCalmSeconds = 60f;
         [SerializeField] private RouteVariant[] variants = Array.Empty<RouteVariant>();
         [Tooltip("Cutscene no motor tocada quando o monstro acorda (C1, planejamento-rc 4). Vazio: só a rota.")]
         [SerializeField] private Cutscene wakeCutscene;
@@ -80,7 +80,37 @@ namespace SombraDaSanidade.Level
             if (GameManager.Instance != null) GameManager.Instance.DriveCollected -= OnDriveCollected;
         }
 
-        private void OnDriveCollected(int total) => WakeFarthest();
+        // Pegou o HD antes do encontro: o Espécime surge na mesma sala, no escuro atrás do Thomas, e a C1 toca.
+        private void OnDriveCollected(int total) => WakeNearPlayer();
+
+        private void WakeNearPlayer()
+        {
+            if (Awakened) return;
+            if (player == null) { WakeFarthest(); return; }
+            Vector2 at = NearPlayerSpot(player, 5.5f);
+            Wake(new RouteVariant { name = "hd", route = new[] { at } });
+        }
+
+        // Ponto no NavMesh atrás do Thomas (contra o lado para onde ele olha), sem parede no meio. Tenta outras
+        // direções se atrás não der.
+        private static Vector2 NearPlayerSpot(Transform player, float distance)
+        {
+            Vector2 from = player.position;
+            var pc = player.GetComponent<SombraDaSanidade.Player.PlayerController>();
+            Vector2 back = pc != null && pc.Facing.sqrMagnitude > 0.01f ? -pc.Facing.normalized : Vector2.down;
+            int walls = LayerMask.GetMask("Walls");
+            for (int k = 0; k < 8; k++)
+            {
+                Vector2 dir = Quaternion.Euler(0f, 0f, (k % 2 == 0 ? 1 : -1) * (k + 1) / 2 * 45f) * back;
+                for (float d = distance; d >= 2.5f; d -= 0.5f)
+                {
+                    Vector2 p = from + dir * d;
+                    if (Physics2D.Linecast(from, p, walls)) continue;
+                    if (UnityEngine.AI.NavMesh.SamplePosition(p, out var hit, 0.8f, UnityEngine.AI.NavMesh.AllAreas)) return hit.position;
+                }
+            }
+            return from + back * 2.5f;
+        }
 
         private void Update()
         {
@@ -167,7 +197,15 @@ namespace SombraDaSanidade.Level
             pendingRoute = true;
             // C1: a câmera vai até o Espécime no começo da rota. A cutscene precisa de freezeWorld desligado
             // para ele andar enquanto ela toca.
-            if (wakeCutscene != null) CutscenePlayer.Play(wakeCutscene);
+            if (wakeCutscene != null) StartCoroutine(PlayWakeCutscene());
+        }
+
+        // Ao pegar o HD, a tela de upgrade abre (e pausa o jogo): a C1 espera ela fechar para não brigar com a pausa.
+        private System.Collections.IEnumerator PlayWakeCutscene()
+        {
+            yield return null;
+            while (UpgradeTerminal.IsOpen || ModalScreen.IsOpen || CutscenePlayer.IsPlaying) yield return null;
+            if (!CutscenePlayer.HasPlayed(wakeCutscene.id)) CutscenePlayer.Play(wakeCutscene);
         }
     }
 }

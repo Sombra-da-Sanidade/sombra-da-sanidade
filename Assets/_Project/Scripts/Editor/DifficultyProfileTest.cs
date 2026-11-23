@@ -179,8 +179,8 @@ namespace SombraDaSanidade.EditorTools
         // Os 4 assets com a tabela da Proposta 1. A chance de bateria vem da tabela de loot da ala.
         private static void CheckAssets()
         {
-            CheckAsset("Medica", 3.2f, 5f, 1f, 0.70f, false, Vector2.zero, MonsterWingBehaviours.Medica);
-            CheckAsset("Energia", 3.85f, 6f, 1.5f, 0.60f, true, new Vector2(20f, 30f), MonsterWingBehaviours.Energia);
+            CheckAsset("Medica", 3.6f, 6.5f, 1.3f, 0.55f, false, Vector2.zero, MonsterWingBehaviours.Medica);
+            CheckAsset("Energia", 3.85f, 6f, 1.8f, 0.45f, true, new Vector2(20f, 30f), MonsterWingBehaviours.Energia);
             CheckAsset("Executiva", 3.8f, 7f, 2f, 0.45f, true, new Vector2(15f, 25f), MonsterWingBehaviours.Executiva);
             CheckAsset("Eclusa", 4.6f, 9f, 2f, 0f, true, new Vector2(10f, 15f), MonsterWingBehaviours.Executiva);
         }

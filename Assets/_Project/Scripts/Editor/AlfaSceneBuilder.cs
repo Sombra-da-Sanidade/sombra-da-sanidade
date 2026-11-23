@@ -180,6 +180,7 @@ namespace SombraDaSanidade.EditorTools
                 var so = new SerializedObject(gm);
                 so.FindProperty("priorDrives").intValue = 3;   // chega com os 3 HDs das alas
                 so.ApplyModifiedPropertiesWithoutUndo();
+                SetSceneProfile("Eclusa");
                 AddVanceCell(ctx.Objectives);   // #82 e #95: cela, escolha e finais
             });
         }
@@ -258,8 +259,21 @@ namespace SombraDaSanidade.EditorTools
 
         // Proposta 4 do v1.1: primeiro minuto sem monstro e encontro roteirizado. Proposta 2 / #45: checkpoint
         // com "Progresso salvo" ao concluir a ala.
+        // Liga o DifficultyProfile da ala no GameManager da cena.
+        private static void SetSceneProfile(string wing)
+        {
+            var profile = DifficultyProfiles.GetOrCreate(wing);
+            var gm = UnityEngine.Object.FindAnyObjectByType<GameManager>();
+            if (profile == null || gm == null) return;
+            var so = new SerializedObject(gm);
+            so.FindProperty("difficulty").objectReferenceValue = profile;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
         private static void AddWingFlow(BuildContext ctx)
         {
+            // Perfil da ala (#30): sem ele a Médica usava os valores padrão do MonsterConfig e da sanidade.
+            SetSceneProfile("Medica");
             var go = new GameObject("WingFlow");
             var checkpoint = go.AddComponent<SombraDaSanidade.Level.WingCheckpoint>();
             var cso = new SerializedObject(checkpoint);

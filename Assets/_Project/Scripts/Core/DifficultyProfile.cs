@@ -27,6 +27,9 @@ namespace SombraDaSanidade.Core
         public MonsterBehaviour monsterBehaviours = MonsterWingBehaviours.Medica;
         [Tooltip("Segundos até o monstro aparecer. 0 = presente desde a entrada. A Médica usa o WingIntro.")]
         [Min(0f)] public float monsterDelaySeconds;
+        [Tooltip("Patrulha do Espécime presa perto do jogador: só vai a pontos de patrulha a até esta distância dele " +
+                 "(longe disso, vai ao ponto mais perto do jogador). 0 = livre.")]
+        [Min(0f)] public float monsterLeashDistance;
 
         [Header("Sonâmbulo (#80)")]
         [Tooltip("Velocidade do Sonâmbulo no escuro, em m/s (planejamento-rc 1: Energia 5.0, Executiva 5.5, Eclusa 6.0). " +

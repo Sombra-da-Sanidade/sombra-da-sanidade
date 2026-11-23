@@ -31,6 +31,18 @@ namespace SombraDaSanidade.Monster
         [Tooltip("Depois de sair da vista, espera isto antes de se mover (evita andar na borda do campo de visão).")]
         public float unseenDelay = 0.12f;
 
+        [Header("Ronda (acordado, antes de achar o Thomas)")]
+        [Tooltip("Velocidade andando no escuro sem ter achado o Thomas (mais devagar que ele).")]
+        public float roamSpeed = 3f;
+        [Tooltip("Raio em volta do ponto de origem por onde ele ronda.")]
+        public float roamRadius = 9f;
+        [Tooltip("Pausa em cada ponto da ronda (mín., máx.).")]
+        public Vector2 roamPause = new Vector2(1.2f, 3.5f);
+        [Tooltip("Rondando, começa a caçar se o Thomas estiver a esta distância sem parede no meio.")]
+        public float detectDistance = 7.5f;
+        [Tooltip("Vai até o alarme de uma câmera de segurança (SecurityCamera.AlarmRaised) a esta distância ou menos.")]
+        public float cameraLureDistance = 20f;
+
         [Header("Poses")]
         [Tooltip("Travado a menos desta distância do jogador, usa a pose do bote.")]
         public float lungePoseDistance = 3f;

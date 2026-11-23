@@ -6,11 +6,12 @@
 # no meio (lado a lado, parede de 3 tiles, atalho do monstro) e Antessala embaixo (início, disjuntor ao lado, porta).
 # 3 disjuntores (Proposta 1). Loops: anel externo, Casa-Controle A-Subestação e Antessala-Controle B-Transformadores. Sem becos.
 # RC (planejamento-rc 1, issue #84): mesma legenda do AlfaSceneBuilder.Rc. O Especime nao esta no mapa (dorme o tempo
-# todo, WingIntro.neverWakes): so se ouve atras das paredes (~). Beats: C2 (!) na entrada do Controle B com o Sonambulo (Z),
+# todo, WingIntro.neverWakes): so se ouve atras das paredes (~). Beats: o Sonambulo (Z) ronda no escuro a partir da Subestacao
+# (sala obrigatoria); a C2 o revela na 1a vez que ele caca, ou ao ejetar o HD-02 ele surge atras do Thomas (WingNarrativeDirector).
 # 1a camera (C) na Antessala ao lado do disjuntor, cameras na Casa de Maquinas e nos Transformadores, M2 (?) no Controle A,
 # subestacao, HD-02 e apagao final (WingBlackout). " falas do Thomas (6)   % objetos de sanidade (espelho, cracha 08).
-# @cutscene ! C2
 # @cutscene ? M2
+# @sonambulo ronda
 # Pistas em fosforo (*, roteiro-rc 3, issue #87), na ordem de leitura:
 # @pista 03 NÃO DORME.\n08 NÃO LEMBRA.
 # @pista ELES ESTÃO MEDINDO
@@ -28,7 +29,7 @@
 #########,m,,,,,,,,,,,,,,......................,,,,,,,,,,,,,,m,#########
 #########,,,,,,,,,,,,,,,,...........*..........,,,,,,,,,,,,,,,,#########
 #########,,,#############.....m...........m....#############,,,#########
-#########,,,#############..................o...#############,,,#########
+#########,,,#############...............Z..o...#############,,,#########
 #########,,,#############......................#############,,,#########
 #########,,,##############,,,##~############################,,,#########
 #########,,,##############,,,###############################,,,#########
@@ -41,14 +42,14 @@
 ###.................#####Q,,,#P#######T####Q########.................###
 ###.................###...A......###..........######...t.............###
 ###.........L.......###.......%..###..........######..........L..t...###
-###.................,,,..........###....Z.....,,,,,,.................###
+###.................,,,..........###..........,,,,,,.................###
 ###.....m...........,,,..".m....(###)...m.....,,,,b,............m....###
 ###.................,,,......*...###...p......,,,,,,.................###
 ###...........w.....###....??....###........a.######.................###
 ###..o..............###..........###..........######.............t...###
 ###........m........#####################,,,########......m..........###
 ###..............i..#####################,,,########..............i..###
-###.................#####################!,!########.................###
+###.................#####################,,,########.................###
 #########,,,#############################,,,################,,,#########
 #########,,,#############################,,,################,,,#########
 #########,,,########~####################,,,################,,,#########

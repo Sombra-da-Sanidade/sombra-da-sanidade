@@ -30,6 +30,8 @@ namespace SombraDaSanidade.Monster
         [SerializeField] private Sprite offSprite;
         [Tooltip("Cone de luz que mostra o campo de visão.")]
         [SerializeField] private Light2D cone;
+        [Tooltip("O cone sai da lente, na parede, acima da raiz (de onde a câmera detecta): o alcance da luz soma esta distância.")]
+        [SerializeField] private float coneExtraRange;
         [SerializeField] private Light2D led;
         [SerializeField] private LayerMask obstacles;
 
@@ -240,7 +242,7 @@ namespace SombraDaSanidade.Monster
                 cone.enabled = watching;
                 if (config != null)
                 {
-                    cone.pointLightOuterRadius = config.range;
+                    cone.pointLightOuterRadius = config.range + coneExtraRange;
                     cone.pointLightOuterAngle = config.coneAngle;
                     cone.pointLightInnerAngle = config.coneAngle * 0.6f;
                     cone.intensity = config.coneIntensity;

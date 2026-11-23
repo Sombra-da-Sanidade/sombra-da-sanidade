@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e28c8d2afcd444f86f5959064cbfbbd, type: 3}
+  m_Name: TC_Camera
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.UI.Cutscene
+  id: TC
+  music: {fileID: 0}
+  freezeWorld: 1
+  shots:
+  - kind: 1
+    image: {fileID: 0}
+    focus: camera_alarme
+    zoom: {x: 0.9, y: 0.75}
+    panFrom: {x: 0, y: 0}
+    panTo: {x: 0, y: 0}
+    duration: 2.4
+    speaker: THOMAS
+    caption: "Uma c\xE2mera. Ela me viu."
+    sound: {fileID: 11400000, guid: 299a6c062fb05c9e8806527ba5c70cd1, type: 2}
+    transition: 0
+    memory: 0
+    cue: 
+  - kind: 1
+    image: {fileID: 0}
+    focus: camera_alarme
+    zoom: {x: 0.75, y: 0.7}
+    panFrom: {x: 0, y: 0}
+    panTo: {x: 0, y: 0}
+    duration: 3.2
+    speaker: THOMAS
+    caption: O alarme apaga as luzes do setor e chama o que estiver perto.
+    sound: {fileID: 0}
+    transition: 0
+    memory: 0
+    cue: 
+  - kind: 1
+    image: {fileID: 0}
+    focus: player
+    zoom: {x: 1, y: 0.9}
+    panFrom: {x: 0, y: 0}
+    panTo: {x: 0, y: 0}
+    duration: 3
+    speaker: THOMAS
+    caption: Religo o disjuntor dela ou derrubo com o EMP.
+    sound: {fileID: 0}
+    transition: 0
+    memory: 0
+    cue: 

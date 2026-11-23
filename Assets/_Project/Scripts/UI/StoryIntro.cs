@@ -26,11 +26,10 @@ namespace SombraDaSanidade.UI
         [Tooltip("Páginas da história (GDD 9). Aceita rich text do TMP.")]
         [SerializeField] private string[] pages =
         {
-            "<color=#55b870>ANOS 90. COMPLEXO EREBUS, SUB-NÍVEL 4.</color>\n\nA Aethelgard Dynamics envia um auditor, Thomas Reis, para revisar os dados do Projeto Hipnos.",
-            "Minutos depois da chegada, a base entra em confinamento.\n\nAs luzes caem. Os rádios ficam mudos. A equipe não responde.",
-            "Nos corredores, algo anda descalço.\n\n<color=#c8922c>O Voluntário 07 não enxerga. Mas sente a luz.</color>",
-            "Os registros da Dra. Valerie Vance estão em <color=#a9f294>3 HDs</color>, nos servidores das alas Médica, de Energia e Executiva.",
-            "Recupere os HDs, insira no terminal da saída e fuja antes da autodestruição.\n\n<color=#55b870>A lanterna protege a sua mente. E mostra onde você está.</color>",
+            "<color=#55b870>1994. COMPLEXO EREBUS, SUB-NÍVEL 4.</color>\n\nA Aethelgard Dynamics manda o auditor Thomas Reis revisar o Projeto Hipnos: experimentos de sono induzido em voluntários.",
+            "Quando ele chega, a base já está em confinamento.\n\nNenhuma equipe responde. Só os servidores continuam ligados.",
+            "Os voluntários nunca foram embora.\n\n<color=#c8922c>Alguns ainda andam pelos corredores.</color>",
+            "Os registros da Dra. Valerie Vance estão em <color=#a9f294>3 HDs</color>. A Aethelgard quer todos.\n\n<color=#55b870>Thomas não lembra de ter aceitado este trabalho.</color>",
         };
 
         // Uma vez por sessão: voltar ao menu depois de uma partida não repete a abertura.
