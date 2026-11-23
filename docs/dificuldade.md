@@ -8,7 +8,8 @@ Ficam em `Assets/_Project/ScriptableObjects/Config/`. Ajustar um número é só 
 
 | Campo | `DifficultyMedica` | `DifficultyEnergia` | `DifficultyExecutiva` | `DifficultyEclusa` |
 |---|---|---|---|---|
-| `monsterSpeed` | 3.5 | 3.85 | 4.2 | 4.6 |
+| `monsterSpeed` | 3.2 | 3.85 (dorme) | 3.8 | 4.6 |
+| `sleepwalkerSpeed` | - | 5.0 | 5.5 | 6.0 |
 | `monsterHearingRadius` | 5 | 6 | 7 | 9 |
 | `monsterBehaviours` | Médica | Energia | Executiva | Executiva |
 | `darknessDrain` (/s) | 1.0 | 1.5 | 2.0 | 2.0 |
@@ -44,7 +45,7 @@ Campos usados pelos builders e testes das alas (Frente 4):
 
 ## Decisões
 
-- **Velocidade:** com perfil, o bônus de +10% por HD do `MonsterConfig` não vale. A tabela já inclui esse aumento (3.5, 3.85, 4.2), e somar os dois daria 4.2 já na Ala de Energia. Assim o monstro acelera ao mudar de ala, não ao ejetar o HD. O teto `maxSpeed` e o galope da perseguição continuam valendo.
+- **Velocidade:** com perfil, o bônus de +10% por HD do `MonsterConfig` não vale. A tabela já tem o valor de cada ala, e somar os dois aceleraria duas vezes. Assim o monstro muda de velocidade ao mudar de ala, não ao ejetar o HD. No RC (#80) a curva segue o `planejamento-rc` seção 1: o Espécime é mais lento na fase 3 (3.8) porque divide a ala com o Sonâmbulo, e na Energia ele só dorme. O teto `maxSpeed` e o galope da perseguição continuam valendo.
 - **Armários com tabela própria:** a tabela posta pelo builder no armário vence a do perfil. Isso mantém a cena Beta, que tem várias alas no mesmo mapa, com a tabela certa em cada armário.
 
 ## Teste
@@ -54,3 +55,9 @@ Menu **Sombra da Sanidade > Rodar teste de dificuldade**, ou em batch:
 ```bash
 Unity -batchmode -projectPath . -executeMethod SombraDaSanidade.EditorTools.DifficultyProfileTest.RunBatch
 ```
+
+## Sonâmbulo por ala (#80)
+
+- `sleepwalkerSpeed`: velocidade do Sonâmbulo no escuro (planejamento-rc 1). 0 usa a do `SleepwalkerConfig` (7.5, a da Beta).
+- Na fase 3 os dois monstros começam a cerca de 40 m um do outro. O agente do Sonâmbulo tem `avoidancePriority` 60 (o Espécime usa 50), então um desvia do outro no NavMesh em vez de travarem num corredor.
+
