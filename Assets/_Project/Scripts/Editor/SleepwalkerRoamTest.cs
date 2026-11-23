@@ -28,7 +28,7 @@ namespace SombraDaSanidade.EditorTools
 
         private static int step;
         private static float stepStart;
-        private static Vector2 mark;
+        private static Vector2 mark, alarmAt;
         private static SleepwalkerController walker, sleeper;
         private static SecurityCamera camera;
         private static readonly List<string> results = new List<string>();
@@ -110,7 +110,9 @@ namespace SombraDaSanidade.EditorTools
                     Check("Visto pelo Thomas, o da revelação continua dormindo", !sleeper.IsAwake);
                     sleeper.gameObject.SetActive(false);
                     // Alarme da câmera (como se ela tivesse visto o Thomas).
-                    typeof(SecurityCamera).GetMethod("RaiseAlarm", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(camera, new object[] { AlarmSpot });
+                    // Ponto do alarme a 6 m de onde ele está (no mesmo corredor), para dar tempo de conferir que foi chamado.
+                    alarmAt = new Vector2(AlarmSpot.x, walker.transform.position.y + (walker.transform.position.y > 0f ? -6f : 6f));
+                    typeof(SecurityCamera).GetMethod("RaiseAlarm", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(camera, new object[] { alarmAt });
                     Next();
                     break;
 
@@ -122,9 +124,9 @@ namespace SombraDaSanidade.EditorTools
                     break;
 
                 case 3:
-                    if (Vector2.Distance(walker.transform.position, AlarmSpot) > 1.6f && t < 6f) return;
-                    Check($"Vai até o ponto do alarme ({Vector2.Distance(walker.transform.position, AlarmSpot):0.0} m)",
-                        Vector2.Distance(walker.transform.position, AlarmSpot) <= 1.6f);
+                    if (Vector2.Distance(walker.transform.position, alarmAt) > 1.6f && t < 6f) return;
+                    Check($"Vai até o ponto do alarme ({Vector2.Distance(walker.transform.position, alarmAt):0.0} m)",
+                        Vector2.Distance(walker.transform.position, alarmAt) <= 1.6f);
                     // Thomas longe e fora de vista: chegando ao alarme sem vê-lo, volta a rondar.
                     Next();
                     break;

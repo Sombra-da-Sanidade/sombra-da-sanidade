@@ -198,6 +198,9 @@ namespace SombraDaSanidade.Monster
                 return;
             }
 
+            // Encontro: lanterna nele, vê o Thomas de perto ou é notado por ele. Daí em diante, persegue para sempre.
+            if (!HasFoundPlayer && (byFlashlight || SeesPlayer() || ComputeNoticed())) FoundPlayer();
+
             if (IsLit)
             {
                 unseenSince = float.PositiveInfinity;
@@ -211,9 +214,6 @@ namespace SombraDaSanidade.Monster
                 Freeze();
                 return;
             }
-
-            // Encontro: vê o Thomas de perto ou é notado por ele. Daí em diante, persegue para sempre.
-            if (!HasFoundPlayer && (SeesPlayer() || ComputeNoticed())) FoundPlayer();
 
             if (!IsHunting)
             {
@@ -234,7 +234,11 @@ namespace SombraDaSanidade.Monster
 
         private void FoundPlayer()
         {
+            bool first = !HasFoundPlayer;
             HasFoundPlayer = true;
+            lure = null;
+            // Primeiro encontro: fica parado um instante (revelação) e não mata nesse tempo.
+            if (first) holdUntil = Mathf.Max(holdUntil, Time.time + config.wakeGrace);
             StartHunting();
         }
 
@@ -429,6 +433,8 @@ namespace SombraDaSanidade.Monster
             // Com a luz nele, não ataca: só pega quem apaga ou desvia a lanterna.
             if (!IsAwake || IsLit || IsKilling || !other.CompareTag("Player")) return;
             if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) return;
+            if (!HasFoundPlayer) { FoundPlayer(); return; }   // esbarrou rondando: é o encontro, não a morte
+            if (Time.time < holdUntil) return;               // folga do encontro
             if (MonsterSafeMode.Enabled)
             {
                 SafeHit(other);
