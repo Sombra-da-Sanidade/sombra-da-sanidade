@@ -218,6 +218,8 @@ namespace SombraDaSanidade.Core
             var config = RankConfig.Load();
             // Tempo ideal pelos HDs da partida inteira: as alas anteriores também contam.
             RankScore = config.Score(RunTime, TotalDrivesRequired, AverageSanity, RunEmps, Deaths);
+            // Final Testemunha (planejamento-rc 3, #95): sair com a Vance soma um bônus.
+            if (VanceChoice.Ending == Ending.Witness) RankScore = Mathf.Min(1f, RankScore + config.witnessBonus);
             FinalRank = config.RankFor(RankScore);
             string scene = SceneManager.GetActiveScene().name;
             var best = BestRank(scene);

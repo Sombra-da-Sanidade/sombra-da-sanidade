@@ -29,6 +29,10 @@ namespace SombraDaSanidade.Core
         [Tooltip("Com tantas mortes a nota de mortes chega a zero. Não está no GDD.")]
         [Min(1)] public int deathsForZero = 3;
 
+        [Header("Final (planejamento-rc 3, #95)")]
+        [Tooltip("Bônus na nota final por sair com a Vance (final Testemunha). Não está no GDD: ajustar no playtest.")]
+        [Range(0f, 0.5f)] public float witnessBonus = 0.1f;
+
         [Header("Corte de cada rank (nota final de 0 a 1)")]
         [Range(0f, 1f)] public float sAbove = 0.85f;
         [Range(0f, 1f)] public float aAbove = 0.70f;
