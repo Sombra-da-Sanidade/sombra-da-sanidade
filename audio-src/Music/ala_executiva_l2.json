@@ -1,0 +1,51 @@
+{
+  "kind": "music",
+  "duration": 50,
+  "seed": 1063,
+  "loop": true,
+  "loop_crossfade": 2,
+  "lufs": -21,
+  "peak": -8,
+  "music_set": "Executiva",
+  "layer": 2,
+  "bass_harmonics": 1.3,
+  "reverb": {
+    "mix": 0.2,
+    "decay": 1.3
+  },
+  "layers": [
+    {
+      "type": "pulse",
+      "bpm": 50,
+      "gain": 0.8,
+      "start": 0.0,
+      "hit": {
+        "type": "sample",
+        "file": "../Raw/OwlishMedia/tambor.flac",
+        "pitch": 0.4,
+        "length": 0.8,
+        "filter": {
+          "type": "lowpass",
+          "freq": 900
+        }
+      },
+      "accent_every": 4
+    },
+    {
+      "type": "pulse",
+      "bpm": 60,
+      "gain": 0.5,
+      "start": 0.3,
+      "hit": {
+        "type": "sample",
+        "file": "../Raw/Kenney/metalClick.ogg",
+        "pitch": 0.6,
+        "length": 0.6,
+        "filter": {
+          "type": "lowpass",
+          "freq": 4000
+        }
+      }
+    }
+  ]
+}

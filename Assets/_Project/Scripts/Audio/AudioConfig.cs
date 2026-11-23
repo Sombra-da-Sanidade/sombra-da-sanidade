@@ -19,6 +19,26 @@ namespace SombraDaSanidade.Audio
         [Tooltip("Volume de cada camada quando ativa.")]
         [Range(0f, 1f)] public float layerVolume = 0.8f;
 
+        [Header("Música por fase (seção 4, #104). Ligadas por Sombra da Sanidade > Áudio > Gerar SoundEvents")]
+        [Tooltip("F1 Ala Médica: ventilação, drone em Ré, batida a 50 bpm, metal e cordas.")]
+        public MusicSet medicaMusic;
+        [Tooltip("F2 Ala de Energia: transformador e metal gemendo, pad aberto, relé a 60 bpm, baixo a 120 bpm.")]
+        public MusicSet energiaMusic;
+        [Tooltip("F3 Ala Executiva: ar-condicionado, relógio e muzak; pulsos defasados; motivo Hipnos.")]
+        public MusicSet executivaMusic;
+        [Tooltip("Eclusa: câmara de pressão até a purga (que troca tudo pela faixa fixa). Vazio: usa a da Ala Executiva.")]
+        public MusicSet eclusaMusic;
+
+        // Música da ala (WingCheckpoint.Wing / WingFlow). Na Eclusa toca até a purga, que troca tudo pela faixa fixa.
+        public MusicSet WingMusic(string wing) => wing switch
+        {
+            "Medica" => medicaMusic,
+            "Energia" => energiaMusic,
+            "Executiva" => executivaMusic,
+            "Eclusa" => eclusaMusic != null ? eclusaMusic : executivaMusic,
+            _ => null,
+        };
+
         [Header("Faixas fixas (seção 4, #103). Ligadas por Sombra da Sanidade > Áudio > Gerar SoundEvents")]
         [Tooltip("Menu: drone com a contagem invertida.")]
         public AudioClip menuMusic;
@@ -30,6 +50,8 @@ namespace SombraDaSanidade.Audio
         public AudioClip gameOverSting;
         [Tooltip("Laudo (vitória na última fase).")]
         public AudioClip laudoMusic;
+        [Tooltip("Segundos de silêncio de música na vitória final antes do laudo: o jingle de vitória (GameSfx.victory, 4,5 s) toca sozinho.")]
+        public float laudoDelay = 4.5f;
         [Tooltip("Segundos de crossfade entre a música da fase e uma faixa fixa.")]
         public float fixedFade = 1.5f;
 

@@ -56,6 +56,7 @@ namespace SombraDaSanidade.UI
             if (!t.config.openOnBoot) return;
             t.amount = 1f;
             t.phase = Phase.Opening;
+            Audio.UiSfx.CrtOn();
         }
 
         private static CrtTransition Ensure()
@@ -86,6 +87,8 @@ namespace SombraDaSanidade.UI
             Time.timeScale = 0f;
             // Continua de onde estava: se a tela já estava abrindo (ou no apagão do Game Over), não pisca.
             if (t.phase != Phase.Closed) t.phase = Phase.Closing;
+            // O tubo desliga. Durante o apagão do Game Over fica mudo (tocam o grito e o sting).
+            if (!t.gameOverPulse) Audio.UiSfx.CrtOff();
         }
 
         // Faixa da imagem que ainda aparece, em pixels de tela. amount 0: a tela inteira; até collapseShare a
@@ -157,6 +160,8 @@ namespace SombraDaSanidade.UI
                         holdLeft -= dt;
                         if (holdLeft > 0f) break;
                         phase = Phase.Opening;
+                        // O tubo liga na cena nova. Abrir sobre a tela de Game Over fica mudo (sting tocando).
+                        if (!gameOverPulse) Audio.UiSfx.CrtOn();
                         gameOverPulse = false;
                     }
                     break;

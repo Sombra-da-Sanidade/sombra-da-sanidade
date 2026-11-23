@@ -36,6 +36,14 @@ Use `CrtTransition.LoadScene(nome)` no lugar de `SceneManager.LoadScene(nome)`.
 
 As cores são da paleta: preto `Vazio`, linha `Fósforo 5` com brilho `Fósforo 4`.
 
+## Som
+
+O `CrtTransition` toca os sons pelo `UiSfx`, no grupo UI:
+- ao fechar para trocar de cena, `GameSfx.crtOff` (`audio-src/UI/crt_desliga.json`): relé, chiado agudo caindo, a imagem sugando no grave e um pop;
+- ao abrir na cena nova e ao abrir o jogo, `GameSfx.crtOn` (`audio-src/UI/crt_liga.json`): o "tum" da desmagnetização, estática e o chiado subindo.
+
+O apagão do Game Over fica mudo, porque nele já tocam o grito do monstro e o sting do Game Over.
+
 ## Teste
 
 Menu **Sombra da Sanidade > Rodar teste da transição CRT**, ou em batch:

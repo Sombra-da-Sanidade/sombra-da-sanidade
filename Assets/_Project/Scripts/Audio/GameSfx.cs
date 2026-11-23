@@ -94,6 +94,10 @@ namespace SombraDaSanidade.Audio
         public SoundEvent uiBack;
         public SoundEvent uiUpgrade;
         public SoundEvent uiSaved;
+        [Tooltip("Transição CRT (#94): tubo desligando ao trocar de cena.")]
+        public SoundEvent crtOff;
+        [Tooltip("Transição CRT: tubo ligando na cena nova e ao abrir o jogo.")]
+        public SoundEvent crtOn;
 
         private static GameSfx cached;
 

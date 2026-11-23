@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3c9d30a98654ee6b68d6bc2801ce5b3, type: 3}
+  m_Name: Energia
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Audio.MusicSet
+  layers:
+  - {fileID: 8300000, guid: 8b08525a565867779a4c6da3321065f2, type: 3}
+  - {fileID: 8300000, guid: be3518930724abfad7907a58af9376f7, type: 3}
+  - {fileID: 8300000, guid: 32240fb1c57df6aa8c0b02e914e37b1c, type: 3}
+  - {fileID: 8300000, guid: 268951422dda8558e8b84f386c34af24, type: 3}

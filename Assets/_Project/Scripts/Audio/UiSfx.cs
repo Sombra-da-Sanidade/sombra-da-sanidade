@@ -9,6 +9,9 @@ namespace SombraDaSanidade.Audio
         public static void Move() => Play(s => s.uiMove);
         public static void Confirm() => Play(s => s.uiConfirm);
         public static void Back() => Play(s => s.uiBack);
+        // Transição CRT: o tubo desligando e ligando.
+        public static void CrtOff() => Play(s => s.crtOff);
+        public static void CrtOn() => Play(s => s.crtOn);
 
         private static void Play(Func<GameSfx, SoundEvent> pick)
         {
