@@ -51,7 +51,7 @@ namespace SombraDaSanidade.EditorTools
 
         // Marcadores sem desenho próprio (desenhados como o vizinho da esquerda): os da introdução e as pistas
         // da Ala Executiva (d = dígito da senha, z = pista da entrada).
-        private const string NeighborMarkers = IntroMarkers + "dz";
+        private const string NeighborMarkers = IntroMarkers + "dz" + RcFloorMarkers;
 
         [MenuItem("Sombra da Sanidade/Gerar cena Alfa (tiles)", priority = 2)]
         public static void BuildFromMenu()
@@ -262,6 +262,7 @@ namespace SombraDaSanidade.EditorTools
             variants.arraySize = 2;
             WriteVariant(ctx.Map, variants.GetArrayElementAtIndex(0), "Enfermaria", "123", 'x');
             WriteVariant(ctx.Map, variants.GetArrayElementAtIndex(1), "Laboratorio", "456", 'y');
+            so.FindProperty("wakeCutscene").objectReferenceValue = FindCutscene("C1");
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -404,6 +405,7 @@ namespace SombraDaSanidade.EditorTools
             PrototypeSceneBuilder.CreateHud(player.GetComponent<FlashlightController>());
             PrototypeSceneBuilder.CreateSanityEffects(player.GetComponent<SanityController>(), square, wallLayer);
             PrototypeSceneBuilder.CreateMonster(monsterSpawn, patrol);
+            AddRcElements(map, objectives, wingAt);
 
             extras?.Invoke(new BuildContext
             {
@@ -422,6 +424,7 @@ namespace SombraDaSanidade.EditorTools
         {
             public int Width, Height;
             public char[,] Cells;   // [x, y], y = 0 embaixo
+            public List<string[]> Directives = new List<string[]>();   // linhas "# @..." (AlfaSceneBuilder.Rc)
             public char this[int x, int y] => x < 0 || y < 0 || x >= Width || y >= Height ? '#' : Cells[x, y];
             public bool IsFloor(int x, int y) => FloorChars.IndexOf(this[x, y]) >= 0;
         }
@@ -435,13 +438,14 @@ namespace SombraDaSanidade.EditorTools
                 return null;
             }
             // Linhas de comentário começam com "# " (com espaço); as do mapa não têm espaço.
-            var rows = File.ReadAllLines(path).Where(l => l.Length > 0 && !l.Contains(' ')).ToList();
+            var lines = File.ReadAllLines(path);
+            var rows = lines.Where(l => l.Length > 0 && !l.Contains(' ')).ToList();
             int w = rows.Max(r => r.Length), h = rows.Count;
             var cells = new char[w, h];
             for (int row = 0; row < h; row++)
                 for (int x = 0; x < w; x++)
                     cells[x, h - 1 - row] = x < rows[row].Length ? rows[row][x] : '#';
-            return new Layout { Width = w, Height = h, Cells = cells };
+            return new Layout { Width = w, Height = h, Cells = cells, Directives = ParseDirectives(lines) };
         }
 
         private static string Wing(int x, int width)
