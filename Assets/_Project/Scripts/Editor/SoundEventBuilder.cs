@@ -87,6 +87,7 @@ namespace SombraDaSanidade.EditorTools
             ("eclusaInsert", "World/eclusa_insere"), ("eclusaOn", "World/eclusa_liga"), ("victory", "World/vitoria_eclusa"),
             ("uiMove", "UI/ui_navegar"), ("uiConfirm", "UI/ui_confirmar"), ("uiBack", "UI/ui_voltar"),
             ("uiUpgrade", "UI/ui_upgrade"), ("uiSaved", "UI/ui_salvo"),
+            ("crtOff", "UI/crt_desliga"), ("crtOn", "UI/crt_liga"),
         };
 
         private static int LinkGameSfx()
