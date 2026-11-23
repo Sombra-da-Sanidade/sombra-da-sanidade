@@ -25,5 +25,8 @@ namespace SombraDaSanidade.Narrative
         [Tooltip("Uma legenda por linha, na ordem em que são faladas.")]
         [TextArea(2, 4)]
         public string[] lines = new string[0];
+
+        // Pensamentos internos do Thomas (InnerVoiceLine) reutilizam o tocador sem chiado de fita nem arquivo da Vance.
+        [HideInInspector] public bool isInternalThought;
     }
 }

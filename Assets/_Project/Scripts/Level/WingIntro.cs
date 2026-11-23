@@ -121,6 +121,8 @@ namespace SombraDaSanidade.Level
             }
         }
 
+        public void WakeNow() => WakeFarthest();
+
         private void WakeFarthest()
         {
             if (Awakened) return;

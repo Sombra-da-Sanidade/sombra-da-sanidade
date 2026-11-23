@@ -27,6 +27,7 @@ namespace SombraDaSanidade.UI
 
         private void OnTriggerStay2D(Collider2D other)
         {
+            if (Core.Checkpoint.PathOverride != null) return;
             if (played || cutscene == null || !other.CompareTag("Player") || CutscenePlayer.IsPlaying) return;
             if (sanityBelow <= 100f)
             {
