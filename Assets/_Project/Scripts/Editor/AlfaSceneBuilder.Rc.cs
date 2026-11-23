@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using SombraDaSanidade.Audio;
 using SombraDaSanidade.Level;
 using SombraDaSanidade.UI;
 using UnityEditor;
@@ -13,6 +14,7 @@ namespace SombraDaSanidade.EditorTools
     //  Z Sonâmbulo (adormecido)        C câmera de segurança (na parede; olha para o chão vizinho)
     //  ! ? & gatilhos de cutscene: a área que cobre todas as células do caractere. Qual cutscene cada um toca
     //        vem de uma diretiva na planta: "# @cutscene ? M1" ou "# @cutscene ? M3 35" (só com sanidade < 35).
+    //  ~ som do Espécime atrás da parede (WallNoise; vai numa célula de parede)
     //  " fala do Thomas   % objeto que muda com a sanidade   V cela da Vance   = atalho da Eclusa
     //        (LevelMarker com id "<tipo>_<ala>_<n>"; o sistema de outra frente encaixa no marcador).
     // A cutscene é achada pelo campo id (C1, M1...) em qualquer pasta. Sem o asset, o gatilho fica vazio e não
@@ -43,6 +45,7 @@ namespace SombraDaSanidade.EditorTools
             var root = new GameObject("RC").transform;
             AddSleepwalkers(map, root);
             AddCameras(map, root);
+            AddWallNoises(map, root);
             AddCutsceneTriggers(map, root);
             AddMarkers(map, root, wingAt);
             if (root.childCount == 0) UnityEngine.Object.DestroyImmediate(root.gameObject);
@@ -79,6 +82,27 @@ namespace SombraDaSanidade.EditorTools
                 float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
                 var go = SecurityCameraPrefabBuilder.Place(parent, pos, angle);
                 go.name = $"SecurityCamera_{cell.x}_{cell.y}";
+            }
+        }
+
+        private const string MonsterAudio = Root + "/ScriptableObjects/Audio/Monster/";
+
+        private static void AddWallNoises(Layout map, Transform root)
+        {
+            var cells = Find(map, '~');
+            if (cells.Count == 0) return;
+            var clips = new[] { "especime_respiracao", "especime_passo", "especime_estalo" }
+                .Select(n => AssetDatabase.LoadAssetAtPath<SoundEvent>(MonsterAudio + n + ".asset"))
+                .Where(s => s != null).ToArray();
+            if (clips.Length == 0) Debug.LogWarning("WallNoise: sons do Espécime não encontrados; gere os SoundEvents.");
+            var parent = new GameObject("WallNoises").transform;
+            parent.SetParent(root, false);
+            foreach (var cell in cells)
+            {
+                var go = new GameObject($"WallNoise_{cell.x}_{cell.y}");
+                go.transform.SetParent(parent, false);
+                go.transform.position = new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f);
+                go.AddComponent<WallNoise>().Setup(clips);
             }
         }
 

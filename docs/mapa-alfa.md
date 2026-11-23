@@ -147,6 +147,14 @@ Unity -batchmode -projectPath . -executeMethod SombraDaSanidade.EditorTools.Smok
 
 - **Zona Segura do disjuntor (Frente 4):** a lâmpada de teto é só desenho até o `Breaker` acender a luz e ligar o `MonsterRepellent`.
 
+## Ala de Energia no RC (#84)
+
+- O Espécime não está no mapa: fica adormecido a ala toda (`WingIntro.neverWakes`) e só se ouve atrás das paredes (`~`).
+- C2 (`!`) na entrada do Controle B, com o Sonâmbulo (`Z`) dentro. M2 (`?`) no Controle A, o escritório.
+- 3 câmeras (`C`): a 1ª na Antessala, ao lado do disjuntor (área segura para aprender), e uma na Casa de Máquinas e outra nos Transformadores.
+- Apagão final (`Level/WingBlackout`): 1,5 s depois do HD-02, todos os disjuntores caem (`Breaker.Cut`). Dá para religar.
+- 6 falas (`"`) e 2 objetos de sanidade (`%`, espelho e crachá 08).
+
 ## Elementos do RC nas plantas
 
 Issues #83 a #87. Código em `Scripts/Editor/AlfaSceneBuilder.Rc.cs`.
@@ -156,6 +164,7 @@ Issues #83 a #87. Código em `Scripts/Editor/AlfaSceneBuilder.Rc.cs`.
 | `Z` | Sonâmbulo adormecido (prefab do `SleepwalkerPrefabBuilder`) |
 | `C` | Câmera de segurança na parede, olhando para o chão vizinho (sul, leste, oeste, norte). Desliga no disjuntor mais perto |
 | `!` `?` `&` | `CutsceneTrigger` cobrindo todas as células do caractere. A cutscene vem da diretiva `# @cutscene ? M1` (com sanidade: `# @cutscene ? M3 35`) |
+| `~` | Som do Espécime atrás da parede (`Level/WallNoise`), numa célula de parede. Toca com o Thomas a até 12 m |
 | `"` | `LevelMarker` de fala do Thomas, id `fala_<ala>_<n>` |
 | `%` | `LevelMarker` de objeto de sanidade, id `objeto_<ala>_<n>` |
 | `V` | `LevelMarker` da cela da Vance (células vizinhas viram um marcador só, com área) |

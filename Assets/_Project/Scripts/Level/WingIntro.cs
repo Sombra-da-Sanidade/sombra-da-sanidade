@@ -31,6 +31,9 @@ namespace SombraDaSanidade.Level
         [SerializeField] private RouteVariant[] variants = Array.Empty<RouteVariant>();
         [Tooltip("Cutscene no motor tocada quando o monstro acorda (C1, planejamento-rc 4). Vazio: só a rota.")]
         [SerializeField] private Cutscene wakeCutscene;
+        [Tooltip("O monstro nunca acorda nesta ala (fase 2, só o Sonâmbulo). Ele fica na cena adormecido para os " +
+                 "sistemas que o procuram (lanterna, sanidade, tensão) seguirem funcionando.")]
+        [SerializeField] private bool neverWakes;
 
         public bool Awakened { get; private set; }
         public string Variant { get; private set; } = "";
@@ -48,6 +51,13 @@ namespace SombraDaSanidade.Level
         private void Awake()
         {
             if (monster == null) monster = FindAnyObjectByType<MonsterController>();
+            if (monster != null && neverWakes)
+            {
+                Sleep();
+                Awakened = false;
+                enabled = false;
+                return;
+            }
             if (monster == null || variants.Length == 0)
             {
                 Debug.LogWarning($"{name}: WingIntro sem monstro ou sem rotas; a ala começa normal.", this);
