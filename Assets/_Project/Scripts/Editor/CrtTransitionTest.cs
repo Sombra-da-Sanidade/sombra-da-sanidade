@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
+using SombraDaSanidade.Audio;
 using SombraDaSanidade.Core;
 using SombraDaSanidade.UI;
 using UnityEditor;
@@ -24,6 +25,9 @@ namespace SombraDaSanidade.EditorTools
         private static float maxAmount;
         private static GameManager firstGm;
         private static readonly List<string> results = new List<string>();
+        private static readonly List<SoundEvent> played = new List<SoundEvent>();
+
+        private static void OnPlayed(SoundEvent sound, AudioSource source) => played.Add(sound);
         private static bool failed;
 
         static CrtTransitionTest()
@@ -88,6 +92,9 @@ namespace SombraDaSanidade.EditorTools
                         !CrtTransition.Busy && CrtTransition.Amount == 0f);
                     if (failed) { Finish(); return; }
 
+                    AudioService.Played -= OnPlayed;
+                    AudioService.Played += OnPlayed;
+                    played.Clear();
                     gm.TriggerGameOver(DeathCause.Monster);
                     Check("Game Over começa a fechar a tela", CrtTransition.Current == CrtTransition.Phase.Closing);
                     Check("A tela de fim fica escondida enquanto fecha (fecha a imagem da morte)", CrtTransition.HidingEndScreen);
@@ -102,12 +109,18 @@ namespace SombraDaSanidade.EditorTools
                     Check("Depois abre sobre a tela de fim (sem trocar de cena)",
                         !CrtTransition.Busy && gm != null && gm.State == GameState.GameOver);
                     Check("A tela de fim aparece quando a linha abre", !CrtTransition.HidingEndScreen);
+                    var sfx = GameSfx.Load();
+                    Check("Apagão do Game Over sem som de tubo (tocam o grito e o sting)",
+                        !played.Contains(sfx.crtOff) && !played.Contains(sfx.crtOn));
+                    played.Clear();
 
                     firstGm = gm;
                     gm.Restart();
                     Check("Reiniciar não troca a cena na hora: fecha a tela primeiro",
                         CrtTransition.PendingScene == firstGm.gameObject.scene.name && GameManager.Instance == firstGm);
                     Check("A imagem congela enquanto fecha", Time.timeScale == 0f);
+                    Check("Trocar de cena toca o tubo desligando", played.Contains(GameSfx.Load().crtOff));
+                    played.Clear();
                     gm.Restart();   // R apertado de novo durante a troca: ignorado
                     Next();
                     break;
@@ -131,6 +144,7 @@ namespace SombraDaSanidade.EditorTools
                     float expected = config.loadHoldSeconds + config.openSeconds;
                     Check($"A abertura dura o tempo do config ({t:0.00} s, config {expected:0.00} s)",
                         t >= expected * 0.8f && t < expected + 1.5f);
+                    Check("A cena nova abre com o tubo ligando", played.Contains(GameSfx.Load().crtOn));
                     Check("Nenhuma troca de cena sobrando (o segundo R foi ignorado)", CrtTransition.PendingScene == null
                         && GameManager.Instance != null && GameManager.Instance.IsPlaying);
                     Finish();
@@ -152,6 +166,7 @@ namespace SombraDaSanidade.EditorTools
 
         private static void Finish()
         {
+            AudioService.Played -= OnPlayed;
             EditorApplication.update -= Tick;
             SessionState.SetBool(RunningKey, false);
             bool batch = SessionState.GetBool(BatchKey, false);
