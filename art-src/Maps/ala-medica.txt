@@ -15,7 +15,7 @@
 # @pista ARMÁRIO 08
 # @pista VOCÊ JÁ ESTEVE AQUI
 # Falas do Thomas (#89): " e a fala da enfermaria (T1-3); as outras sao por evento. Objetos (%), na ordem de leitura:
-# @falas Medica
+# @fala T1-3
 # @objeto pulseira
 # @objeto prontuario
 ########################################################################

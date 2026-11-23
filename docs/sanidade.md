@@ -116,10 +116,10 @@ Sobre o último item: o GDD diz que a sanidade **não aparece como barra**, só 
 
 ## Falas do Thomas e objetos de sanidade (#89)
 
-- **Falas:** `Narrative/InnerVoiceLine` (uma por fala do [roteiro](narrativa/roteiro-rc.md) seção 2), geradas por **Sombra da Sanidade > Narrativa > Gerar falas do Thomas** (`InnerVoiceAssetBuilder`). Versão Estável com sanidade 40 a 100 e Abalado abaixo de 40.
-- **Gatilhos:** por evento (começo da ala, 1º escuro, 1º disjuntor, fim de cutscene, HD, câmera vista, câmera que chama o Espécime, subestação, Módulo Neural, pista da senha, escolha da Eclusa) ou por área (`"` na planta). O `InnerVoiceDirector` da ala toca cada fala uma vez e espera a cutscene acabar.
+- **Falas:** `Narrative/InnerVoiceLine` (uma por fala do [roteiro](narrativa/roteiro-rc.md) seção 2), geradas por **Sombra da Sanidade > Narrativa > Gerar falas do Thomas (RC3)** (`NarrativeRc3Builder`) em `Resources/Narrative/Voices/`. Versão Estável com sanidade 40 a 100 e Abalado abaixo de 40.
+- **Gatilhos:** por evento (começo da ala, 1º escuro, 1º disjuntor, fim de cutscene, HD, câmera vista, câmera que chama o Espécime, subestação, Módulo Neural, pista da senha, escolha da Eclusa) ou por área (`"` na planta). Por evento, o `WingNarrativeDirector` (criado em runtime); por área, o `InnerVoiceTrigger`. Cada fala toca uma vez e espera a cutscene acabar.
 - **Voz:** legenda e bipes do `AudioLogPlayer`, com o nome THOMAS e o pitch na metade do da Vance (uma oitava abaixo). `AudioLog.tape = false`: sem clique, sem chiado e fora da lista de logs ouvidos. O log da Vance do HD interrompe uma fala do Thomas; a fala do HD entra na fila depois dele.
-- **Objetos:** `Sanity/SanityObject` troca o sprite abaixo de 35 (piscando na troca): pulseira e prontuário na Médica, foto na Energia, espelho na Executiva. Sprites em `art-src/Props/sanity_*.json`.
+- **Objetos:** `Sanity/SanitySpriteSwap` troca o sprite abaixo de 35: pulseira e prontuário na Médica, foto na Energia, espelho na Executiva (que racha depois da M3). Sprites em `Resources/Narrative/Props/<nome>_normal` e `<nome>_08`.
 - **Crachá:** no menu de pausa (`UI/ThomasBadge`, `Resources/ThomasBadge.asset`): "T. REIS / AUDITORIA" e, abaixo de 35, "VOL-08 / HIPNOS".
-- Teste: **Sombra da Sanidade > Narrativa > Rodar teste das falas do Thomas** (`InnerVoiceTest`).
+- Teste: **Sombra da Sanidade > Narrativa > Validar assets RC3** (`Rc3NarrativeTest`).
 

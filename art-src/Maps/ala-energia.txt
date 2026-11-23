@@ -16,7 +16,7 @@
 # @pista ELES ESTÃO MEDINDO
 # @pista T. REIS
 # Falas do Thomas (#89): " e a fala do escritorio (T2-4); as outras sao por evento. Objeto (%): foto na mesa da Vance.
-# @falas Energia
+# @fala T2-4
 # @objeto foto
 ########################################################################
 ########################################################################

@@ -46,24 +46,25 @@ Teste: **Sombra da Sanidade > Rodar teste das cutscenes** (`CutsceneTest`).
 
 ## As 11 cutscenes do RC (#91)
 
-Geradas por **Sombra da Sanidade > Narrativa > Gerar cutscenes** (`CutsceneAssetBuilder`, batchmode `...CutsceneAssetBuilder.Build`) a partir do [roteiro](narrativa/roteiro-rc.md) seção 5. Ficam em `Resources/Cutscenes/<id>.asset`. Mudar um texto = editar o builder e gerar de novo; não editar o asset à mão.
+Geradas por **Sombra da Sanidade > Narrativa > Gerar todas as 11 Cutscenes e Painéis (RC3)** (`CutsceneRc3Builder.BuildAllCutscenes`) a partir do [roteiro](narrativa/roteiro-rc.md) seção 5. Ficam em `Resources/Narrative/Cutscenes/<id>_<nome>.asset` (ex.: `C0_Abertura`). Mudar um texto = editar o builder e gerar de novo; não editar o asset à mão.
 
 | Id | Tipo | Onde toca | Som |
 |---|---|---|---|
-| C0 | Painéis | Começo da Ala Médica (`Level/WingOpening`) | CRT, eclusa |
+| C0 | Painéis | Começo da Ala Médica (`WingNarrativeDirector`) | CRT, eclusa |
 | C1 | Motor | Quando o Espécime acorda (`WingIntro.wakeCutscene`) | Respiração, estalo, grito |
 | M1 | Memória | Gatilho `?` no corredor oeste da Médica | `memoria_memory.ogg`, sussurro |
-| I1 | Intertítulo | Começo da Ala de Energia (`WingOpening`) | CRT |
+| I1 | Intertítulo | Começo da Ala de Energia (`WingNarrativeDirector`) | CRT |
 | C2 | Motor | Gatilho `!` na entrada do Controle B | Respiração, apagão, rangido |
 | M2 | Memória | Gatilho `?` no Controle A | `memoria_memory.ogg`, sussurro |
-| I2 | Intertítulo | Começo da Ala Executiva (`WingOpening`) | CRT |
+| I2 | Intertítulo | Começo da Ala Executiva (`WingNarrativeDirector`) | CRT |
 | M3 | Motor + memória | Gatilho `?` no RH, sanidade < 35 | `memoria_memory.ogg`, sussurro |
-| C3 | Painéis + motor | 1 s depois do HD-03 (`Level/DriveCutscene`) | `revelacao.ogg` |
+| C3 | Painéis + motor | Depois do HD-03 (`WingNarrativeDirector`) | `revelacao.ogg` |
 | C4 | Painéis | Final "Testemunha" (a #95 toca) | `final_testemunha.ogg` |
 | C5 | Painéis | Final "Amostra entregue" (a #95 toca) | `final_amostra.ogg` |
 
 - **Painéis (#98):** fonte em `art-src/Cutscenes/<id>_<nn>_<nome>.aseprite`, exportada com `python3 tools/art/export_cutscenes.py` para `Art/Cutscenes/` (ver [guia de estilo](arte/guia-de-estilo.md) seção 6). O `CutsceneRc3Builder` liga cada PNG ao plano pelo nome. Sem o PNG, o builder desenha um rascunho de retângulos no lugar.
-- **C2:** o marcador `c2_lampada` fica sobre o Sonâmbulo com `Level/SleepwalkerReveal`. A luz acende quando a C2 começa, apaga no cue do 2º plano e volta com ele 2 passos mais perto.
-- **C4 e C5:** a escolha (#95) toca com `CutscenePlayer.Play(WingOpening.Load("C4"))`.
+- **C2:** o `WingNarrativeDirector` liga o cue `c2_lampada` na Ala de Energia: a luz pisca e o Sonâmbulo avança 2 passos.
+- **C4 e C5:** o `EndingDirector` toca com `CutscenePlayer.Play(WingNarrativeDirector.LoadCutscene("C4_Testemunha"))`.
 - Depois de gerar as cutscenes, gerar as alas de novo para os gatilhos receberem os assets (o builder das alas gera as cutscenes sozinho se ainda não existirem).
-- Teste: **Sombra da Sanidade > Narrativa > Rodar teste dos assets das cutscenes** (`CutsceneAssetsTest`).
+- O `WingNarrativeDirector` é criado em runtime em cada ala; as cenas não guardam C0, I1, I2, C1, C3 nem os finais.
+- Teste: **Sombra da Sanidade > Narrativa > Validar assets RC3** (`Rc3NarrativeTest`).

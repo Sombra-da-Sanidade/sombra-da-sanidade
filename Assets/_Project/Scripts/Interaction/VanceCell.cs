@@ -93,6 +93,7 @@ namespace SombraDaSanidade.Interaction
             IsOpen = true;
             if (cellArt != null && openSprite != null) cellArt.sprite = openSprite;
             VanceChoice.Release();
+            Narrative.WingNarrativeDirector.VanceSaved = true;   // final C4 e fala T4-1 (Frente 3)
             ShortcutGate.OpenAll();
             ShutdownPathCameras();
             Opened?.Invoke(this);

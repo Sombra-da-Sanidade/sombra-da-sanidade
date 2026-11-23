@@ -8,8 +8,7 @@
 # corredor norte, Antecamara. Cela da Vance (V) na sala nordeste, do outro lado: vai-se pelo sul e pelo leste, com o
 # Sonambulo (Z) na sala sudeste e 4 cameras (C). O atalho (=) fecha o corredor norte entre a cela e a saida ate a
 # Vance ser solta (ShortcutGate). " falas do Thomas (4).
-# Falas do Thomas (#89): so as da escolha (T4-1, T4-2), por evento.
-# @falas Eclusa
+# Falas do Thomas (#89): as da escolha (T4-1, T4-2) sao do WingNarrativeDirector.
 ####################################################################################################
 ####################################################################################################
 ####################################################################################################

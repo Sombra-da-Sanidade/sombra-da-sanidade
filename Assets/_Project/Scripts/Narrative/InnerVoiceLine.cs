@@ -2,26 +2,9 @@ using UnityEngine;
 
 namespace SombraDaSanidade.Narrative
 {
-    public enum InnerVoiceTrigger
-    {
-        WingStart,          // começo da ala, depois da cutscene de abertura
-        FirstDarkness,      // primeira vez no escuro total
-        Area,               // entrar no LevelMarker de id = arg
-        FirstBreaker,       // primeiro disjuntor consertado
-        AfterCutscene,      // fim da cutscene de id = arg
-        DriveCollected,     // HD da ala ejetado
-        CameraSeen,         // primeira câmera de segurança vista
-        CameraCall,         // primeira câmera que chama o Espécime
-        SubstationPowered,  // subestação religada
-        NeuralModule,       // Módulo Neural usado
-        ClueRead,           // primeira pista da senha revelada perto do Thomas
-        ChoiceSave,         // escolha na Eclusa: salvar a Vance
-        ChoiceLeave,        // escolha na Eclusa: deixar a Vance
-    }
-
     // Monólogo do Thomas (roteiro-rc 2, #89): uma fala com versão Estável (sanidade 40 a 100) e Abalado (abaixo de
-    // 40). Toca uma vez por ala, com a legenda e a voz de bipes do AudioLogPlayer uma oitava abaixo da Vance.
-    // Gerado pelo InnerVoiceAssetBuilder a partir do roteiro; não editar o asset à mão.
+    // 40). Assets em Resources/Narrative/Voices; quem toca é o WingNarrativeDirector (por evento) e o
+    // InnerVoiceTrigger (por área, '"' na planta).
     [CreateAssetMenu(fileName = "InnerVoiceLine", menuName = "Sombra da Sanidade/Narrativa/Fala do Thomas")]
     public class InnerVoiceLine : ScriptableObject
     {
@@ -32,9 +15,10 @@ namespace SombraDaSanidade.Narrative
         public string id = "T1-1";
         [Tooltip("Ala onde a fala vale (Medica, Energia, Executiva, Eclusa).")]
         public string wing = "Medica";
-        public InnerVoiceTrigger trigger;
-        [Tooltip("Argumento do gatilho: id do LevelMarker (Area) ou da cutscene (AfterCutscene).")]
-        public string arg = "";
+        [Tooltip("Quem fala na legenda.")]
+        public string speaker = "THOMAS";
+        [Tooltip("Tom da voz de bipes (0.575 = uma oitava abaixo da Vance).")]
+        [Range(0.35f, 1.5f)] public float babblePitch = ThomasPitch;
         [TextArea(1, 3)] public string stable = "";
         [TextArea(1, 3)] public string shaken = "";
 
@@ -54,8 +38,8 @@ namespace SombraDaSanidade.Narrative
             var log = CreateInstance<AudioLog>();
             log.hideFlags = HideFlags.DontSave;
             log.id = id;
-            log.speaker = "THOMAS";
-            log.babblePitch = ThomasPitch;
+            log.speaker = speaker;
+            log.babblePitch = babblePitch;
             log.lines = PickLines(shaken);
             log.isInternalThought = true;
             log.tape = false;
@@ -68,8 +52,8 @@ namespace SombraDaSanidade.Narrative
             var log = CreateInstance<AudioLog>();
             log.name = id;
             log.id = id;
-            log.speaker = "THOMAS";
-            log.babblePitch = ThomasPitch;
+            log.speaker = speaker;
+            log.babblePitch = babblePitch;
             log.tape = false;
             log.lines = new[] { TextFor(sanity) };
             return log;

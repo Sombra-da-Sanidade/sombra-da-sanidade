@@ -160,7 +160,7 @@ Unity -batchmode -projectPath . -executeMethod SombraDaSanidade.EditorTools.Smok
 - Espécime na Diretoria (norte) e Sonâmbulo (`Z`) na Sala de Reuniões (sudoeste), a cerca de 40 m um do outro.
 - 4 câmeras (`C`): Reuniões, RH, Escritórios e Diretoria. Chamar o Espécime no alarme vem do perfil da ala (RC1).
 - M3 (`?`, `# @cutscene ? M3 35`) no RH: só toca com sanidade < 35.
-- C3 toca 1 s depois do HD-03 (`Level/DriveCutscene`), na fila do `CutscenePlayer`.
+- C3 toca depois do HD-03, pelo `WingNarrativeDirector` (criado em runtime), na fila do `CutscenePlayer`.
 - Senha, pistas e Módulo Neural sem mudança. Fala do espelho (`"`, T3-3) e o espelho (`%`).
 
 ## Elementos do RC nas plantas
@@ -175,11 +175,11 @@ Issues #83 a #87. Código em `Scripts/Editor/AlfaSceneBuilder.Rc.cs`.
 | `~` | Som do Espécime atrás da parede (`Level/WallNoise`), numa célula de parede. Toca com o Thomas a até 12 m |
 | `*` | Pista em fósforo (sanidade < 35). Texto pela diretiva `# @pista <TEXTO>`, na ordem de leitura da planta (`\n` quebra a linha) |
 | `"` | Área de uma fala do Thomas (`LevelMarker` `fala_<ala>_<n>`, gatilho `Area` da `InnerVoiceLine`). As outras falas são por evento |
-| `%` | Objeto que muda com a sanidade (`SanityObject`). Qual objeto vem de `# @objeto <nome>`, na ordem de leitura |
+| `%` | Objeto que muda com a sanidade (`SanitySpriteSwap`). Qual objeto vem de `# @objeto <nome>`, na ordem de leitura; sprites em `Resources/Narrative/Props/<nome>_normal` e `<nome>_08` |
 | `V` | `LevelMarker` da cela da Vance (células vizinhas viram um marcador só, com área) |
 | `=` | `LevelMarker` do atalho da Eclusa |
 
 - A numeração dos marcadores segue a leitura da planta: de cima para baixo, da esquerda para a direita.
 - A cutscene é achada pelo campo `id` do asset, em qualquer pasta. Sem o asset, o gatilho é criado vazio (aviso no console): depois da #91, basta gerar a cena de novo.
 - Outras frentes encaixam o sistema no marcador com `LevelMarker.Find("fala_medica_1")`, sem editar a planta.
-- `# @falas <Ala>` põe o `InnerVoiceDirector` com as falas do Thomas da ala (#89).
+- `# @fala <id>`: cada `"`, na ordem de leitura, vira um `InnerVoiceTrigger` com a fala `Resources/Narrative/Voices/<id>` (#89). As falas por evento são do `WingNarrativeDirector`.

@@ -5,7 +5,7 @@ namespace SombraDaSanidade.UI
 {
     // Crachá do Thomas no menu de pausa (roteiro-rc 4, #89): "T. REIS / AUDITORIA" e, abaixo de 35 de sanidade,
     // "VOL-08 / HIPNOS". Fica em Resources para valer em todas as cenas sem editar nenhuma (como o RankConfig).
-    // O asset é gerado pelo InnerVoiceAssetBuilder.
+    // O asset Resources/ThomasBadge.asset aponta para Art/Props/sanity_cracha.png.
     public class ThomasBadge : ScriptableObject
     {
         public const string ResourcePath = "ThomasBadge";

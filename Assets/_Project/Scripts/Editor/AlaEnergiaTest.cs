@@ -180,9 +180,8 @@ namespace SombraDaSanidade.EditorTools
             Check("Gatilhos da C2 e da M2", GameObject.Find("CutsceneTrigger_C2") && GameObject.Find("CutsceneTrigger_M2"));
             var c2 = Object.FindObjectsByType<CutsceneTrigger>().FirstOrDefault(t => t.name == "CutsceneTrigger_C2");
             Check("Gatilho da C2 com a cutscene (#91)", c2 != null && c2.Cutscene != null && c2.Cutscene.id == "C2");
-            Check("Marcador c2_lampada com a luz do Sonâmbulo", CutsceneMarker.Find("c2_lampada") != null
-                && CutsceneMarker.Find("c2_lampada").GetComponent<SleepwalkerReveal>() != null);
-            Check("I1 abre a ala", Object.FindAnyObjectByType<WingOpening>()?.CutsceneId == "I1");
+            Check("Fala do escritório (T2-4) por área", Object.FindObjectsByType<SombraDaSanidade.Narrative.InnerVoiceTrigger>().Length == 1);
+            Check("Foto que muda com a sanidade", Object.FindObjectsByType<SanitySpriteSwap>().Length == 1);
             Check("Sons do Espécime atrás das paredes", Object.FindObjectsByType<WallNoise>().Length >= 2);
             Check("Apagão final montado", Object.FindAnyObjectByType<WingBlackout>() != null);
         }
