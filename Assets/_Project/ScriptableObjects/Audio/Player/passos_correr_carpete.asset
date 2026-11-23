@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d04ddb4a18e401093f19a04a74cfd60, type: 3}
+  m_Name: passos_correr_carpete
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Audio.SoundEvent
+  clips:
+  - {fileID: 8300000, guid: 7ffc899c938b8e9750948192f4b8099e, type: 3}
+  - {fileID: 8300000, guid: 4e0d843ffeefd88e1c2136b41434973d, type: 3}
+  - {fileID: 8300000, guid: 01377b5b96013062402a896e54c4385e, type: 3}
+  - {fileID: 8300000, guid: 5ccb927facb788f79fa46be3a6612c7c, type: 3}
+  - {fileID: 8300000, guid: da34e95de287375995ae57c50c401e9c, type: 3}
+  - {fileID: 8300000, guid: f184b33f280c4129f7480cdb2dcba99d, type: 3}
+  muffledClips: []
+  bus: 2
+  volume: {x: 0.55, y: 0.68}
+  pitch: {x: 0.96, y: 1.08}
+  spatial: 0
+  maxDistance: 0
+  noiseRadius: 0
+  cooldown: 0

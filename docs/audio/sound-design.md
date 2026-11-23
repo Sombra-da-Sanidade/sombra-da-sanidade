@@ -138,14 +138,14 @@ Receitas em `audio-src/{Player,Lux,Monster,SkillCheck,Camera}/`, ligadas no `Res
 
 | Gancho | Sons |
 |---|---|
-| Passos do Thomas pela distância andada (0,85 u) | `passos_andar` (6 tomadas), `passos_correr` com Adrena-Syn |
+| Passos do Thomas pela distância andada (0,85 u), no piso da ala (`DifficultyProfile.floor`) | `passos_andar`/`passos_correr` (azulejo: Médica), `_metal` (Energia e Eclusa), `_carpete` (Executiva); 6 tomadas cada, corrida com Adrena-Syn |
 | `FlashlightController.LitChanged`, `EmpFired`, `EmpFailed`, bateria < 20% | liga, desliga, zumbido aceso, bateria fraca (a cada 6 s), esgotada, EMP, EMP falho |
 | Espécime: loop com `AudioOcclusion`, `StateChanged`, `Caught`, distância andada | respiração (mais alta na perseguição, some atordoado), estalo ao investigar, grito na perseguição, atordoado, passos, ataque |
 | Sonâmbulo: estado, `Woke`, `Caught` | rangido só em `Moving` (corta no mesmo quadro ao congelar), respiração em `Frozen`, despertar, ataque |
 | `SkillCheck.Warned`, `Resolved`, ponteiro | aviso, 8 tiques por varredura, bom, ótimo, falha |
 | Câmera (#79, ainda sem gancho) | servo, detecção, alarme, apagão, curto do EMP |
 
-Ainda não: passos por tipo de piso (as cenas não marcam o piso), respiração cansada.
+O piso é por ala, não por tile: as cenas não marcam o piso. Ainda não: respiração cansada.
 
 ### Feito na #106
 

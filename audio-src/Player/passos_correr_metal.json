@@ -1,0 +1,161 @@
+{
+  "duration": 0.26,
+  "takes": 6,
+  "seed": 112,
+  "vary": {
+    "pitch": 0.08,
+    "gain": 0.12
+  },
+  "event": {
+    "spatial": false,
+    "volume": [
+      0.7,
+      0.85
+    ],
+    "pitch": [
+      0.96,
+      1.08
+    ]
+  },
+  "layers": [
+    {
+      "type": "noise",
+      "color": "brown",
+      "gain": 1.0,
+      "length": 0.1,
+      "filter": {
+        "type": "lowpass",
+        "freq": 1500
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.002,
+          1
+        ],
+        [
+          0.1,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "white",
+      "gain": 0.5,
+      "length": 0.05,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          3000,
+          9000
+        ]
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.001,
+          1
+        ],
+        [
+          0.05,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 135,
+      "freq_end": 85,
+      "gain": 0.5,
+      "length": 0.1,
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.002,
+          1
+        ],
+        [
+          0.1,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "triangle",
+      "freq": 455,
+      "freq_end": 452,
+      "gain": 0.22,
+      "length": 0.2,
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.001,
+          1
+        ],
+        [
+          0.2,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 1210,
+      "freq_end": 1205,
+      "gain": 0.13,
+      "length": 0.14,
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.001,
+          1
+        ],
+        [
+          0.14,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 2510,
+      "freq_end": 2500,
+      "gain": 0.08,
+      "length": 0.09,
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.001,
+          1
+        ],
+        [
+          0.09,
+          0
+        ]
+      ]
+    }
+  ]
+}

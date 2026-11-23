@@ -60,6 +60,16 @@ namespace SombraDaSanidade.EditorTools
                 Check("Sons repetidos com 3+ tomadas (passos, passos do Espécime, tique)",
                     sfx.footstepWalk.clips.Length >= 3 && sfx.footstepRun.clips.Length >= 3
                     && sfx.specimenStep.clips.Length >= 3 && sfx.skillTick.clips.Length >= 3);
+                Check("Passos em 3 pisos com 3+ tomadas (#105: azulejo, metal, carpete)",
+                    new[] { sfx.footstepWalkMetal, sfx.footstepRunMetal, sfx.footstepWalkCarpet, sfx.footstepRunCarpet }
+                        .All(x => x != null && x.clips.Length >= 3));
+                Check("Piso escolhe o passo (metal, carpete, azulejo e corrida)",
+                    sfx.Footstep(FloorType.Metal, false) == sfx.footstepWalkMetal
+                    && sfx.Footstep(FloorType.Carpet, true) == sfx.footstepRunCarpet
+                    && sfx.Footstep(FloorType.Tile, false) == sfx.footstepWalk);
+                Check("Perfis das alas com o piso certo",
+                    Floor("Medica") == FloorType.Tile && Floor("Energia") == FloorType.Metal
+                    && Floor("Executiva") == FloorType.Carpet && Floor("Eclusa") == FloorType.Metal);
                 Check("Nenhum som novo emite ruído no NoiseBus", sounds.All(x => x.s == null || x.s.noiseRadius <= 0f));
                 Check("Respiração do Espécime tem versão abafada", sfx.specimenBreath.muffledClips.Length == sfx.specimenBreath.clips.Length);
             }
@@ -162,6 +172,9 @@ namespace SombraDaSanidade.EditorTools
             step++;
             stepStart = Time.realtimeSinceStartup;
         }
+
+        private static FloorType Floor(string wing) =>
+            AssetDatabase.LoadAssetAtPath<DifficultyProfile>($"Assets/_Project/ScriptableObjects/Config/Difficulty{wing}.asset").floor;
 
         private static void Check(string label, bool ok)
         {

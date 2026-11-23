@@ -59,6 +59,8 @@ namespace SombraDaSanidade.EditorTools
         public static readonly (string field, string sound)[] GameSfxTable =
         {
             ("footstepWalk", "Player/passos_andar"), ("footstepRun", "Player/passos_correr"),
+            ("footstepWalkMetal", "Player/passos_andar_metal"), ("footstepRunMetal", "Player/passos_correr_metal"),
+            ("footstepWalkCarpet", "Player/passos_andar_carpete"), ("footstepRunCarpet", "Player/passos_correr_carpete"),
             ("playerPanting", "Player/respiracao_ofegante"),
             ("hallucinationWhisper", "Sanity/alucinacao_sussurro"),
             ("flashlightOn", "Lux/lanterna_liga"), ("flashlightOff", "Lux/lanterna_desliga"),

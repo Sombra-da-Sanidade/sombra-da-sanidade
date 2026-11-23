@@ -1,0 +1,95 @@
+{
+  "duration": 0.22,
+  "takes": 6,
+  "seed": 121,
+  "vary": {
+    "pitch": 0.08,
+    "gain": 0.12
+  },
+  "event": {
+    "spatial": false,
+    "volume": [
+      0.4,
+      0.52
+    ],
+    "pitch": [
+      0.94,
+      1.06
+    ]
+  },
+  "layers": [
+    {
+      "type": "noise",
+      "color": "brown",
+      "gain": 1.0,
+      "length": 0.16,
+      "filter": {
+        "type": "lowpass",
+        "freq": 800
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.012,
+          1
+        ],
+        [
+          0.16,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "noise",
+      "color": "pink",
+      "gain": 0.35,
+      "length": 0.09,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          600,
+          1600
+        ]
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.01,
+          1
+        ],
+        [
+          0.09,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "tone",
+      "wave": "sine",
+      "freq": 92,
+      "freq_end": 70,
+      "gain": 0.4,
+      "length": 0.13,
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.01,
+          1
+        ],
+        [
+          0.13,
+          0
+        ]
+      ]
+    }
+  ]
+}

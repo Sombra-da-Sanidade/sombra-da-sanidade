@@ -55,5 +55,11 @@ namespace SombraDaSanidade.Core
         [Header("Mapa")]
         [Tooltip("Disjuntores no mapa da ala (Proposta 1: 3 / 3 / 2 / 0). O builder da ala confere.")]
         [Min(0)] public int breakersAvailable = 3;
+        [Tooltip("Piso dos passos do Thomas (#105, sound-design 5): azulejo na Médica, metal na Energia e na Eclusa, " +
+                 "carpete na Executiva.")]
+        public FloorType floor = FloorType.Tile;
     }
+
+    // Piso da ala para os passos (#105). As cenas não marcam piso por tile; a ala inteira usa um só.
+    public enum FloorType { Tile, Metal, Carpet }
 }

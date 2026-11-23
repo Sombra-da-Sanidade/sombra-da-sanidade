@@ -11,7 +11,7 @@ namespace SombraDaSanidade.Audio
 {
     // Liga os eventos dos sistemas aos sons do GameSfx (#105). Criado em runtime em toda cena com GameManager,
     // como o AudioDirector: nenhuma cena ou prefab de outra frente precisa mudar.
-    // - Thomas: passos pela distância andada (corrida com Adrena-Syn).
+    // - Thomas: passos pela distância andada, no piso da ala (corrida com Adrena-Syn).
     // - Lux-90: liga, desliga, zumbido aceso, bateria fraca, esgotada, EMP e EMP falho.
     // - Espécime: respiração em loop com oclusão, passos pela distância, estalo ao investigar, grito na
     //   perseguição, atordoado, ataque.
@@ -221,7 +221,8 @@ namespace SombraDaSanidade.Audio
             // O efeito só é adicionado ao jogador na primeira injeção (AdrenaSynEffect.On).
             if (adrena == null) adrena = player.GetComponent<AdrenaSynEffect>();
             bool running = adrena != null && adrena.IsActive;
-            Play(running && sfx.footstepRun != null ? sfx.footstepRun : sfx.footstepWalk, pos);
+            var profile = Core.DifficultyProfile.Active;
+            Play(sfx.Footstep(profile != null ? profile.floor : Core.FloorType.Tile, running), pos);
         }
 
         // ---------- Lux-90 ----------
