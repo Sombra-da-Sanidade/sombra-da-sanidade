@@ -95,6 +95,8 @@ namespace SombraDaSanidade.EditorTools
                 case 0:
                 {
                     if (Time.frameCount < 5 || GameManager.Instance == null) return;
+                    // A Ala Médica abre com a C0 (WingOpening, #91): pula para o teste começar com a fila vazia.
+                    if (CutscenePlayer.IsPlaying) { CutscenePlayer.Skip(); return; }
                     if (!GameManager.Instance.IsPlaying) { if (t > 20f) { Check("Partida começou", false); Finish(); } return; }
                     if (player == null || cam == null) { Check("Thomas e câmera na cena", false); Finish(); return; }
 
