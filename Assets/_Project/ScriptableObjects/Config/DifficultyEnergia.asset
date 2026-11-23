@@ -13,15 +13,15 @@ MonoBehaviour:
   m_Name: DifficultyEnergia
   m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Core.DifficultyProfile
   wing: Energia
-  sleepwalkerSpeed: 5.0
+  sleepwalkerSpeed: 6
   monsterSpeed: 3.85
   monsterHearingRadius: 6
   monsterBehaviours: 7
   monsterDelaySeconds: 0
-  darknessDrain: 1.5
+  darknessDrain: 1.8
   hallucinations: 1
   hallucinationInterval: {x: 20, y: 30}
   lootTable: {fileID: 11400000, guid: 4004ec7a94e440a8813fb402aefab2b4, type: 2}
-  batteryChance: 0.6
+  batteryChance: 0.45
   breakersAvailable: 3
   floor: 1

@@ -1089,16 +1089,10 @@ MonoBehaviour:
   root: {fileID: 1534219445}
   charsPerSecond: 38
   pages:
-  - "<color=#55b870>ANOS 90. COMPLEXO EREBUS, SUB-N\xCDVEL 4.</color>\n\nA Aethelgard
-    Dynamics envia um auditor, Thomas Reis, para revisar os dados do Projeto Hipnos."
-  - "Minutos depois da chegada, a base entra em confinamento.\n\nAs luzes caem. Os
-    r\xE1dios ficam mudos. A equipe n\xE3o responde."
-  - "Nos corredores, algo anda descal\xE7o.\n\n<color=#c8922c>O Volunt\xE1rio 07
-    n\xE3o enxerga. Mas sente a luz.</color>"
-  - "Os registros da Dra. Valerie Vance est\xE3o em <color=#a9f294>3 HDs</color>,
-    nos servidores das alas M\xE9dica, de Energia e Executiva."
-  - "Recupere os HDs, insira no terminal da sa\xEDda e fuja antes da autodestrui\xE7\xE3o.\n\n<color=#55b870>A
-    lanterna protege a sua mente. E mostra onde voc\xEA est\xE1.</color>"
+  - "<color=#55b870>1994. COMPLEXO EREBUS, SUB-N\xCDVEL 4.</color>\n\nA Aethelgard Dynamics manda o auditor Thomas Reis revisar o Projeto Hipnos: experimentos de sono induzido em volunt\xE1rios."
+  - "Quando ele chega, a base j\xE1 est\xE1 em confinamento.\n\nNenhuma equipe responde. S\xF3 os servidores continuam ligados."
+  - "Os volunt\xE1rios nunca foram embora.\n\n<color=#c8922c>Alguns ainda andam pelos corredores.</color>"
+  - "Os registros da Dra. Valerie Vance est\xE3o em <color=#a9f294>3 HDs</color>. A Aethelgard quer todos.\n\n<color=#55b870>Thomas n\xE3o lembra de ter aceitado este trabalho.</color>"
 --- !u!114 &1534219447
 MonoBehaviour:
   m_ObjectHideFlags: 0

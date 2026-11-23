@@ -25,9 +25,9 @@ namespace SombraDaSanidade.Level
 
         [SerializeField] private MonsterController monster;
         [Tooltip("Tempo mínimo sem monstro (GDD v1.1, Proposta 4: ~1 min).")]
-        [SerializeField, Min(0f)] private float calmSeconds = 60f;
+        [SerializeField, Min(0f)] private float calmSeconds = 35f;
         [Tooltip("Se o jogador não passar por nenhum gatilho até aqui, o monstro acorda mesmo assim.")]
-        [SerializeField, Min(0f)] private float maxCalmSeconds = 100f;
+        [SerializeField, Min(0f)] private float maxCalmSeconds = 60f;
         [SerializeField] private RouteVariant[] variants = Array.Empty<RouteVariant>();
         [Tooltip("Cutscene no motor tocada quando o monstro acorda (C1, planejamento-rc 4). Vazio: só a rota.")]
         [SerializeField] private Cutscene wakeCutscene;

@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfb68d15b08d487e830398602a883a24, type: 3}
   m_Name: LootTable_Energia
   m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Interaction.LootTable
-  nothingWeight: 0.2
-  batteryWeight: 0.6
+  nothingWeight: 0.35
+  batteryWeight: 0.45
   sedativeWeight: 0.15
   adrenaSynWeight: 0.05
   guaranteeBattery: 1

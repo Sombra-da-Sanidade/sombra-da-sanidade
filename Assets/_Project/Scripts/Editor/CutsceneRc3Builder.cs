@@ -91,11 +91,12 @@ namespace SombraDaSanidade.EditorTools
                 PanelShot(pC0_4, 4.2f, "", "A AETHELGARD AGRADECE A SUA COLABORAÇÃO.", CutsceneTransition.Fade, new Vector2(1f, 1.15f))
             );
 
-            // 2. C1 Espécime (World, freezeWorld = false)
+            // 2. C1 Espécime (World, freezeWorld = false). As falas ensinam a regra dele: cego, segue luz e som.
             SaveCutscene("C1_Especime", "C1", false, null,
-                WorldShot("especime", 2.2f, "", "", CutsceneTransition.Fade, new Vector2(1f, 0.85f)),
-                WorldShot("especime", 1.8f, "", "", CutsceneTransition.Cut, new Vector2(0.85f, 0.72f)),
-                WorldShot("especime", 2.4f, "THOMAS", "Ele não me viu.", CutsceneTransition.Cut, new Vector2(0.72f, 0.62f))
+                WorldShot("especime", 2.0f, "", "", CutsceneTransition.Fade, new Vector2(1f, 0.85f)),
+                WorldShot("especime", 2.6f, "THOMAS", "Sem olhos. Ele está ouvindo.", CutsceneTransition.Cut, new Vector2(0.85f, 0.72f)),
+                WorldShot("especime", 3.2f, "THOMAS", "Lanterna apagada. Ele segue a luz e o barulho.", CutsceneTransition.Cut, new Vector2(0.72f, 0.62f)),
+                WorldShot("player", 3.2f, "THOMAS", "Se ele me achar, apago a luz e saio da frente dele.", CutsceneTransition.Cut, new Vector2(1f, 0.9f))
             );
 
             // 3. M1 Sala Branca
@@ -111,11 +112,26 @@ namespace SombraDaSanidade.EditorTools
                 PanelShot(null, 3.2f, "", "A ALA DE ENERGIA FICA ABAIXO. ALGO ANDA NO ESCURO DE LÁ.", CutsceneTransition.Fade)
             );
 
-            // 5. C2 Sonâmbulo (World, cue = c2_lampada)
+            // 5. C2 Sonâmbulo (World, cue = c2_lampada). As falas ensinam a regra dele: só para sob a luz.
             SaveCutscene("C2_Sonambulo", "C2", false, null,
-                WorldShot("sonambulo", 2.0f, "", "", CutsceneTransition.Fade, new Vector2(1f, 0.9f)),
+                WorldShot("sonambulo", 2.4f, "THOMAS", "Tem alguém parado ali.", CutsceneTransition.Fade, new Vector2(1f, 0.9f)),
                 WorldShot("sonambulo", 1.2f, "", "", CutsceneTransition.Cut, new Vector2(0.9f, 0.8f), cue: "c2_lampada"),
-                WorldShot("sonambulo", 2.8f, "THOMAS", "Ele se mexeu. Quando a luz apagou, ele se mexeu.", CutsceneTransition.Cut, new Vector2(0.8f, 0.65f))
+                WorldShot("sonambulo", 2.8f, "THOMAS", "Ele se mexeu. Quando a luz apagou, ele se mexeu.", CutsceneTransition.Cut, new Vector2(0.8f, 0.65f)),
+                WorldShot("player", 3.2f, "THOMAS", "Na luz ele não anda. Não posso tirar a lanterna dele.", CutsceneTransition.Cut, new Vector2(1f, 0.9f)),
+                WorldShot("player", 3.0f, "THOMAS", "Um sinalizador seguraria ele no lugar.", CutsceneTransition.Cut, new Vector2(0.9f, 0.85f))
+            );
+
+            // Tutoriais no motor: primeira câmera que dispara (foco na câmera, marcador criado pelo
+            // WingNarrativeDirector) e primeiro sinalizador pego.
+            SaveCutscene("TC_Camera", "TC", true, null,
+                WorldShot("camera_alarme", 2.4f, "THOMAS", "Uma câmera. Ela me viu.", CutsceneTransition.Cut, new Vector2(0.9f, 0.75f)),
+                WorldShot("camera_alarme", 3.2f, "THOMAS", "O alarme apaga as luzes do setor e chama o que estiver perto.", CutsceneTransition.Cut, new Vector2(0.75f, 0.7f)),
+                WorldShot("player", 3.0f, "THOMAS", "Religo o disjuntor dela ou derrubo com o EMP.", CutsceneTransition.Cut, new Vector2(1f, 0.9f))
+            );
+            SaveCutscene("TS_Sinalizador", "TS", true, null,
+                WorldShot("player", 1.8f, "THOMAS", "Sinalizadores.", CutsceneTransition.Cut, new Vector2(1f, 0.8f)),
+                WorldShot("player", 3.0f, "THOMAS", "A luz vermelha segura o que só anda no escuro.", CutsceneTransition.Cut, new Vector2(0.8f, 0.75f)),
+                WorldShot("player", 2.4f, "", "G: JOGAR O SINALIZADOR", CutsceneTransition.Cut, new Vector2(0.75f, 0.75f))
             );
 
             // 6. M2 Assinatura
@@ -210,8 +226,7 @@ namespace SombraDaSanidade.EditorTools
                 var safe = FindSafeAnchor(0, new Vector2(4f, 2f));
                 var cam = FindAnchor<SecurityCamera>(0, new Vector2(2f, -2f));
 
-                Vector2 c2Pos = Vector2.Lerp(player, sw, 0.45f);
-                AddCutsceneTrigger(root, "Trigger_C2_Sonambulo", "C2_Sonambulo", c2Pos, new Vector2(6f, 5f));
+                // C2 não tem gatilho: o WingNarrativeDirector a toca ao ejetar o HD-02 (revelação na Subestação).
                 AddCutsceneTrigger(root, "Trigger_M2_Assinatura", "M2_Assinatura", safe, new Vector2(4.5f, 4.5f));
                 AddVoiceTrigger(root, "Voice_T2_4_Escritorio", "T2-4", safe + new Vector2(0f, -1.5f), new Vector2(4.5f, 4.5f));
                 AddPhosporClue(root, "Clue_P3_Subestacao", "03 NÃO DORME. 08 NÃO LEMBRA.", sub + new Vector2(0f, 1.4f));
@@ -368,7 +383,8 @@ namespace SombraDaSanidade.EditorTools
         private static readonly System.Collections.Generic.Dictionary<string, string[]> ShotSounds = new()
         {
             ["C0_Abertura"] = new[] { "World/elevador", "UI/crt_liga", "Lux/lanterna_liga", "World/eclusa_liga" },
-            ["C1_Especime"] = new[] { "Monster/especime_respiracao", "Monster/especime_estalo", null },
+            ["C1_Especime"] = new[] { "Monster/especime_respiracao", "Monster/especime_estalo", null, null },
+            ["TC_Camera"] = new[] { "Camera/camera_alarme", null, null },
             ["I1_AlaEnergia"] = new[] { "UI/crt_liga" },
             ["C2_Sonambulo"] = new[] { "Monster/sonambulo_respiracao", "Camera/camera_apagao", "Monster/sonambulo_rangido" },
             ["I2_AlaExecutiva"] = new[] { "UI/crt_liga" },

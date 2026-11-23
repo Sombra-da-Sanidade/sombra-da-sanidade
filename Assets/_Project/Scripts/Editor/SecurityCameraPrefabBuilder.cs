@@ -48,9 +48,57 @@ namespace SombraDaSanidade.EditorTools
             var so = new SerializedObject(cam);
             var head = (Transform)so.FindProperty("head").objectReferenceValue;
             if (head != null) head.rotation = Quaternion.Euler(0f, 0f, facingDegrees);
+            MountOnWall(so, go.transform, facingDegrees);
             if (shutdown != null) so.FindProperty("shutdownBreaker").objectReferenceValue = shutdown;
             so.ApplyModifiedPropertiesWithoutUndo();
             return go;
+        }
+
+        // O desenho vai para a parede de onde a câmera olha: olhando para baixo, pendurada na faixa de cima da
+        // parede norte (de frente); para os lados, de perfil na parede lateral (a da direita espelhada).
+        // position (raiz) fica 0,6 tile à frente da célula da parede, que é de onde sai o cone.
+        private static void MountOnWall(SerializedObject so, Transform root, float facingDegrees)
+        {
+            var art = (SpriteRenderer)so.FindProperty("art").objectReferenceValue;
+            if (art == null) return;
+            var dir = Quaternion.Euler(0f, 0f, facingDegrees) * Vector3.right;
+            bool sideways = Mathf.Abs(dir.x) > 0.7f;
+            if (sideways)
+            {
+                var sprites = AssetDatabase.LoadAllAssetsAtPath(ArtPath).OfType<Sprite>().ToArray();
+                Sprite S(string n) => sprites.FirstOrDefault(s => s.name == "security_camera_side_" + n);
+                if (S("idle") != null)
+                {
+                    so.FindProperty("idleSprite").objectReferenceValue = S("idle");
+                    so.FindProperty("detectSprite").objectReferenceValue = S("detect");
+                    so.FindProperty("alarmSprite").objectReferenceValue = S("alarm");
+                    so.FindProperty("offSprite").objectReferenceValue = S("off");
+                    so.ApplyModifiedPropertiesWithoutUndo();
+                    art.sprite = S("idle");
+                }
+                art.flipX = dir.x < 0f;
+                art.transform.position = root.position + new Vector3(dir.x > 0f ? 0.4f : -0.4f, -0.3f, 0f);
+            }
+            else if (dir.y < 0f)
+                art.transform.position = root.position + new Vector3(0f, 1.1f, 0f);   // parede norte
+            else
+                art.transform.position = root.position + new Vector3(0f, -0.6f, 0f);  // parede sul
+            var led = art.transform.Find("Led");
+            if (led != null && art.flipX) led.localPosition = new Vector3(-led.localPosition.x, led.localPosition.y, 0f);
+
+            // A luz sai da lente do desenho. A detecção continua na raiz (SecurityCamera usa transform.position),
+            // então só o cone sobe; o alcance cresce na mesma medida para a luz chegar até onde ela detecta.
+            var head = (Transform)so.FindProperty("head").objectReferenceValue;
+            var cone = (UnityEngine.Rendering.Universal.Light2D)so.FindProperty("cone").objectReferenceValue;
+            if (head == null) return;
+            Vector3 lens = sideways
+                ? art.transform.position + new Vector3(art.flipX ? -0.375f : 0.375f, 0.53f, 0f)
+                : art.transform.position + new Vector3(0f, dir.y < 0f ? 0.3f : 0.5f, 0f);
+            float lift = Vector2.Distance(lens, root.position);
+            head.position = lens;
+            if (cone != null) cone.pointLightOuterRadius += lift;
+            so.FindProperty("coneExtraRange").floatValue = lift;
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         public static GameObject GetOrBuild()
@@ -83,8 +131,9 @@ namespace SombraDaSanidade.EditorTools
                 var head = new GameObject("Head").transform;
                 head.SetParent(root.transform, false);
 
+                // O desenho fica preso na parede (não gira com a cabeça): Place o encosta na parede certa.
                 var artGo = new GameObject("Art");
-                artGo.transform.SetParent(head, false);
+                artGo.transform.SetParent(root.transform, false);
                 var art = artGo.AddComponent<SpriteRenderer>();
                 art.sprite = S("idle");
                 art.sortingOrder = 8;
@@ -106,8 +155,8 @@ namespace SombraDaSanidade.EditorTools
                 cone.falloffIntensity = 0.7f;
 
                 var ledGo = new GameObject("Led");
-                ledGo.transform.SetParent(head, false);
-                ledGo.transform.localPosition = new Vector3(-0.28f, 0.2f, 0f);
+                ledGo.transform.SetParent(artGo.transform, false);
+                ledGo.transform.localPosition = new Vector3(0.2f, 0.45f, 0f);
                 var led = ledGo.AddComponent<Light2D>();
                 led.lightType = Light2D.LightType.Point;
                 led.pointLightOuterRadius = 0.6f;

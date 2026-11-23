@@ -61,6 +61,16 @@ Geradas por **Sombra da Sanidade > Narrativa > Gerar todas as 11 Cutscenes e Pai
 | C3 | Painéis + motor | Depois do HD-03 (`WingNarrativeDirector`) | `revelacao.ogg` |
 | C4 | Painéis | Final "Testemunha" (a #95 toca) | `final_testemunha.ogg` |
 | C5 | Painéis | Final "Amostra entregue" (a #95 toca) | `final_amostra.ogg` |
+| TC | Motor | Primeira câmera de segurança que dispara (`WingNarrativeDirector`, foco no marcador `camera_alarme` sobre ela) | Alarme |
+| TS | Motor | Primeiro sinalizador pego numa caixa de ferramentas (`WingNarrativeDirector`) | — |
+
+**Falas que ensinam:** as cutscenes dos monstros e os tutoriais usam as falas do Thomas para explicar a mecânica.
+- **C1:** "Sem olhos. Ele está ouvindo.", "Lanterna apagada. Ele segue a luz e o barulho." e "Se ele me achar, apago a luz e saio da frente dele."
+- **C2:** "Na luz ele não anda. Não posso tirar a lanterna dele." e "Um sinalizador seguraria ele no lugar."
+- **TC:** o alarme apaga o setor e chama monstros; o disjuntor ou o EMP desligam a câmera.
+- **TS:** o sinalizador segura o Sonâmbulo, e G joga.
+
+A C2 não tem gatilho: na Ala de Energia ela toca na primeira vez que o Sonâmbulo caça, ou quando o HD-02 é ejetado (ver [sonambulo.md](sonambulo.md)).
 
 - **Painéis (#98):** fonte em `art-src/Cutscenes/<id>_<nn>_<nome>.aseprite`, exportada com `python3 tools/art/export_cutscenes.py` para `Art/Cutscenes/` (ver [guia de estilo](arte/guia-de-estilo.md) seção 6). O `CutsceneRc3Builder` liga cada PNG ao plano pelo nome. Sem o PNG, o builder desenha um rascunho de retângulos no lugar.
 - **C2:** o `WingNarrativeDirector` liga o cue `c2_lampada` na Ala de Energia: a luz pisca e o Sonâmbulo avança 2 passos.

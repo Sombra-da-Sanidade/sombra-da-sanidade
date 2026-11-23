@@ -13,14 +13,14 @@ MonoBehaviour:
   m_Name: DifficultyMedica
   m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Core.DifficultyProfile
   wing: Medica
-  monsterSpeed: 3.2
-  monsterHearingRadius: 5
+  monsterSpeed: 3.6
+  monsterHearingRadius: 6.5
   monsterBehaviours: 1
   monsterDelaySeconds: 0
-  darknessDrain: 1
+  darknessDrain: 1.3
   hallucinations: 0
   hallucinationInterval: {x: 20, y: 30}
   lootTable: {fileID: 11400000, guid: 2945ffb39aae46ada91dca2b63f55f05, type: 2}
-  batteryChance: 0.7
+  batteryChance: 0.55
   breakersAvailable: 3
   floor: 0
