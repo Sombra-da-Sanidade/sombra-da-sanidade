@@ -43,6 +43,18 @@ namespace SombraDaSanidade.UI
             lastState = check.State;
         }
 
+        // Centro do mostrador no mundo (pivô do ponteiro, 16 px por unidade): de onde saem as partículas do great (#81).
+        public Vector3 DialWorldPosition
+        {
+            get
+            {
+                var p = transform.position + (Vector3)worldOffset;
+                var art = HudArt.Instance;
+                if (art != null) p += new Vector3(art.dialPivot.x, -art.dialPivot.y) / 16f;
+                return p;
+            }
+        }
+
         private void OnGUI()
         {
             if (Event.current.type != EventType.Repaint) return;

@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d170647868424de895cb5fd119eb5c51, type: 3}
+  m_Name: GameFx
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.Flashlight.GameFx
+  empWave: {fileID: 7754144310606721383, guid: 472991d376a8c262abfcb6fb404d42be, type: 3}
+  skillGreat: {fileID: 3053428429705529547, guid: a836424772a5fbf91ad7c660f1761265, type: 3}
+  skillFail: {fileID: 3674117362520029670, guid: c10054c3470b47a87a63a9456c53d988, type: 3}

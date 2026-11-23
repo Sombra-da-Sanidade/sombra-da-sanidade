@@ -137,6 +137,15 @@ Painéis de tela inteira não passam pelo JSON de texto (57.600 pixels por paine
 3. `python3 tools/art/export_cutscenes.py` exporta o PNG 320x180 para `Assets/_Project/Art/Cutscenes/` e recusa painel com cor fora da paleta ou transparência. `--check` só valida; um prefixo (`C0_01`) exporta só esse painel.
 4. A importação é a mesma dos sprites: Point, sem compressão, 16 PPU.
 
+### Efeitos de partícula
+
+Gerados por código (#81), não desenhados: **Sombra da Sanidade > Arte > Gerar efeitos de partícula** (`FxPrefabBuilder`) cria `Prefabs/FX/` e o `Resources/GameFx`. Teste: **Arte > Rodar teste dos efeitos de partícula** (`FxTest`).
+
+- Partícula quadrada de 1 a 2 px (16 PPU), material `Art/FX/fx_unlit.mat` (Sprite-Unlit do URP 2D: brilha no escuro).
+- Cor inicial branca e cor ao longo da vida em degraus (`GradientMode.Fixed`), só com cores da paleta.
+- EMP: anel elétrico que some em 0,4 s. Great: pontos de fósforo saindo do mostrador. Fail: faíscas âmbar e fumaça de concreto no servidor (o tremor de tela é do `SkillCheck`).
+- Mudar um efeito = editar o builder e gerar de novo; não editar o prefab à mão.
+
 ## 7. Referências (só links)
 
 Imagens para estudo ficam em `docs/referencias/arte/` (local, ignorado). O arquivo `FONTES.md` dessa pasta diz de onde veio cada uma: screenshots da página Steam do Yuppie Psycho e previews das páginas do Penusbmic no itch.io.

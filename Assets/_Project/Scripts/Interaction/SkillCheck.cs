@@ -27,6 +27,9 @@ namespace SombraDaSanidade.Interaction
         // Ponteiro tremendo pela sanidade baixa: o mostrador puxa para o roxo de Hipnos (SkillCheckHud).
         public bool IsShaky { get; private set; }
 
+        // Onde está o que o jogador canaliza (servidor, cela). Sem alvo, o próprio jogador. Usado pelas faíscas (#81).
+        public Vector3 TargetPosition => target is MonoBehaviour mb && mb != null ? mb.transform.position : transform.position;
+
         public event Action Warned;
         public event Action<SkillCheckResult> Resolved;
 
