@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SombraDaSanidade.EditorTools
 {
-    // Build WebGL em Builds/WebGL (pasta ignorada pelo git): Menu e a cena do jogo.
+    // Build WebGL em Builds/WebGL (pasta ignorada pelo git): cenas habilitadas do Build Settings.
     // Também roda em batchmode: -executeMethod SombraDaSanidade.EditorTools.WebGLBuilder.Build
     public static class WebGLBuilder
     {
@@ -15,18 +15,12 @@ namespace SombraDaSanidade.EditorTools
         [MenuItem("Sombra da Sanidade/Build WebGL", priority = 40)]
         public static void Build()
         {
-            // A Beta (mapa gerado com tudo o que existe, docs/beta.md) é a cena publicada; Alfa, Demo e Protótipo ficam de reserva.
-            string scene = new[]
+            // Cenas habilitadas no Build Settings, na ordem: Menu primeiro (#32), depois as 4 alas do encadeamento
+            // (WingFlow) e as cenas de reserva. O GameManager só carrega o que estiver no build.
+            string[] scenes = EditorBuildSettings.scenes.Where(s => s.enabled && File.Exists(s.path)).Select(s => s.path).ToArray();
+            if (scenes.Length == 0)
             {
-                BetaSceneBuilder.ScenePath,
-                AlfaSceneBuilder.ScenePath,
-                PrototypeSceneBuilder.DemoScenePath,
-                PrototypeSceneBuilder.PrototypeScenePath
-            }.FirstOrDefault(File.Exists);
-
-            if (scene == null)
-            {
-                Debug.LogError("Nenhuma cena para build. Use Sombra da Sanidade > Gerar cena Alfa (tiles).");
+                Debug.LogError("Nenhuma cena habilitada no Build Settings.");
                 if (Application.isBatchMode) EditorApplication.Exit(1);
                 return;
             }
@@ -34,9 +28,6 @@ namespace SombraDaSanidade.EditorTools
             // Gzip com fallback: funciona em hosts que não mandam o header Content-Encoding (itch.io, Unity Play).
             PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Gzip;
             PlayerSettings.WebGL.decompressionFallback = true;
-
-            // Menu primeiro (#32): é a cena que abre no navegador e carrega a do jogo (MainMenuScreen.gameScene, Beta).
-            string[] scenes = File.Exists(MenuSceneBuilder.ScenePath) ? new[] { MenuSceneBuilder.ScenePath, scene } : new[] { scene };
 
             var options = new BuildPlayerOptions
             {
