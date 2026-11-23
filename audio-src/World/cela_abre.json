@@ -1,0 +1,102 @@
+{
+  "duration": 2.4,
+  "takes": 1,
+  "seed": 471,
+  "bass_harmonics": 0.4,
+  "reverb": {
+    "mix": 0.18,
+    "decay": 1.1
+  },
+  "event": {
+    "spatial": true,
+    "volume": [
+      0.9,
+      0.95
+    ]
+  },
+  "layers": [
+    {
+      "type": "tone",
+      "wave": "square",
+      "freq": 180,
+      "freq_end": 340,
+      "gain": 0.12,
+      "length": 0.7,
+      "filter": {
+        "type": "lowpass",
+        "freq": 1800
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.05,
+          1
+        ],
+        [
+          0.65,
+          1
+        ],
+        [
+          0.7,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/metalLatch.ogg",
+      "gain": 0.9,
+      "delay": 0.7,
+      "pitch": 0.8
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/impactMetal_medium_000.ogg",
+      "gain": 0.7,
+      "delay": 0.78,
+      "pitch": 0.6
+    },
+    {
+      "type": "noise",
+      "color": "pink",
+      "gain": 0.35,
+      "delay": 0.95,
+      "length": 1.2,
+      "filter": {
+        "type": "bandpass",
+        "freq": [
+          300,
+          1400
+        ]
+      },
+      "env": [
+        [
+          0,
+          0
+        ],
+        [
+          0.2,
+          1
+        ],
+        [
+          1.0,
+          0.8
+        ],
+        [
+          1.2,
+          0
+        ]
+      ]
+    },
+    {
+      "type": "sample",
+      "file": "../Raw/Kenney/impactPlate_heavy_000.ogg",
+      "gain": 0.8,
+      "delay": 2.1,
+      "pitch": 0.7
+    }
+  ]
+}
