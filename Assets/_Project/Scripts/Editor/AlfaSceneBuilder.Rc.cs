@@ -16,6 +16,8 @@ namespace SombraDaSanidade.EditorTools
     //        vem de uma diretiva na planta: "# @cutscene ? M1" ou "# @cutscene ? M3 35" (só com sanidade < 35).
     //  ~ som do Espécime atrás da parede (WallNoise; vai numa célula de parede)
     //  = vira também a grade do atalho (ShortcutGate), fechada até a Vance abrir
+    //  * pista em fósforo (SanityClue, sanidade < 35). O texto vem das diretivas "# @pista <TEXTO>", na ordem de
+    //    leitura da planta (de cima para baixo, da esquerda para a direita), como no roteiro (roteiro-rc 3).
     //  " fala do Thomas   % objeto que muda com a sanidade   V cela da Vance   = atalho da Eclusa
     //        (LevelMarker com id "<tipo>_<ala>_<n>"; o sistema de outra frente encaixa no marcador).
     // A cutscene é achada pelo campo id (C1, M1...) em qualquer pasta. Sem o asset, o gatilho fica vazio e não
@@ -23,7 +25,7 @@ namespace SombraDaSanidade.EditorTools
     public static partial class AlfaSceneBuilder
     {
         // São chão (o desenho é o do vizinho da esquerda, como os marcadores da introdução).
-        private const string RcFloorMarkers = "Z!?&\"%V=";
+        private const string RcFloorMarkers = "Z!?&\"%V=*";
         private const string CutsceneChars = "!?&";
 
         private static readonly (char c, LevelMarker.Kind kind, string prefix)[] MarkerChars =
@@ -47,6 +49,7 @@ namespace SombraDaSanidade.EditorTools
             AddSleepwalkers(map, root);
             AddCameras(map, root);
             AddWallNoises(map, root);
+            AddPhosphorClues(map, root);
             AddCutsceneTriggers(map, root);
             AddMarkers(map, root, wingAt);
             if (root.childCount == 0) UnityEngine.Object.DestroyImmediate(root.gameObject);
@@ -105,6 +108,20 @@ namespace SombraDaSanidade.EditorTools
                 go.transform.position = new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f);
                 go.AddComponent<WallNoise>().Setup(clips);
             }
+        }
+
+        private static void AddPhosphorClues(Layout map, Transform root)
+        {
+            var cells = Find(map, '*').OrderByDescending(p => p.y).ThenBy(p => p.x).ToList();
+            var texts = map.Directives.Where(d => d[0] == "pista").Select(d => string.Join(" ", d.Skip(1))).ToList();
+            if (cells.Count != texts.Count)
+                Debug.LogError($"Pistas: a planta tem {cells.Count} '*' e {texts.Count} diretivas \"# @pista\".");
+            if (cells.Count == 0) return;
+            var parent = new GameObject("PhosphorClues").transform;
+            parent.SetParent(root, false);
+            for (int i = 0; i < cells.Count && i < texts.Count; i++)
+                PrototypeSceneBuilder.CreateClue(parent, $"Clue_P{i + 1}",
+                    new Vector2(cells[i].x + 0.5f, cells[i].y + 0.5f), texts[i].Replace("\\n", "\n"), 0.05f);
         }
 
         private static void AddCutsceneTriggers(Layout map, Transform root)
