@@ -155,6 +155,14 @@ Unity -batchmode -projectPath . -executeMethod SombraDaSanidade.EditorTools.Smok
 - Apagão final (`Level/WingBlackout`): 1,5 s depois do HD-02, todos os disjuntores caem (`Breaker.Cut`). Dá para religar.
 - 6 falas (`"`) e 2 objetos de sanidade (`%`, espelho e crachá 08).
 
+## Ala Executiva no RC (#85)
+
+- Espécime na Diretoria (norte) e Sonâmbulo (`Z`) na Sala de Reuniões (sudoeste), a cerca de 40 m um do outro.
+- 4 câmeras (`C`): Reuniões, RH, Escritórios e Diretoria. Chamar o Espécime no alarme vem do perfil da ala (RC1).
+- M3 (`?`, `# @cutscene ? M3 35`) no RH: só toca com sanidade < 35.
+- C3 toca 1 s depois do HD-03 (`Level/DriveCutscene`), na fila do `CutscenePlayer`.
+- Senha, pistas e Módulo Neural sem mudança. 6 falas (`"`) e 2 objetos de sanidade (`%`, foto e pulseira 08).
+
 ## Elementos do RC nas plantas
 
 Issues #83 a #87. Código em `Scripts/Editor/AlfaSceneBuilder.Rc.cs`.
