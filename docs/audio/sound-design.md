@@ -168,6 +168,7 @@ Receitas em `audio-src/World/` e `audio-src/UI/`, no mesmo esquema da #105 (`Gam
 | Vitória de uma ala (checkpoint salvo) | `ui_salvo` |
 | Vitória final (VOCÊ ESCAPOU) | `vitoria_eclusa` (trava, ar despressurizando e o jingle de homologação Ré–Fá#–Lá–Ré), depois a música do laudo |
 | Menu, pausa (inclusive ao abrir), configurações e tela de fim (teclado e mouse) | `ui_navegar`, `ui_confirmar`, `ui_voltar` |
+| Transição CRT (`CrtTransition`): troca de cena / cena nova e abrir o jogo | `crt_desliga` (relé, chiado agudo caindo, a imagem sugando no grave e um pop) / `crt_liga` (o "tum" da desmagnetização, estática e o chiado subindo). O apagão do Game Over fica mudo: tocam o grito e o sting |
 
 O aviso de bateria fraca (`bateria_fraca`) virou um piscar de filamento discreto (antes era um zumbido quadrado de 180 Hz que soava como erro). O EMP (`emp_disparo`) foi refeito: carga de 0,2 s, clique do gatilho, estrondo grave, rajada de estática, zap descendo e cauda de faíscas. A lanterna também mudou: liga e desliga viraram clique mecânico (4 tomadas) e o zumbido ficou um chiado abafado, com volume 0,06 no `AudioConfig`.
 
