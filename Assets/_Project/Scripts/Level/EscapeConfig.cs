@@ -16,6 +16,14 @@ namespace SombraDaSanidade.Level
         [Header("Purga")]
         [Tooltip("Segundos entre inserir os HDs e a purga (GDD 7: corrida de 2-3 min).")]
         [Min(1f)] public float purgeSeconds = 150f;
+
+        [Header("Cela da Vance (planejamento-rc 3, #82)")]
+        [Tooltip("Segurar E para abrir a cela (planejamento-rc 3: 6 s com 2 skill checks).")]
+        [Min(0f)] public float cellHoldSeconds = 6f;
+        [Tooltip("Raio do barulho da cela a cada segundo de abertura: as câmeras e o Espécime ouvem.")]
+        [Min(0f)] public float cellNoiseRadius = 8f;
+        [Tooltip("Segundos até a Vance sumir pelo duto depois de solta.")]
+        [Min(0f)] public float vanceExitSeconds = 1.5f;
         [Tooltip("A partir desta fração do tempo, fase final: sirene mais rápida e estrobo. Não está no GDD.")]
         [Range(0f, 1f)] public float finalPhaseFrom = 0.8f;
 
