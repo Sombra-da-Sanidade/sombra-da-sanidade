@@ -43,3 +43,27 @@ Issue #88. Plano de direção: [planejamento-rc.md](planejamento-rc.md) seção 
 3. Um `CutsceneTrigger` na entrada da ala com o asset.
 
 Teste: **Sombra da Sanidade > Rodar teste das cutscenes** (`CutsceneTest`).
+
+## As 11 cutscenes do RC (#91)
+
+Geradas por **Sombra da Sanidade > Narrativa > Gerar cutscenes** (`CutsceneAssetBuilder`, batchmode `...CutsceneAssetBuilder.Build`) a partir do [roteiro](narrativa/roteiro-rc.md) seção 5. Ficam em `Resources/Cutscenes/<id>.asset`. Mudar um texto = editar o builder e gerar de novo; não editar o asset à mão.
+
+| Id | Tipo | Onde toca | Som |
+|---|---|---|---|
+| C0 | Painéis | Começo da Ala Médica (`Level/WingOpening`) | CRT, eclusa |
+| C1 | Motor | Quando o Espécime acorda (`WingIntro.wakeCutscene`) | Respiração, estalo, grito |
+| M1 | Memória | Gatilho `?` no corredor oeste da Médica | `memoria_memory.ogg`, sussurro |
+| I1 | Intertítulo | Começo da Ala de Energia (`WingOpening`) | CRT |
+| C2 | Motor | Gatilho `!` na entrada do Controle B | Respiração, apagão, rangido |
+| M2 | Memória | Gatilho `?` no Controle A | `memoria_memory.ogg`, sussurro |
+| I2 | Intertítulo | Começo da Ala Executiva (`WingOpening`) | CRT |
+| M3 | Motor + memória | Gatilho `?` no RH, sanidade < 35 | `memoria_memory.ogg`, sussurro |
+| C3 | Painéis + motor | 1 s depois do HD-03 (`Level/DriveCutscene`) | `revelacao.ogg` |
+| C4 | Painéis | Final "Testemunha" (a #95 toca) | `final_testemunha.ogg` |
+| C5 | Painéis | Final "Amostra entregue" (a #95 toca) | `final_amostra.ogg` |
+
+- **Painéis (#98):** salvar o PNG em `Art/Cutscenes/<id>_<n>.png` (n = número do painel na cutscene, a partir de 1) e gerar de novo. Sem o PNG, o plano vira intertítulo.
+- **C2:** o marcador `c2_lampada` fica sobre o Sonâmbulo com `Level/SleepwalkerReveal`. A luz acende quando a C2 começa, apaga no cue do 2º plano e volta com ele 2 passos mais perto.
+- **C4 e C5:** a escolha (#95) toca com `CutscenePlayer.Play(WingOpening.Load("C4"))`.
+- Depois de gerar as cutscenes, gerar as alas de novo para os gatilhos receberem os assets (o builder das alas gera as cutscenes sozinho se ainda não existirem).
+- Teste: **Sombra da Sanidade > Narrativa > Rodar teste dos assets das cutscenes** (`CutsceneAssetsTest`).

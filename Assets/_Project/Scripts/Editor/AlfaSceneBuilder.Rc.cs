@@ -204,6 +204,28 @@ namespace SombraDaSanidade.EditorTools
             go.AddComponent<ShortcutGate>().Setup(art);
         }
 
+        // C2 (#91): marcador "c2_lampada" sobre o Sonâmbulo da ala, com a luz que acende, pisca e o mostra mais perto.
+        private static void AddSleepwalkerReveal()
+        {
+            var walker = UnityEngine.Object.FindAnyObjectByType<SombraDaSanidade.Monster.SleepwalkerController>();
+            if (walker == null)
+            {
+                Debug.LogError("C2: a ala não tem Sonâmbulo (Z) para o marcador c2_lampada.");
+                return;
+            }
+            var go = new GameObject("CutsceneMarker_c2_lampada");
+            go.transform.position = walker.transform.position;
+            go.AddComponent<CutsceneMarker>().Setup("c2_lampada");
+            var light = new GameObject("Luz").AddComponent<UnityEngine.Rendering.Universal.Light2D>();
+            light.transform.SetParent(go.transform, false);
+            light.lightType = UnityEngine.Rendering.Universal.Light2D.LightType.Point;
+            light.color = new Color(1f, 0.92f, 0.75f);
+            light.intensity = 1.1f;
+            light.pointLightOuterRadius = 3f;
+            light.pointLightInnerRadius = 0.6f;
+            go.AddComponent<SleepwalkerReveal>().Setup(light, "C2");
+        }
+
         private static Rect RectOf(List<Vector2Int> cells)
         {
             int x0 = cells.Min(c => c.x), y0 = cells.Min(c => c.y);
