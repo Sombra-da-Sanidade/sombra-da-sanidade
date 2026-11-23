@@ -91,7 +91,7 @@ MonoBehaviour:
     panTo: {x: 0, y: 0}
     duration: 3.8
     speaker: VANCE
-    caption: "V\xE1 para o esconderijo. Ou venha me buscar. A escolha \xE9 sua."
+    caption: "V\xE1 para a sa\xEDda. Ou venha me buscar. A escolha \xE9 sua."
     sound: {fileID: 0}
     transition: 0
     memory: 0

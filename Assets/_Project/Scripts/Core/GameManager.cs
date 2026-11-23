@@ -260,7 +260,7 @@ namespace SombraDaSanidade.Core
                 body = LastDeathCause switch
                 {
                     DeathCause.Monster => "O Espécime Vazio te alcançou.",
-                    DeathCause.Purge => "A autodestruição do esconderijo te alcançou.",
+                    DeathCause.Purge => "A autodestruição da base te alcançou.",
                     _ => "Sua mente colapsou no escuro."
                 };
             }

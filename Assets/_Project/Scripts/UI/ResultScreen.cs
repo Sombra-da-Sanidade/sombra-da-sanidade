@@ -66,7 +66,7 @@ namespace SombraDaSanidade.UI
             else
             {
                 PixelHud.Text("VOCÊ ESCAPOU", x + 52, y + 18, PixelHud.Fosforo5, 1f, 2);
-                PixelHud.Text("ESCONDERIJO ABERTO. HDS ENTREGUES À SUPERFÍCIE.", x + 52, y + 36, PixelHud.Fosforo3);
+                PixelHud.Text("SAÍDA ABERTA. HDS ENTREGUES À SUPERFÍCIE.", x + 52, y + 36, PixelHud.Fosforo3);
             }
 
             for (int i = 0; i < gm.TotalDrivesRequired; i++)

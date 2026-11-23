@@ -423,7 +423,7 @@ namespace SombraDaSanidade.Narrative
             return tex != null ? Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector2.one * 0.5f, 16f) : null;
         }
 
-        // No Esconderijo (Eclusa), cria o intercomunicador/trava da Sala de Observação da Dra. Vance
+        // Na Saída de Emergência (Eclusa), cria o intercomunicador/trava da Sala de Observação da Dra. Vance
         // para permitir a escolha entre C4 (Testemunha, T4-1) e C5 (Amostra entregue, T4-2).
         private void EnsureVanceRescueChoice()
         {
@@ -453,7 +453,7 @@ namespace SombraDaSanidade.Narrative
         }
     }
 
-    // Ponto de decisão no Esconderijo (#91): destrancar a sala de observação resgata a Dra. Vance (final C4 + fala T4-1).
+    // Ponto de decisão na Saída de Emergência (#91): destrancar a sala de observação resgata a Dra. Vance (final C4 + fala T4-1).
     [RequireComponent(typeof(Collider2D))]
     public class VanceRescueInteractable : MonoBehaviour, IInteractable
     {

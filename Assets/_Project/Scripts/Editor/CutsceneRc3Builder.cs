@@ -145,7 +145,7 @@ namespace SombraDaSanidade.EditorTools
                 WorldShot("player", 3.2f, "VANCE", "Thomas. Não é gravação. Estou viva.", CutsceneTransition.Cut, new Vector2(1f, 0.85f)),
                 WorldShot("player", 3.8f, "VANCE", "Você não é auditor. A auditoria é o teste. Eu apaguei sua memória."),
                 WorldShot("player", 3.6f, "VANCE", "Estou presa na observação. A Aethelgard ativou a autodestruição da base."),
-                WorldShot("player", 3.8f, "VANCE", "Vá para o esconderijo. Ou venha me buscar. A escolha é sua.")
+                WorldShot("player", 3.8f, "VANCE", "Vá para a saída. Ou venha me buscar. A escolha é sua.")
             );
 
             // 10. C4 Final Testemunha

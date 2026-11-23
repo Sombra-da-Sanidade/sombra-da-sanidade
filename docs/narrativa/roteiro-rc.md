@@ -83,9 +83,9 @@ Cada fala toca uma vez, no gatilho indicado, com a versão da faixa de sanidade 
 | T3-3 | Diante do espelho (antes da M3) | "Só um espelho sujo." | "Esse não sou eu. Esse sou eu." |
 | T3-4 | Pista da senha lida | "Os números só aparecem quando eu perco o controle." | "Eu já sabia essa senha. Eu escrevi essa senha." |
 | T3-5 | Módulo Neural usado | "Dói. Mas eu enxergo o que estava escondido." | "Mais uma dose. Eles sempre davam mais uma dose." |
-| T3-6 | HD-03 ejetado (antes da C3) | "Três. Acabou. Só falta o esconderijo." | "Três. Não acabou. Nunca acaba no três." |
+| T3-6 | HD-03 ejetado (antes da C3) | "Três. Acabou. Só falta a saída." | "Três. Não acabou. Nunca acaba no três." |
 
-### Esconderijo (opcional, se sobrar tempo)
+### Saída de Emergência (opcional, se sobrar tempo)
 
 | # | Gatilho | Estável | Abalado |
 |---|---|---|---|
@@ -184,7 +184,7 @@ Formato dos planos: `[tipo] descrição | legenda`. Painéis em 320x180.
 3. `[motor]` Alto-falante da sala chia; a voz da Vance, limpa, sem fita. | VANCE: "Thomas. Não é gravação. Estou viva."
 4. `[motor]` | VANCE: "Você não é auditor. A auditoria é o teste. Eu apaguei sua memória."
 5. `[motor]` | VANCE: "Estou presa na observação. A Aethelgard ativou a autodestruição da base."
-6. `[motor]` Sirene começa. | VANCE: "Vá para o esconderijo. Ou venha me buscar. A escolha é sua."
+6. `[motor]` Sirene começa. | VANCE: "Vá para a saída. Ou venha me buscar. A escolha é sua."
 
 ### C4 Final "Testemunha" (painéis, saiu com a Vance)
 

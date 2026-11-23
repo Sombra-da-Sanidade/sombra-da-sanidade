@@ -73,7 +73,7 @@ namespace SombraDaSanidade.EditorTools
                 "Dói. Mas eu enxergo o que estava escondido.",
                 "Mais uma dose. Eles sempre davam mais uma dose.");
             SaveVoice("T3-6",
-                "Três. Acabou. Só falta o esconderijo.",
+                "Três. Acabou. Só falta a saída.",
                 "Três. Não acabou. Nunca acaba no três.");
 
             // Eclusa (escolha da Vance)

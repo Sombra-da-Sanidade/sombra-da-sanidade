@@ -30,7 +30,7 @@ namespace SombraDaSanidade.UI
             "Minutos depois da chegada, a base entra em confinamento.\n\nAs luzes caem. Os rádios ficam mudos. A equipe não responde.",
             "Nos corredores, algo anda descalço.\n\n<color=#c8922c>O Voluntário 07 não enxerga. Mas sente a luz.</color>",
             "Os registros da Dra. Valerie Vance estão em <color=#a9f294>3 HDs</color>, nos servidores das alas Médica, de Energia e Executiva.",
-            "Recupere os HDs, insira no terminal do esconderijo e saia antes da autodestruição.\n\n<color=#55b870>A lanterna protege a sua mente. E mostra onde você está.</color>",
+            "Recupere os HDs, insira no terminal da saída e fuja antes da autodestruição.\n\n<color=#55b870>A lanterna protege a sua mente. E mostra onde você está.</color>",
         };
 
         // Uma vez por sessão: voltar ao menu depois de uma partida não repete a abertura.
