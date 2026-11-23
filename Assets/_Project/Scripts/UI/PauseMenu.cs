@@ -147,6 +147,8 @@ namespace SombraDaSanidade.UI
             if (e.type != EventType.Repaint) return;
 
             PixelHud.Panel(x, y, PanelW, PanelH);
+            // Crachá do Thomas (#89): muda com a sanidade baixa.
+            ThomasBadge.Draw(x - 32 * 2 - 10, y + 4, 2);
             PixelHud.TextCentered("PAUSADO", x + PanelW / 2, y + 14, PixelHud.Fosforo5, 1f, 2);
             for (int i = 0; i < Items.Length; i++) PixelHud.Button(Items[i], bx, ButtonY(i), ButtonW, i == selected);
         }
