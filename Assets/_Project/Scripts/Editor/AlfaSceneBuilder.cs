@@ -114,6 +114,16 @@ namespace SombraDaSanidade.EditorTools
             cso.FindProperty("nextWing").stringValue = "Executiva";
             cso.ApplyModifiedPropertiesWithoutUndo();
 
+            // Fase 2 do RC (#84): o Espécime fica adormecido o tempo todo (só se ouve atrás das paredes, '~') e
+            // o HD-02 derruba as luzes da ala.
+            var intro = go.AddComponent<SombraDaSanidade.Level.WingIntro>();
+            var iso = new SerializedObject(intro);
+            iso.FindProperty("monster").objectReferenceValue = UnityEngine.Object.FindAnyObjectByType<MonsterController>();
+            iso.FindProperty("neverWakes").boolValue = true;
+            iso.ApplyModifiedPropertiesWithoutUndo();
+            go.AddComponent<SombraDaSanidade.Level.WingBlackout>().Setup(
+                AssetDatabase.LoadAssetAtPath<SombraDaSanidade.Audio.SoundEvent>(Root + "/ScriptableObjects/Audio/Camera/camera_apagao.asset"));
+
             var substation = ctx.Objectives.GetComponentInChildren<Substation>();
             var server = ctx.Objectives.GetComponentInChildren<DriveServer>();
             if (substation == null || server == null) Debug.LogError("Ala de Energia: falta a subestação (U) ou o servidor (S) na planta.");
