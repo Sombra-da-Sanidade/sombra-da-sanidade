@@ -173,6 +173,7 @@ Issues #83 a #87. Código em `Scripts/Editor/AlfaSceneBuilder.Rc.cs`.
 | `C` | Câmera de segurança na parede, olhando para o chão vizinho (sul, leste, oeste, norte). Desliga no disjuntor mais perto |
 | `!` `?` `&` | `CutsceneTrigger` cobrindo todas as células do caractere. A cutscene vem da diretiva `# @cutscene ? M1` (com sanidade: `# @cutscene ? M3 35`) |
 | `~` | Som do Espécime atrás da parede (`Level/WallNoise`), numa célula de parede. Toca com o Thomas a até 12 m |
+| `*` | Pista em fósforo (sanidade < 35). Texto pela diretiva `# @pista <TEXTO>`, na ordem de leitura da planta (`\n` quebra a linha) |
 | `"` | `LevelMarker` de fala do Thomas, id `fala_<ala>_<n>` |
 | `%` | `LevelMarker` de objeto de sanidade, id `objeto_<ala>_<n>` |
 | `V` | `LevelMarker` da cela da Vance (células vizinhas viram um marcador só, com área) |
