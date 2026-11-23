@@ -152,6 +152,7 @@ namespace SombraDaSanidade.Core
                 return;
             }
 
+            if (UI.CutscenePlayer.IsPlaying) return;
             var kb = Keyboard.current;
             if (kb == null) return;
             if (kb.rKey.wasPressedThisFrame) Restart();
@@ -234,7 +235,7 @@ namespace SombraDaSanidade.Core
 
         private void OnGUI()
         {
-            if (IsPlaying) return;
+            if (IsPlaying || UI.CutscenePlayer.IsPlaying) return;
             // Tela com o kit CRT (UI.ResultScreen); sem a arte, a versão de texto abaixo.
             if (UI.ResultScreen.Draw(this)) return;
             EnsureStyles();
@@ -259,7 +260,7 @@ namespace SombraDaSanidade.Core
                 body = LastDeathCause switch
                 {
                     DeathCause.Monster => "O Espécime Vazio te alcançou.",
-                    DeathCause.Purge => "A purga da eclusa te alcançou.",
+                    DeathCause.Purge => "A autodestruição do esconderijo te alcançou.",
                     _ => "Sua mente colapsou no escuro."
                 };
             }

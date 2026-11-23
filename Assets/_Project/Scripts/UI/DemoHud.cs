@@ -6,6 +6,7 @@ using SombraDaSanidade.Narrative;
 using SombraDaSanidade.Player;
 using SombraDaSanidade.Sanity;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.InputSystem;
 using static SombraDaSanidade.UI.PixelHud;
 
@@ -53,16 +54,26 @@ namespace SombraDaSanidade.UI
         private float drivesVisibleUntil;
         private int newestDrive = -1;
 
+        public static bool HasWatchCluster { get; private set; }
+        public static int WatchClusterLeftPx { get; private set; }
+        public static float WatchClusterScale { get; private set; } = 1f;
+
         private bool watchHeld;
         private bool watchVisible = true;
         private bool watchSlowApplied;
         private float watchRaise; // 0 = ancorado no canto, 1 = foco com zoom
 
-        // Bússola e Radar Forense do HD (Chrono-Vigil GPS)
-        private DriveServer nearestDriveServer;
-        private float nearestDriveDistance = float.MaxValue;
-        private float nearestDriveAngle;
+        private enum RadarTargetKind { None, Drive, Substation, Terminal, Exit }
+
+        // Bússola e Radar Forense (Chrono-Vigil GPS com pathfinding NavMesh)
+        private Transform radarTarget;
+        private RadarTargetKind radarKind;
+        private Color radarColor = Fosforo5;
+        private float radarDistance = float.MaxValue;
+        private float radarAngle;
         private float nextRadarScanTime;
+        private NavMeshPath radarPath;
+        private ExitDoor cachedExitDoor;
 
         // Feedback sonoro de alertas da HUD
         private AudioSource audioSrc;
@@ -113,6 +124,7 @@ namespace SombraDaSanidade.UI
 
         private void OnDestroy()
         {
+            HasWatchCluster = false;
             SetWatchSlow(false);
             if (sanity != null) sanity.IsFocusing = false;
             if (flashlight != null)
@@ -139,7 +151,11 @@ namespace SombraDaSanidade.UI
             {
                 if (kb.tabKey.wasPressedThisFrame) watchHeld = true;
                 if (kb.tabKey.wasReleasedThisFrame) watchHeld = false;
-                if (kb.hKey.wasPressedThisFrame && !ModalScreen.IsOpen && !UpgradeTerminal.IsOpen) watchVisible = !watchVisible;
+                if (kb.hKey.wasPressedThisFrame && !ModalScreen.IsOpen && !UpgradeTerminal.IsOpen)
+                {
+                    watchVisible = !watchVisible;
+                    Dismiss("h");
+                }
                 if (kb.fKey.wasPressedThisFrame) Dismiss("f");
                 if (kb.f3Key.wasPressedThisFrame && (Application.isEditor || Debug.isDebugBuild)) showDebugBar = !showDebugBar;
             }
@@ -164,41 +180,154 @@ namespace SombraDaSanidade.UI
 
         private void UpdateRadar()
         {
-            if (Time.time < nextRadarScanTime && nearestDriveServer != null && !nearestDriveServer.IsEjected)
+            if (player == null) return;
+            if (radarPath == null) radarPath = new NavMeshPath();
+
+            if (Time.time >= nextRadarScanTime || radarTarget == null)
             {
-                if (player != null)
+                nextRadarScanTime = Time.time + 0.2f;
+                ResolveRadarTarget();
+                ComputeRadarPath();
+            }
+            else
+            {
+                // Mantém a direção responsiva para o próximo canto do caminho a cada frame
+                ComputeRadarDirectionFromPath();
+            }
+        }
+
+        private void ResolveRadarTarget()
+        {
+            radarTarget = null;
+            radarKind = RadarTargetKind.None;
+            radarColor = Fosforo5;
+
+            var gm = GameManager.Instance;
+            Vector2 pPos = player.transform.position;
+
+            if (gm == null || !gm.HasAllDrives)
+            {
+                DriveServer bestDrive = null;
+                float bestDist = float.MaxValue;
+                var list = DriveServer.All;
+                for (int i = 0; i < list.Count; i++)
                 {
-                    Vector2 diff = (Vector2)nearestDriveServer.transform.position - (Vector2)player.transform.position;
-                    nearestDriveDistance = diff.magnitude;
-                    nearestDriveAngle = Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg;
+                    var s = list[i];
+                    if (s == null || s.IsEjected) continue;
+                    float dist = Vector2.Distance(pPos, s.transform.position);
+                    if (dist < bestDist)
+                    {
+                        bestDist = dist;
+                        bestDrive = s;
+                    }
                 }
+
+                if (bestDrive != null)
+                {
+                    if (!bestDrive.IsPowered)
+                    {
+                        var sub = FindUnpoweredSubstation(pPos);
+                        if (sub != null)
+                        {
+                            radarTarget = sub.transform;
+                            radarKind = RadarTargetKind.Substation;
+                            radarColor = Ambar2;
+                            return;
+                        }
+                    }
+
+                    radarTarget = bestDrive.transform;
+                    radarKind = RadarTargetKind.Drive;
+                    radarColor = !bestDrive.IsPowered ? Emergencia4 : bestDrive.IsLocked ? Ambar2 : Fosforo5;
+                    return;
+                }
+            }
+
+            if (cachedExitDoor == null) cachedExitDoor = FindAnyObjectByType<ExitDoor>();
+            if (cachedExitDoor != null)
+            {
+                if (cachedExitDoor.Terminal != null && !cachedExitDoor.Terminal.Activated)
+                {
+                    radarTarget = cachedExitDoor.Terminal.transform;
+                    radarKind = RadarTargetKind.Terminal;
+                    radarColor = Ambar2;
+                }
+                else
+                {
+                    radarTarget = cachedExitDoor.transform;
+                    radarKind = RadarTargetKind.Exit;
+                    radarColor = Eletrico4;
+                }
+            }
+        }
+
+        private static Substation FindUnpoweredSubstation(Vector2 from)
+        {
+            Substation best = null;
+            float bestDist = float.MaxValue;
+            foreach (var s in FindObjectsByType<Substation>())
+            {
+                if (s == null || s.IsPowered) continue;
+                float d = Vector2.Distance(from, s.transform.position);
+                if (d < bestDist) { bestDist = d; best = s; }
+            }
+            return best;
+        }
+
+        private void ComputeRadarPath()
+        {
+            if (radarTarget == null)
+            {
+                radarDistance = float.MaxValue;
                 return;
             }
 
-            nextRadarScanTime = Time.time + 0.25f;
-            nearestDriveServer = null;
-            nearestDriveDistance = float.MaxValue;
-
-            if (player == null) return;
             Vector2 pPos = player.transform.position;
-            var list = DriveServer.All;
-            for (int i = 0; i < list.Count; i++)
+            Vector2 tPos = radarTarget.position;
+
+            if (NavMesh.SamplePosition(pPos, out var fromHit, 3f, NavMesh.AllAreas)
+                && NavMesh.SamplePosition(tPos, out var toHit, 3f, NavMesh.AllAreas)
+                && NavMesh.CalculatePath(fromHit.position, toHit.position, NavMesh.AllAreas, radarPath)
+                && radarPath.status != NavMeshPathStatus.PathInvalid
+                && radarPath.corners.Length >= 2)
             {
-                var s = list[i];
-                if (s == null || s.IsEjected) continue;
-                float dist = Vector2.Distance(pPos, s.transform.position);
-                if (dist < nearestDriveDistance)
+                float pathLen = 0f;
+                for (int i = 1; i < radarPath.corners.Length; i++)
+                    pathLen += Vector2.Distance(radarPath.corners[i - 1], radarPath.corners[i]);
+                radarDistance = pathLen;
+                ComputeRadarDirectionFromPath();
+            }
+            else
+            {
+                radarPath.ClearCorners();
+                Vector2 diff = tPos - pPos;
+                radarDistance = diff.magnitude;
+                radarAngle = Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg;
+            }
+        }
+
+        private void ComputeRadarDirectionFromPath()
+        {
+            if (radarTarget == null || player == null) return;
+            Vector2 pPos = player.transform.position;
+            Vector2 nextWaypoint = radarTarget.position;
+
+            if (radarPath != null && radarPath.corners.Length >= 2)
+            {
+                var corners = radarPath.corners;
+                nextWaypoint = corners[corners.Length - 1];
+                for (int i = 1; i < corners.Length; i++)
                 {
-                    nearestDriveDistance = dist;
-                    nearestDriveServer = s;
+                    if (Vector2.Distance(pPos, corners[i]) >= 0.7f)
+                    {
+                        nextWaypoint = corners[i];
+                        break;
+                    }
                 }
             }
 
-            if (nearestDriveServer != null)
-            {
-                Vector2 diff = (Vector2)nearestDriveServer.transform.position - pPos;
-                nearestDriveAngle = Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg;
-            }
+            Vector2 diff = nextWaypoint - pPos;
+            radarAngle = Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg;
         }
 
         private void CheckBuffAudioWarning()
@@ -267,6 +396,7 @@ namespace SombraDaSanidade.UI
         {
             newestDrive = (GameManager.Instance != null ? GameManager.Instance.PriorDrives : 0) + count - 1;
             drivesVisibleUntil = Time.time + Config.driveShowSeconds;
+            nextRadarScanTime = 0f;
         }
 
         // Cada batida desenha um complexo QRS no ECG a partir da cabeça do traço.
@@ -291,6 +421,7 @@ namespace SombraDaSanidade.UI
 
             float played = GameManager.Instance != null ? GameManager.Instance.ElapsedTime : Time.timeSinceLevelLoad;
             if (flashlight != null && played > Config.flashlightHintDelay) Show("f", "F", "lanterna");
+            if (played > 8f && hintsShown.Contains("f")) Show("h", "H", "esconder relógio");
             if (sanity != null && (sanity.State != SanityState.Lucid || (heartbeat != null && heartbeat.Tier != ProximityTier.Safe)))
                 Show("tab", "TAB", "focar pulso");
             if (heartbeat != null && heartbeat.Tier == ProximityTier.Danger && flashlight != null && flashlight.IsLit
@@ -387,12 +518,13 @@ namespace SombraDaSanidade.UI
 
         private void OnGUI()
         {
-            if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) return;
+            if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) { HasWatchCluster = false; return; }
             // Pausa, terminal de upgrade ou outra tela modal aberta: a HUD não pode ficar por cima do painel.
-            if (ModalScreen.IsOpen || UpgradeTerminal.IsOpen) return;
+            if (ModalScreen.IsOpen || UpgradeTerminal.IsOpen) { HasWatchCluster = false; return; }
 
             Begin();
             bool showWatch = watchVisible || watchRaise > 0.01f;
+            UpdateWatchClusterBounds(showWatch);
 
             if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
             {
@@ -417,6 +549,25 @@ namespace SombraDaSanidade.UI
             GUI.color = Color.white;
         }
 
+        private void UpdateWatchClusterBounds(bool showWatch)
+        {
+            HasWatchCluster = true;
+            if (showWatch)
+            {
+                const int w = 64;
+                float ease = 1f - (1f - watchRaise) * (1f - watchRaise);
+                float scale = Mathf.Lerp(1f, 1.45f, ease);
+                int rightEdge = Screen.width / Px - 8;
+                WatchClusterLeftPx = rightEdge - Mathf.RoundToInt(w * scale);
+                WatchClusterScale = scale;
+            }
+            else
+            {
+                WatchClusterLeftPx = Screen.width / Px - 46;
+                WatchClusterScale = 1f;
+            }
+        }
+
         private bool HandleWatchToggleClick(bool showWatch)
         {
             if (showWatch)
@@ -424,31 +575,50 @@ namespace SombraDaSanidade.UI
                 int w = 64, h = HasArt ? 66 : 56;
                 int x = Screen.width / Px - w - 8;
                 int y = Screen.height / Px - h - 6;
-                if (PixelHud.MouseOver(x, y, 9, 7))
+                if (PixelHud.MouseOver(x, y, 12, 9))
                 {
                     watchVisible = false;
+                    Dismiss("h");
                     return true;
                 }
             }
             else
             {
-                int bx = Screen.width / Px - 24, by = Screen.height / Px - 14;
-                if (PixelHud.MouseOver(bx, by, 18, 9))
+                int bx = Screen.width / Px - 46, by = Screen.height / Px - 15;
+                if (PixelHud.MouseOver(bx, by, 38, 11))
                 {
                     watchVisible = true;
+                    Dismiss("h");
                     return true;
                 }
             }
             return false;
         }
 
+        // Relógio escondido: mostra só a seta 4 vias do caminho, distância curta e botão [H].
         private void DrawWatchCollapsedButton()
         {
-            int bx = Screen.width / Px - 24, by = Screen.height / Px - 14;
-            bool hover = PixelHud.MouseOver(bx, by, 18, 9);
-            Box(bx, by, 18, 9, hover ? Concreto4 : Concreto3, 0.9f);
-            Box(bx + 1, by + 1, 16, 7, Vazio, 0.9f);
-            PixelHud.Text("H+", bx + 3, by + 2, hover ? Fosforo5 : Fosforo4);
+            int bx = Screen.width / Px - 46, by = Screen.height / Px - 15;
+            bool hover = PixelHud.MouseOver(bx, by, 38, 11);
+            Box(bx, by, 38, 11, hover ? Concreto4 : Concreto3, 0.92f);
+            Box(bx + 1, by + 1, 36, 9, Vazio, 0.92f);
+
+            if (radarTarget != null && radarKind != RadarTargetKind.None)
+            {
+                DrawCardinalArrow(bx + 2, by + 2, radarAngle, radarColor);
+                string shortDist = radarDistance < 2.5f
+                    ? (radarKind == RadarTargetKind.Exit ? "SAI" : "AQ")
+                    : $"{Mathf.RoundToInt(radarDistance)}M";
+                Color dCol = radarKind == RadarTargetKind.Exit ? Eletrico4 : Concreto7;
+                PixelHud.Text(shortDist, bx + 11, by + 3, dCol);
+            }
+            else
+            {
+                Box(bx + 4, by + 5, 3, 1, Concreto5, 1f);
+            }
+
+            Box(bx + 27, by + 2, 9, 7, hover ? Concreto5 : Concreto2, 1f);
+            PixelHud.Text("H", bx + 29, by + 3, hover ? Fosforo5 : Fosforo4);
         }
 
         // Pilha de 4 segmentos a um palmo do Thomas, com a marca do EMP.
@@ -542,10 +712,10 @@ namespace SombraDaSanidade.UI
                 Box(x + w, y + 12, 2, 6, Concreto4, 1f); // coroa
                 Box(x + 4, y + 4, w - 8, h - 8, Vazio, 1f);
 
-                // Botão discreto para minimizar/esconder o relógio (clique ou tecla H)
-                bool minHover = !watchHeld && PixelHud.MouseOver(x, y, 9, 7);
-                Box(x + 2, y + 1, 6, 3, minHover ? Concreto5 : Concreto2, 1f);
-                Box(x + 3, y + 2, 4, 1, minHover ? Concreto8 : Concreto6, 1f);
+                // Botão visível para minimizar/esconder o relógio (clique ou tecla H)
+                bool minHover = !watchHeld && PixelHud.MouseOver(x, y, 12, 9);
+                Box(x + 1, y + 1, 9, 4, minHover ? Concreto5 : Concreto2, 1f);
+                Box(x + 3, y + 2, 5, 1, minHover ? Concreto8 : Fosforo4, 1f);
 
                 // Borda interna destaca suavemente em modo foco
                 if (watchHeld)
@@ -580,48 +750,49 @@ namespace SombraDaSanidade.UI
             }
         }
 
-        // Radar de proximidade com seta direcional simples (cima, baixo, esquerda, direita)
+        // Radar de proximidade inteligente (NavMesh): guia até o HD/Subestação e depois até a Saída.
         private void DrawRadarRow(int x, int y)
         {
-            if (nearestDriveServer == null || nearestDriveServer.IsEjected)
+            if (radarTarget == null || radarKind == RadarTargetKind.None)
             {
                 var gm = GameManager.Instance;
-                bool allDone = gm != null && gm.TotalDrives >= gm.TotalDrivesRequired;
-                string msg = allDone ? "HD: OK" : "SEM SINAL";
-                Color col = allDone ? Fosforo4 : Concreto5;
+                bool allDone = gm != null && gm.HasAllDrives;
+                string msg = allDone ? "SAÍDA" : "SEM SINAL";
+                Color col = allDone ? Eletrico4 : Concreto5;
                 PixelHud.Text(msg, x, y, col);
                 return;
             }
 
-            // Seta cardeal 7x7 apontando para cima, baixo, esquerda ou direita
-            Color arrowCol = !nearestDriveServer.IsPowered ? Emergencia4
-                : nearestDriveServer.IsLocked ? Ambar2
-                : Fosforo5;
-            DrawCardinalArrow(x, y, nearestDriveAngle, arrowCol);
+            // Seta cardeal 7x7 apontando para o próximo corredor/porta do caminho
+            DrawCardinalArrow(x, y, radarAngle, radarColor);
 
             // Barras de sinal RF (4 barras)
             float maxDist = Config.radarMaxDistance;
-            float prox = 1f - Mathf.Clamp01(nearestDriveDistance / maxDist);
+            float prox = 1f - Mathf.Clamp01(radarDistance / maxDist);
             int bars = Mathf.Clamp(Mathf.CeilToInt(prox * 4), 1, 4);
             int bx = x + 9;
             for (int b = 0; b < 4; b++)
             {
                 int barH = 2 + b;
-                Color barCol = b < bars ? (bars >= 3 ? Fosforo4 : Ambar2) : Concreto2;
+                Color barCol = b < bars
+                    ? (radarKind == RadarTargetKind.Exit ? Eletrico4 : (bars >= 3 ? Fosforo4 : Ambar2))
+                    : Concreto2;
                 Box(bx + b * 3, y + 6 - barH, 2, barH, barCol, 1f);
             }
 
-            // Distância em metros ou aviso de proximidade
+            // Distância em metros ou aviso de chegada
             int tx = bx + 13;
-            if (nearestDriveDistance < 2.5f)
+            if (radarDistance < 2.5f)
             {
                 bool blink = Mathf.Repeat(Time.time * 4f, 1f) < 0.5f;
-                PixelHud.Text("AQUI", tx, y, blink ? Fosforo5 : Fosforo4);
+                string arrive = radarKind == RadarTargetKind.Exit ? "SAIR" : "AQUI";
+                PixelHud.Text(arrive, tx, y, blink ? radarColor : Fosforo4);
             }
             else
             {
-                string distStr = nearestDriveDistance < 10f ? $"{nearestDriveDistance:0.0}M" : $"{nearestDriveDistance:0}M";
-                PixelHud.Text(distStr, tx, y, Concreto7);
+                string distStr = radarDistance < 10f ? $"{radarDistance:0.0}M" : $"{radarDistance:0}M";
+                Color distCol = radarKind == RadarTargetKind.Exit ? Eletrico4 : Concreto7;
+                PixelHud.Text(distStr, tx, y, distCol);
             }
         }
 
@@ -727,36 +898,73 @@ namespace SombraDaSanidade.UI
             _ => "up_resonator"
         };
 
-        // Legenda sem moldura, centrada embaixo: nome em fósforo e fala em branco, com sombra para ler sobre a cena.
-        // A fala é digitada letra a letra (AudioLogPlayer); a posição usa a linha inteira para o texto não andar.
+        // Legenda confinada à área livre à esquerda do conjunto [Flare + Relógio] para nunca ficar coberta pelo HUD.
         private void DrawSubtitles()
         {
-            var player = AudioLogPlayer.Instance;
-            if (player == null || !player.IsPlaying) return;
+            var logPlayer = AudioLogPlayer.Instance;
+            if (logPlayer == null || !logPlayer.IsPlaying) return;
+
+            var flare = this.player != null ? this.player.GetComponent<FlareThrower>() : null;
+            int flareReserve = (flare != null && flare.Count > 0) ? Mathf.RoundToInt(38 * WatchClusterScale) : 0;
+            float rightLimitPx = HasWatchCluster ? (WatchClusterLeftPx - flareReserve - 8) * Px : Screen.width - Px * 14;
+            float leftMarginPx = Px * 14f;
+            float availW = Mathf.Max(Px * 110f, rightLimitPx - leftMarginPx);
 
             textStyle.fontSize = Px * 5;
-            float bottom = Screen.height - Px * 26;
+            bool prevWrap = textStyle.wordWrap;
+            textStyle.wordWrap = true;
 
-            if (player.SignalLost)
+            try
             {
-                const string lost = "— sinal perdido —";
-                var lostSize = textStyle.CalcSize(new GUIContent(lost));
-                float jitter = Random.Range(-1, 2) * Px;
-                Label(new UnityEngine.Rect((Screen.width - lostSize.x) / 2f + jitter, bottom, lostSize.x, lostSize.y), lost, Emergencia4, 0.9f);
-                return;
+                if (logPlayer.SignalLost)
+                {
+                    const string lost = "— sinal perdido —";
+                    var lostSize = textStyle.CalcSize(new GUIContent(lost));
+                    float jitter = Random.Range(-1, 2) * Px;
+                    float lx = leftMarginPx + Mathf.Max(0f, (availW - lostSize.x) * 0.5f) + jitter;
+                    float ly = Screen.height - Px * 20 - lostSize.y;
+                    Label(new UnityEngine.Rect(lx, ly, lostSize.x, lostSize.y), lost, Emergencia4, 0.9f);
+                    return;
+                }
+
+                string full = logPlayer.FullLine;
+                if (full.Length == 0) return;
+                float fade = Mathf.Max(0.01f, Config.subtitleFadeSeconds);
+                float alpha = Mathf.Min(Mathf.Clamp01(logPlayer.LineTime / fade), Mathf.Clamp01(logPlayer.LineTimeLeft / fade));
+
+                string speaker = logPlayer.Current.speaker + ":  ";
+                string fullCombined = speaker + full;
+                var speakerSize = textStyle.CalcSize(new GUIContent(speaker));
+                float singleW = textStyle.CalcSize(new GUIContent(fullCombined)).x;
+
+                if (singleW <= availW)
+                {
+                    float totalH = textStyle.CalcHeight(new GUIContent(fullCombined), availW);
+                    float boxW = Mathf.Min(availW, singleW);
+                    float boxX = leftMarginPx + (availW - boxW) * 0.5f;
+                    float boxY = Screen.height - Px * 12f - totalH;
+
+                    Fill(new UnityEngine.Rect(boxX - Px * 3f, boxY - Px * 2f, boxW + Px * 6f, totalH + Px * 4f), Vazio, 0.62f * alpha);
+                    Label(new UnityEngine.Rect(boxX, boxY, speakerSize.x, speakerSize.y), speaker, Fosforo4, alpha);
+                    Label(new UnityEngine.Rect(boxX + speakerSize.x, boxY, boxW - speakerSize.x + Px * 4f, totalH), logPlayer.VisibleText, Concreto8, alpha);
+                }
+                else
+                {
+                    float bodyH = textStyle.CalcHeight(new GUIContent(full), availW);
+                    float headerH = speakerSize.y + Px;
+                    float boxX = leftMarginPx;
+                    float bodyY = Screen.height - Px * 12f - bodyH;
+                    float topY = bodyY - headerH;
+
+                    Fill(new UnityEngine.Rect(boxX - Px * 3f, topY - Px * 2f, availW + Px * 6f, headerH + bodyH + Px * 4f), Vazio, 0.62f * alpha);
+                    Label(new UnityEngine.Rect(boxX, topY, speakerSize.x, speakerSize.y), logPlayer.Current.speaker + ":", Fosforo4, alpha);
+                    Label(new UnityEngine.Rect(boxX, bodyY, availW, bodyH + Px * 2f), logPlayer.VisibleText, Concreto8, alpha);
+                }
             }
-
-            string full = player.FullLine;
-            if (full.Length == 0) return;
-            float fade = Mathf.Max(0.01f, Config.subtitleFadeSeconds);
-            float alpha = Mathf.Min(Mathf.Clamp01(player.LineTime / fade), Mathf.Clamp01(player.LineTimeLeft / fade));
-
-            string speaker = player.Current.speaker + ":  ";
-            var speakerSize = textStyle.CalcSize(new GUIContent(speaker));
-            var fullSize = textStyle.CalcSize(new GUIContent(full));
-            float left = (Screen.width - speakerSize.x - fullSize.x) / 2f;
-            Label(new UnityEngine.Rect(left, bottom, speakerSize.x, speakerSize.y), speaker, Fosforo4, alpha);
-            Label(new UnityEngine.Rect(left + speakerSize.x, bottom, fullSize.x, fullSize.y), player.VisibleText, Concreto8, alpha);
+            finally
+            {
+                textStyle.wordWrap = prevWrap;
+            }
         }
 
         // Tecla em relevo acima do Thomas, com o nome da ação ao lado.

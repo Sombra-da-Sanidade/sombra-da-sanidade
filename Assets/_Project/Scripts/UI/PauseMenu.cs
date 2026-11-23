@@ -13,11 +13,12 @@ namespace SombraDaSanidade.UI
         public const string MenuScene = "Menu";
 
         private static readonly string[] Items = { "CONTINUAR", "CONFIGURAÇÕES", "REINICIAR", "SAIR" };
-        private const int PanelW = 144, PanelH = 124, ButtonW = 112;
+        private const int PanelW = 144, PanelH = 126, ButtonW = 112;
 
         public bool IsOpen { get; private set; }
 
         private readonly SettingsPanel settings = new SettingsPanel();
+        private Sanity.SanityController cachedSanity;
         private bool inSettings;
         private int selected;
         private float previousTimeScale = 1f;
@@ -51,6 +52,7 @@ namespace SombraDaSanidade.UI
             IsOpen = true;
             inSettings = false;
             selected = 0;
+            cachedSanity = FindAnyObjectByType<Sanity.SanityController>();
             ModalScreen.Push();
             previousTimeScale = Time.timeScale > 0f ? Time.timeScale : 1f;
             Time.timeScale = 0f;
@@ -130,7 +132,7 @@ namespace SombraDaSanidade.UI
 
             int x = (PixelHud.Width - PanelW) / 2, y = (PixelHud.Height - PanelH) / 2;
             int bx = x + (PanelW - ButtonW) / 2;
-            int ButtonY(int i) => y + 36 + i * 18;
+            int ButtonY(int i) => y + 38 + i * 18;
             for (int i = 0; i < Items.Length; i++)
             {
                 if (!PixelHud.MouseOver(bx, ButtonY(i) + 2, ButtonW, 11)) continue;
@@ -145,7 +147,14 @@ namespace SombraDaSanidade.UI
             if (e.type != EventType.Repaint) return;
 
             PixelHud.Panel(x, y, PanelW, PanelH);
-            PixelHud.TextCentered("PAUSADO", x + PanelW / 2, y + 14, PixelHud.Fosforo5, 1f, 2);
+            PixelHud.TextCentered("PAUSADO", x + PanelW / 2, y + 10, PixelHud.Fosforo5, 1f, 2);
+
+            // Crachá do Thomas reativo à sanidade (roteiro-rc.md seção 4, #89)
+            bool shaken = cachedSanity != null && (cachedSanity.Value < 35f || cachedSanity.IsRevealForced);
+            string badge = shaken ? "VOL-08 / HIPNOS" : "T. REIS / AUDITORIA";
+            Color badgeCol = shaken ? PixelHud.Fosforo4 : PixelHud.Concreto6;
+            PixelHud.TextCentered(badge, x + PanelW / 2, y + 26, badgeCol);
+
             for (int i = 0; i < Items.Length; i++) PixelHud.Button(Items[i], bx, ButtonY(i), ButtonW, i == selected);
         }
     }
