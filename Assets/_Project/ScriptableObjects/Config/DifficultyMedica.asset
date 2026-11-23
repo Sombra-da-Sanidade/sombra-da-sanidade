@@ -23,3 +23,4 @@ MonoBehaviour:
   lootTable: {fileID: 11400000, guid: 2945ffb39aae46ada91dca2b63f55f05, type: 2}
   batteryChance: 0.7
   breakersAvailable: 3
+  floor: 0

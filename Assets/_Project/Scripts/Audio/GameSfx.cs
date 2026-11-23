@@ -15,6 +15,21 @@ namespace SombraDaSanidade.Audio
         public SoundEvent footstepWalk;
         [Tooltip("Passos com o Adrena-Syn ativo.")]
         public SoundEvent footstepRun;
+        [Tooltip("Passos no metal (DifficultyProfile.floor = Metal). Sem eles, os de azulejo.")]
+        public SoundEvent footstepWalkMetal;
+        public SoundEvent footstepRunMetal;
+        [Tooltip("Passos no carpete (DifficultyProfile.floor = Carpet). Sem eles, os de azulejo.")]
+        public SoundEvent footstepWalkCarpet;
+        public SoundEvent footstepRunCarpet;
+
+        // Passo do piso da ala (#105). Azulejo (footstepWalk/Run) é o padrão e a reserva quando falta o som.
+        public SoundEvent Footstep(Core.FloorType floor, bool running)
+        {
+            SoundEvent walk = footstepWalk, run = footstepRun;
+            if (floor == Core.FloorType.Metal && footstepWalkMetal != null) { walk = footstepWalkMetal; run = footstepRunMetal; }
+            else if (floor == Core.FloorType.Carpet && footstepWalkCarpet != null) { walk = footstepWalkCarpet; run = footstepRunCarpet; }
+            return running && run != null ? run : walk;
+        }
 
         [Tooltip("Respiração ofegante em loop (SanityHeartbeat). Sem ela, o SanityHeartbeat gera a sintética.")]
         public SoundEvent playerPanting;
