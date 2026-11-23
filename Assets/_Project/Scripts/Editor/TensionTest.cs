@@ -85,6 +85,13 @@ namespace SombraDaSanidade.EditorTools
                     if (failed) { Finish(); return; }
                     Check("Começa em Build Up com tensão zero", director.Phase == TensionPhase.BuildUp && director.Value < 0.01f);
                     player.enabled = false;
+                    // Lanterna apagada: iluminado, o monstro persegue (regra 2 do GDD) e o Relax nunca o afasta.
+                    // Era a causa das 2 falhas da #74: ele saía do atordoamento iluminado a 1,2 m e matava o Thomas.
+                    var fl = player.GetComponent<SombraDaSanidade.Flashlight.FlashlightController>();
+                    if (fl != null)
+                        typeof(SombraDaSanidade.Flashlight.FlashlightController)
+                            .GetField("<IsSwitchedOn>k__BackingField", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+                            ?.SetValue(fl, false);
                     // Números rápidos só para o teste (instância nova: o asset não é alterado).
                     var fast = ScriptableObject.CreateInstance<TensionConfig>();
                     fast.proximityGain = 2f;
