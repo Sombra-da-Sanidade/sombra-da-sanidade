@@ -65,6 +65,7 @@ namespace SombraDaSanidade.Narrative
         private void OnEnable()
         {
             CutscenePlayer.Finished += OnCutsceneFinished;
+            VanceChoice.Decided += OnVanceDecided;
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.DriveCollected += OnDriveCollected;
@@ -75,6 +76,7 @@ namespace SombraDaSanidade.Narrative
         private void OnDisable()
         {
             CutscenePlayer.Finished -= OnCutsceneFinished;
+            VanceChoice.Decided -= OnVanceDecided;
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.DriveCollected -= OnDriveCollected;
@@ -323,6 +325,18 @@ namespace SombraDaSanidade.Narrative
             else if (wing == "Executiva") PlayVoice("T3-2");
         }
 
+        // Escolha no terminal da Eclusa (#95): fala do Thomas na hora da decisão.
+        private void OnVanceDecided(VanceDecision d)
+        {
+            if (IsAutoSuppressed) return;
+            if (d == VanceDecision.Save) PlayVoice("T4-1");
+            else
+            {
+                abandonVoiceTriggered = true;
+                PlayVoice("T4-2");
+            }
+        }
+
         private void OnCutsceneFinished(Cutscene scene)
         {
             if (IsAutoSuppressed || scene == null) return;
@@ -427,7 +441,9 @@ namespace SombraDaSanidade.Narrative
         // para permitir a escolha entre C4 (Testemunha, T4-1) e C5 (Amostra entregue, T4-2).
         private void EnsureVanceRescueChoice()
         {
-            if (wing != "Eclusa" || FindAnyObjectByType<VanceRescueInteractable>() != null) return;
+            // A Eclusa gerada já tem a cela da Vance com a escolha no terminal (#82, #95).
+            if (wing != "Eclusa" || FindAnyObjectByType<VanceRescueInteractable>() != null
+                || FindAnyObjectByType<VanceCell>() != null) return;
 
             var terminal = FindAnyObjectByType<EclusaTerminal>();
             var exit = cachedExitDoor != null ? cachedExitDoor : FindAnyObjectByType<ExitDoor>();

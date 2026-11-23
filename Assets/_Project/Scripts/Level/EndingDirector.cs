@@ -40,7 +40,9 @@ namespace SombraDaSanidade.Level
                 gm.TriggerVictory();
                 return;
             }
-            var scene = WingOpening.Load(Ending == Ending.Witness ? "C4" : "C5");
+            // Assets da Frente 3; o WingNarrativeDirector vê que já tocou (HasPlayed) e não repete.
+            var scene = SombraDaSanidade.Narrative.WingNarrativeDirector.LoadCutscene(
+                Ending == Ending.Witness ? "C4_Testemunha" : "C5_AmostraEntregue");
             CutscenePlayer.Play(scene, Finish);
         }
 

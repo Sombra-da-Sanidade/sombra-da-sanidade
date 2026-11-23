@@ -249,7 +249,7 @@ namespace SombraDaSanidade.EditorTools
             }
             var m3 = GameObject.Find("CutsceneTrigger_M3");
             Check("Gatilho da M3 só com sanidade baixa", m3 != null);
-            Check("C3 montada para depois do HD-03", Object.FindAnyObjectByType<DriveCutscene>() != null);
+            Check("Espelho que muda com a sanidade", Object.FindObjectsByType<SanitySpriteSwap>().Length == 1);
         }
 
         private static void Check(string label, bool ok)

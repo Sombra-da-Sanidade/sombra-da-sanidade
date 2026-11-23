@@ -18,8 +18,9 @@ namespace SombraDaSanidade.EditorTools
     //  = vira também a grade do atalho (ShortcutGate), fechada até a Vance abrir
     //  * pista em fósforo (SanityClue, sanidade < 35). O texto vem das diretivas "# @pista <TEXTO>", na ordem de
     //    leitura da planta (de cima para baixo, da esquerda para a direita), como no roteiro (roteiro-rc 3).
-    //  # @falas <Ala>: InnerVoiceDirector com as falas do Thomas da ala (#89); " marca a área de uma fala
-    //  # @objeto <nome>: cada %, na ordem de leitura, vira o objeto de sanidade art/Props/sanity_<nome> (#89)
+    //  # @fala <id>: cada ", na ordem de leitura, vira o InnerVoiceTrigger da fala Resources/Narrative/Voices/<id>
+    //  # @objeto <nome>: cada %, na ordem de leitura, vira o SanitySpriteSwap com Resources/Narrative/Props/<nome>_*
+    //  C0, I1, I2, C1, C3, C4/C5 e as falas por evento são do WingNarrativeDirector (Frente 3, criado em runtime).
     //  " fala do Thomas   % objeto que muda com a sanidade   V cela da Vance   = atalho da Eclusa
     //        (LevelMarker com id "<tipo>_<ala>_<n>"; o sistema de outra frente encaixa no marcador).
     // A cutscene é achada pelo campo id (C1, M1...) em qualquer pasta. Sem o asset, o gatilho fica vazio e não
@@ -54,7 +55,6 @@ namespace SombraDaSanidade.EditorTools
             AddPhosphorClues(map, root);
             AddCutsceneTriggers(map, root);
             AddMarkers(map, root, wingAt);
-            AddInnerVoice(map, root);
             if (root.childCount == 0) UnityEngine.Object.DestroyImmediate(root.gameObject);
         }
 
@@ -173,7 +173,7 @@ namespace SombraDaSanidade.EditorTools
                     if (g != null) g.Add(cell); else groups.Add(new List<Vector2Int> { cell });
                 }
                 var counters = new Dictionary<string, int>();
-                int objectIndex = 0;
+                int objectIndex = 0, voiceIndex = 0;
                 foreach (var g in groups)
                 {
                     string wing = wingAt(g[0].x, g[0].y).ToLowerInvariant();
@@ -186,6 +186,7 @@ namespace SombraDaSanidade.EditorTools
                         g.Count > 1 ? rect.size : Vector2.zero);
                     if (kind == LevelMarker.Kind.Shortcut) AddShortcutGate(go, rect.size);
                     if (kind == LevelMarker.Kind.SanityObject) AddSanityObject(go, map, objectIndex++);
+                    if (kind == LevelMarker.Kind.InnerVoice) AddVoiceArea(go, map, voiceIndex++, rect.size);
                 }
             }
         }
@@ -207,28 +208,6 @@ namespace SombraDaSanidade.EditorTools
             art.sprite = PrototypeSceneBuilder.GetOrCreatePlaceholderSprite();
             art.sortingOrder = 5;
             go.AddComponent<ShortcutGate>().Setup(art);
-        }
-
-        // C2 (#91): marcador "c2_lampada" sobre o Sonâmbulo da ala, com a luz que acende, pisca e o mostra mais perto.
-        private static void AddSleepwalkerReveal()
-        {
-            var walker = UnityEngine.Object.FindAnyObjectByType<SombraDaSanidade.Monster.SleepwalkerController>();
-            if (walker == null)
-            {
-                Debug.LogError("C2: a ala não tem Sonâmbulo (Z) para o marcador c2_lampada.");
-                return;
-            }
-            var go = new GameObject("CutsceneMarker_c2_lampada");
-            go.transform.position = walker.transform.position;
-            go.AddComponent<CutsceneMarker>().Setup("c2_lampada");
-            var light = new GameObject("Luz").AddComponent<UnityEngine.Rendering.Universal.Light2D>();
-            light.transform.SetParent(go.transform, false);
-            light.lightType = UnityEngine.Rendering.Universal.Light2D.LightType.Point;
-            light.color = new Color(1f, 0.92f, 0.75f);
-            light.intensity = 1.1f;
-            light.pointLightOuterRadius = 3f;
-            light.pointLightInnerRadius = 0.6f;
-            go.AddComponent<SleepwalkerReveal>().Setup(light, "C2");
         }
 
         private const string VanceArt = Root + "/Art/Sprites/vance.png";
@@ -290,16 +269,26 @@ namespace SombraDaSanidade.EditorTools
                 .Setup(escape, skill, art, closed, open, vance, exit != null ? exit.transform : null);
         }
 
-        private static void AddInnerVoice(Layout map, Transform root)
+        // Fala por área (#89): InnerVoiceTrigger da Frente 3 com a fala de Resources/Narrative/Voices.
+        private static void AddVoiceArea(GameObject go, Layout map, int index, Vector2 size)
         {
-            var d = map.Directives.FirstOrDefault(a => a[0] == "falas" && a.Length > 1);
-            if (d == null) return;
-            var lines = InnerVoiceAssetBuilder.ForWing(d[1]);
-            var go = new GameObject("InnerVoiceDirector");
-            go.transform.SetParent(root, false);
-            go.AddComponent<SombraDaSanidade.Narrative.InnerVoiceDirector>().Setup(lines);
+            var ids = map.Directives.Where(a => a[0] == "fala" && a.Length > 1).Select(a => a[1]).ToList();
+            if (index >= ids.Count)
+            {
+                Debug.LogError($"Fala {index + 1}: falta a diretiva \"# @fala <id>\" na planta.");
+                return;
+            }
+            var line = AssetDatabase.LoadAssetAtPath<SombraDaSanidade.Narrative.InnerVoiceLine>(
+                $"{Root}/Resources/Narrative/Voices/{ids[index]}.asset");
+            if (line == null) Debug.LogError($"Fala {ids[index]} não encontrada em Resources/Narrative/Voices.");
+            var box = go.AddComponent<BoxCollider2D>();
+            box.isTrigger = true;
+            box.size = Vector2.Max(size, new Vector2(4.5f, 4.5f));
+            go.AddComponent<SombraDaSanidade.Narrative.InnerVoiceTrigger>().Setup(line);
         }
 
+        // Objeto que muda com a sanidade (#89): SanitySpriteSwap da Frente 3 com os sprites de
+        // Resources/Narrative/Props (<nome>_normal e <nome>_08; o espelho racha depois da M3).
         private static void AddSanityObject(GameObject go, Layout map, int index)
         {
             var names = map.Directives.Where(a => a[0] == "objeto" && a.Length > 1).Select(a => a[1]).ToList();
@@ -308,12 +297,22 @@ namespace SombraDaSanidade.EditorTools
                 Debug.LogError($"Objeto de sanidade {index + 1}: falta a diretiva \"# @objeto <nome>\" na planta.");
                 return;
             }
-            var sprites = InnerVoiceAssetBuilder.SanitySprites(names[index]);
-            go.name = $"SanityObject_{names[index]}";
+            string n = names[index];
+            Sprite Load(string f) => AssetDatabase.LoadAllAssetsAtPath($"{Root}/Resources/Narrative/Props/{f}.png").OfType<Sprite>().FirstOrDefault();
+            var normal = Load($"{n}_normal");
+            var shaken = Load($"{n}_08");
+            if (normal == null || shaken == null)
+            {
+                Debug.LogError($"Sprites de {n} não encontrados em Resources/Narrative/Props.");
+                return;
+            }
+            go.name = $"Prop_{n}";
             var art = go.AddComponent<SpriteRenderer>();
-            art.sprite = sprites[0];
-            art.sortingOrder = 2;
-            go.AddComponent<SombraDaSanidade.Sanity.SanityObject>().Setup(art, sprites[0], sprites[1]);
+            art.sprite = normal;
+            art.sortingOrder = 5;
+            bool mirror = n == "espelho";
+            go.AddComponent<SombraDaSanidade.Sanity.SanitySpriteSwap>().Setup(normal, shaken, 35f,
+                mirror ? "M3" : "", mirror ? Load("espelho_rachado") : null);
         }
 
         private static Rect RectOf(List<Vector2Int> cells)
