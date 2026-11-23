@@ -38,6 +38,8 @@ Cada regra de arte reforça uma regra de jogo:
 | Pele | `p` a `s` | Personagens humanos, couro, madeira |
 | Âmbar | `t`, `u` | Lâmpadas (Zona Segura), faixas de aviso |
 | Hipnos | `v`, `w` | Alucinações, Revelação pela Loucura |
+
+**Exceção: memórias.** As memórias (`M1` a `M3`) usam uma paleta própria de 4 cores fora do `palette.json`: `#0d1915`, `#1e4d3b`, `#74d482`, `#ecf7ee`. As cutscenes do presente (`C0`, `C3`, `C4`, `C5`) continuam só com as 43 cores acima. O `MemoryEffect` reforça a diferença no motor. Ver [ADR 0007](../decisoes/0007-paleta-memoria.md).
 | Espécime | `x y z` (trapos verde-doente), `A B C` (carne, cérebro exposto) | Só no Espécime Vazio |
 | Thomas | `D E F` (jaqueta verde-acinzentada), `G H` (calça cáqui) | Só no Thomas |
 
@@ -125,6 +127,15 @@ Ver [CONTRIBUTING.md, seção Arte](../../CONTRIBUTING.md#arte). Resumo:
 2. `python3 tools/art/export_sprites.py` gera o PNG em `Assets/_Project/Art/`.
 3. Abra o Unity: o PNG é fatiado e configurado sozinho. Teste em **Sombra da Sanidade > Arte > Gerar cena de teste de arte**.
 4. PR com escopo `art`, com print da cena de teste.
+
+### Exceção: painéis de cutscene 320x180
+
+Painéis de tela inteira não passam pelo JSON de texto (57.600 pixels por painel). Ver [ADR 0006](../decisoes/0006-paineis-cutscene-aseprite.md).
+
+1. Desenhe no Aseprite em modo indexado e salve a fonte em `art-src/Cutscenes/<id>_<nn>_<nome>.aseprite` (ex.: `C0_01_elevador`). Paleta: `art-src/sombra.gpl` no presente, `art-src/memoria.gpl` nas memórias (`M*`).
+2. Deixe a camada como **fundo** (Layer > Convert > Layer to Background). Em camada comum o índice 0 vira transparente e sai com outra cor no PNG.
+3. `python3 tools/art/export_cutscenes.py` exporta o PNG 320x180 para `Assets/_Project/Art/Cutscenes/` e recusa painel com cor fora da paleta ou transparência. `--check` só valida; um prefixo (`C0_01`) exporta só esse painel.
+4. A importação é a mesma dos sprites: Point, sem compressão, 16 PPU.
 
 ## 7. Referências (só links)
 

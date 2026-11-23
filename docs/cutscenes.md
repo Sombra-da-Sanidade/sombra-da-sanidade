@@ -62,7 +62,7 @@ Geradas por **Sombra da Sanidade > Narrativa > Gerar cutscenes** (`CutsceneAsset
 | C4 | Painéis | Final "Testemunha" (a #95 toca) | `final_testemunha.ogg` |
 | C5 | Painéis | Final "Amostra entregue" (a #95 toca) | `final_amostra.ogg` |
 
-- **Painéis (#98):** salvar o PNG em `Art/Cutscenes/<id>_<n>.png` (n = número do painel na cutscene, a partir de 1) e gerar de novo. Sem o PNG, o plano vira intertítulo.
+- **Painéis (#98):** fonte em `art-src/Cutscenes/<id>_<nn>_<nome>.aseprite`, exportada com `python3 tools/art/export_cutscenes.py` para `Art/Cutscenes/` (ver [guia de estilo](arte/guia-de-estilo.md) seção 6). O `CutsceneRc3Builder` liga cada PNG ao plano pelo nome. Sem o PNG, o builder desenha um rascunho de retângulos no lugar.
 - **C2:** o marcador `c2_lampada` fica sobre o Sonâmbulo com `Level/SleepwalkerReveal`. A luz acende quando a C2 começa, apaga no cue do 2º plano e volta com ele 2 passos mais perto.
 - **C4 e C5:** a escolha (#95) toca com `CutscenePlayer.Play(WingOpening.Load("C4"))`.
 - Depois de gerar as cutscenes, gerar as alas de novo para os gatilhos receberem os assets (o builder das alas gera as cutscenes sozinho se ainda não existirem).
