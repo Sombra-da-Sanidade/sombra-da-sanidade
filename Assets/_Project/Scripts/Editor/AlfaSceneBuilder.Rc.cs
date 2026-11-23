@@ -18,6 +18,8 @@ namespace SombraDaSanidade.EditorTools
     //  = vira também a grade do atalho (ShortcutGate), fechada até a Vance abrir
     //  * pista em fósforo (SanityClue, sanidade < 35). O texto vem das diretivas "# @pista <TEXTO>", na ordem de
     //    leitura da planta (de cima para baixo, da esquerda para a direita), como no roteiro (roteiro-rc 3).
+    //  # @falas <Ala>: InnerVoiceDirector com as falas do Thomas da ala (#89); " marca a área de uma fala
+    //  # @objeto <nome>: cada %, na ordem de leitura, vira o objeto de sanidade art/Props/sanity_<nome> (#89)
     //  " fala do Thomas   % objeto que muda com a sanidade   V cela da Vance   = atalho da Eclusa
     //        (LevelMarker com id "<tipo>_<ala>_<n>"; o sistema de outra frente encaixa no marcador).
     // A cutscene é achada pelo campo id (C1, M1...) em qualquer pasta. Sem o asset, o gatilho fica vazio e não
@@ -52,6 +54,7 @@ namespace SombraDaSanidade.EditorTools
             AddPhosphorClues(map, root);
             AddCutsceneTriggers(map, root);
             AddMarkers(map, root, wingAt);
+            AddInnerVoice(map, root);
             if (root.childCount == 0) UnityEngine.Object.DestroyImmediate(root.gameObject);
         }
 
@@ -170,6 +173,7 @@ namespace SombraDaSanidade.EditorTools
                     if (g != null) g.Add(cell); else groups.Add(new List<Vector2Int> { cell });
                 }
                 var counters = new Dictionary<string, int>();
+                int objectIndex = 0;
                 foreach (var g in groups)
                 {
                     string wing = wingAt(g[0].x, g[0].y).ToLowerInvariant();
@@ -181,6 +185,7 @@ namespace SombraDaSanidade.EditorTools
                     go.AddComponent<LevelMarker>().Setup($"{prefix}_{wing}_{counters[wing]}", kind,
                         g.Count > 1 ? rect.size : Vector2.zero);
                     if (kind == LevelMarker.Kind.Shortcut) AddShortcutGate(go, rect.size);
+                    if (kind == LevelMarker.Kind.SanityObject) AddSanityObject(go, map, objectIndex++);
                 }
             }
         }
@@ -283,6 +288,32 @@ namespace SombraDaSanidade.EditorTools
             var exit = UnityEngine.Object.FindAnyObjectByType<SombraDaSanidade.Interaction.ExitDoor>();
             go.AddComponent<SombraDaSanidade.Interaction.VanceCell>()
                 .Setup(escape, skill, art, closed, open, vance, exit != null ? exit.transform : null);
+        }
+
+        private static void AddInnerVoice(Layout map, Transform root)
+        {
+            var d = map.Directives.FirstOrDefault(a => a[0] == "falas" && a.Length > 1);
+            if (d == null) return;
+            var lines = InnerVoiceAssetBuilder.ForWing(d[1]);
+            var go = new GameObject("InnerVoiceDirector");
+            go.transform.SetParent(root, false);
+            go.AddComponent<SombraDaSanidade.Narrative.InnerVoiceDirector>().Setup(lines);
+        }
+
+        private static void AddSanityObject(GameObject go, Layout map, int index)
+        {
+            var names = map.Directives.Where(a => a[0] == "objeto" && a.Length > 1).Select(a => a[1]).ToList();
+            if (index >= names.Count)
+            {
+                Debug.LogError($"Objeto de sanidade {index + 1}: falta a diretiva \"# @objeto <nome>\" na planta.");
+                return;
+            }
+            var sprites = InnerVoiceAssetBuilder.SanitySprites(names[index]);
+            go.name = $"SanityObject_{names[index]}";
+            var art = go.AddComponent<SpriteRenderer>();
+            art.sprite = sprites[0];
+            art.sortingOrder = 2;
+            go.AddComponent<SombraDaSanidade.Sanity.SanityObject>().Setup(art, sprites[0], sprites[1]);
         }
 
         private static Rect RectOf(List<Vector2Int> cells)
