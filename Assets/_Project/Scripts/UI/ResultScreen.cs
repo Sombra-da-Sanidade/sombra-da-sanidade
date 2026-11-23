@@ -66,7 +66,7 @@ namespace SombraDaSanidade.UI
             else
             {
                 PixelHud.Text("VOCÊ ESCAPOU", x + 52, y + 18, PixelHud.Fosforo5, 1f, 2);
-                PixelHud.Text("ECLUSA ABERTA. HDS ENTREGUES À SUPERFÍCIE.", x + 52, y + 36, PixelHud.Fosforo3);
+                PixelHud.Text("ESCONDERIJO ABERTO. HDS ENTREGUES À SUPERFÍCIE.", x + 52, y + 36, PixelHud.Fosforo3);
             }
 
             for (int i = 0; i < gm.TotalDrivesRequired; i++)
@@ -101,7 +101,7 @@ namespace SombraDaSanidade.UI
             PixelHud.Sprite("screens", mind ? "stamp_dead_mind" : "stamp_dead_monster", cx - 24, y + 4, 1f, 3);
             PixelHud.TextCentered("FIM DA LINHA", cx, y + 64, mind ? PixelHud.Hipnos2 : PixelHud.Emergencia4, 1f, 2);
             string cause = mind ? "SUA MENTE COLAPSOU NO ESCURO."
-                : purge ? "A PURGA DA ECLUSA TE ALCANÇOU."
+                : purge ? "A AUTODESTRUIÇÃO TE ALCANÇOU."
                 : "O ESPÉCIME VAZIO TE ALCANÇOU.";
             PixelHud.TextCentered(cause, cx, y + 84, PixelHud.Concreto7);
             cachedFailures = -1;

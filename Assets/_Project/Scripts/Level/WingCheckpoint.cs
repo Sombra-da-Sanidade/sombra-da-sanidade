@@ -186,7 +186,7 @@ namespace SombraDaSanidade.Level
             "Medica" => "ALA MÉDICA",
             "Energia" => "ALA DE ENERGIA",
             "Executiva" => "ALA EXECUTIVA",
-            "Eclusa" => "ECLUSA",
+            "Eclusa" => "ESCONDERIJO",
             _ => "SAGUÃO"
         };
 
