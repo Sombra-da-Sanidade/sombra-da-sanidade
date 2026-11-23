@@ -24,7 +24,7 @@ namespace SombraDaSanidade.Interaction
         private bool HasDrives => Gm == null || Gm.HasAllDrives;
 
         // Sem número: quantos HDs faltam o relógio do HUD já mostra.
-        public string Prompt => HasDrives ? "Inserir HDs na eclusa" : "Faltam HDs";
+        public string Prompt => HasDrives ? "Inserir HDs na saída" : "Faltam HDs";
         public bool CanInteract => !Activated && HasDrives && (Gm == null || Gm.IsPlaying);
         public float HoldDuration => config != null ? config.insertHoldSeconds : 3f;
 

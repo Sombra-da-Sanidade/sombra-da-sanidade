@@ -14,14 +14,27 @@ namespace SombraDaSanidade.UI
         [Tooltip("Posição do canto superior esquerdo do multímetro em relação ao Thomas, em unidades do mundo.")]
         [SerializeField] private Vector2 worldOffset = new Vector2(-3.4f, 1.6f);
 
+        private static bool resolvedOnce;
+
         private SkillCheck check;
         private float resultStart;
         private SkillCheckState lastState;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatics() => resolvedOnce = false;
+
         private void Awake()
         {
             check = GetComponent<SkillCheck>();
+            if (check != null) check.Resolved += OnResolved;
         }
+
+        private void OnDestroy()
+        {
+            if (check != null) check.Resolved -= OnResolved;
+        }
+
+        private void OnResolved(SkillCheckResult _) => resolvedOnce = true;
 
         private void Update()
         {
@@ -75,6 +88,18 @@ namespace SombraDaSanidade.UI
                 int x1 = Mathf.RoundToInt(art.dialPivot.x + art.dialNeedleRadius * Mathf.Cos(a));
                 int y1 = Mathf.RoundToInt(art.dialPivot.y - art.dialNeedleRadius * Mathf.Sin(a));
                 PixelHud.Line(x + art.dialPivot.x, y + art.dialPivot.y, x + x1, y + y1, PixelHud.Concreto8);
+            }
+
+            // Na 1ª abertura de HD da sessão, indica explicitamente a tecla ESPAÇO.
+            if (!resolvedOnce && (check.State == SkillCheckState.Warning || check.State == SkillCheckState.Active))
+            {
+                const string hint = "ESPAÇO";
+                int w = PixelHud.TextWidth(hint) + 8;
+                int hx = x + 12 - w / 2, hy = y + 34;
+                Color border = blink ? PixelHud.Ambar2 : PixelHud.Fosforo4;
+                PixelHud.Box(hx, hy, w, 10, border, 0.95f);
+                PixelHud.Box(hx + 1, hy + 1, w - 2, 8, PixelHud.Vazio, 0.95f);
+                PixelHud.Text(hint, hx + 4, hy + 2, border);
             }
         }
     }

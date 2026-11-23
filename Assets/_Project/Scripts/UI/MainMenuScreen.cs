@@ -23,7 +23,7 @@ namespace SombraDaSanidade.UI
         private string[] items = { Play, Options, Quit };
         private string continueScene;
         private const string Briefing =
-            "COMPLEXO EREBUS, SUB-NÍVEL 4. APAGÃO TOTAL. RECUPERE OS 3 HDS DOS SERVIDORES E SAIA PELA ECLUSA.";
+            "COMPLEXO EREBUS, SUB-NÍVEL 4. APAGÃO TOTAL. RECUPERE OS 3 HDS DOS SERVIDORES E FUJA PELA SAÍDA DE EMERGÊNCIA.";
 
         private readonly SettingsPanel settings = new SettingsPanel();
         private Page page;

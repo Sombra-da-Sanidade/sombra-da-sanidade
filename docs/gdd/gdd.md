@@ -25,8 +25,10 @@ Explorar com o cone de luz → apagar a luz e se esconder ao ouvir o monstro →
 
 | Objeto | Atributos | Estados |
 |---|---|---|
-| Jogador (Thomas Reis) | vel. 4.0, sanidade 0-100, bateria 0-100, HDs 0-3 | Lúcido (100-75), Ansioso (74-40), Alucinando (39-15), Colapsado (14-1), Morto (0) |
-| Espécime Vazio | vel. 3.5 a 4.8, raio auditivo, stun 0-4s | Patrulha Cega, Investigação Auditiva, Perseguição Furiosa, Atordoado |
+| Jogador (Thomas Reis) | vel. 4.0, sanidade 0-100, bateria 0-100, HDs 0-3 | Lúcido (100-75), Ansioso (74-40), Alucinando (39-15), Colapsado (14-1), Morto (0); Modo Foco (`Tab`) |
+| Espécime Vazio (Voluntário 07) | vel. 3.2 a 4.6, raio auditivo, stun 0-4s | Patrulha Cega, Investigação Auditiva, Perseguição Furiosa, Atordoado |
+| Sonâmbulo (Voluntário 03) | vel. 5.0 a 6.0 no escuro | Congelado (sob luz), Perseguição no Escuro |
+| Câmera de Segurança | cone que varre, alarme 5s, EMP 10s | Varrendo, Detectando, Alarme (apagão / chama Espécime), Desligada |
 | Lanterna Lux-90 | carga 0-100, cone 60°, alcance 8 | Apagada, Iluminando, Disparo EMP (-40), Esgotada |
 | Disjuntor | tensão, fusível, timer de luz 0-60s | Queimado, Em Reparo (4s), Ativo (Zona Segura) |
 | Servidor de HD | ejeção 12 s, até 3 skill checks de multímetro | Carregado, Ejetando, Vazio |
@@ -35,15 +37,15 @@ Explorar com o cone de luz → apagar a luz e se esconder ao ouvir o monstro →
 
 ## 5. Regras
 
-1. Monstro imortal e cego.
-2. O cone de luz atrai o monstro se tocá-lo.
-3. Escuro esconde o jogador, mas drena sanidade (-1.5/s).
-4. Cada HD coletado acelera o monstro em +10%.
-5. Pistas de enigma só aparecem com sanidade < 35.
-6. Lâmpadas de teto criam áreas impenetráveis ao monstro por 60s.
+1. Espécime Vazio é imortal e cego (caça por som); Sonâmbulo congela sob qualquer luz e corre no escuro.
+2. O cone de luz atrai o Espécime, mas paralisa o Sonâmbulo.
+3. Escuro esconde o jogador, mas drena sanidade (-1.2/s a -2.0/s conforme a ala).
+4. Modo Foco (`Tab`): reduz velocidade para 55%, corta o dreno no escuro pela metade e regenera sanidade até 60% com a lanterna acesa (quebrado por monstro próximo).
+5. Pistas em fósforo, objetos reativos (`SanitySpriteSwap`) e falas abaladas só aparecem com sanidade < 35 (ou Módulo Neural).
+6. Lâmpadas de teto criam áreas impenetráveis ao monstro por 60s; câmeras de segurança disparam apagão (Fase 2+) e chamam o Espécime (Fase 3+).
 
-- **Vitória:** inserir os 3 HDs no terminal da eclusa e alcançar a porta externa.
-- **Derrota:** sanidade chega a 0 ou o monstro encosta no jogador.
+- **Vitória:** inserir os 3 HDs no terminal da eclusa, decidir se resgata ou abandona a Dra. Vance e alcançar a porta externa (finais *Testemunha* ou *Amostra entregue*).
+- **Derrota:** sanidade chega a 0, monstro/Sonâmbulo encosta no jogador ou acaba o tempo da purga (150 s).
 
 ## 6. Economia
 
@@ -66,10 +68,10 @@ Todos os números acima vivem em `Assets/_Project/ScriptableObjects/Config/`.
 
 | Fase | Mecânica nova | Desafio | Duração |
 |---|---|---|---|
-| 1. Ala Médica | Lanterna, furtividade, fusível | Aprender que a luz atrai; HD-01 | 3-5 min |
-| 2. Ala de Energia | EMP, disjuntores | Stun no tempo certo; religar subestação; HD-02 | 5-7 min |
-| 3. Ala Executiva | Módulos neurais, Revelação pela Loucura | Senhas com sanidade baixa; HD-03 | 5-7 min |
-| 4. Fuga da Eclusa | Corrida cronometrada | Chegar à porta antes da purga | 2-3 min |
+| 1. Ala Médica | Lanterna, furtividade, fusível, EMP | Aprender que a luz atrai o Espécime; HD-01 | ~6 min |
+| 2. Ala de Energia | Sonâmbulo, câmeras com apagão, Adrena-Syn | Congelar o Sonâmbulo na luz; religar subestação; HD-02 | ~7 min |
+| 3. Ala Executiva | Espécime + Sonâmbulo + câmeras, Módulo Neural | Dilema da luz; senhas com sanidade baixa; HD-03 | ~8 min |
+| 4. Fuga da Eclusa | Purga 150 s e Escolha da Vance | Chegar à porta (direto ou salvando a Vance) | 2,5-4 min |
 
 **Recompensa por HD** (Proposta 2 do v1.1, pendente da #3): ao ejetar cada HD o jogador escolhe 1 de 2 upgrades da Lux-90. HD-01: Lente Focal (alcance +25%) ou Célula Extra (bateria 130). HD-02: Capacitor Duplo (EMP 30) ou Bobina Longa (stun 5,5 s). HD-03: Filtro Âmbar (modo econômico que não atrai) ou Ressonador Neural (pistas com sanidade < 50). Ver [upgrades-lux90.md](../upgrades-lux90.md).
 
@@ -79,13 +81,13 @@ Curva dente-de-serra: cada HD é um pico de perigo, cada Zona Segura um alívio.
 
 ## 8. Controles e interface
 
-WASD move, mouse mira, F/clique esquerdo liga a lanterna, clique direito dispara EMP, E segura para interagir, Espaço calibra o multímetro no skill check, Q liga o modo econômico (com o Filtro Âmbar), 1/2 escolhem o upgrade no terminal. Esc pausa (configurações de volume, brilho e tela cheia). HUD diegético: medidor de bateria e contador de HDs no canto superior esquerdo; sanidade comunicada por vinheta, batimentos e aberração cromática. Posição do monstro e timers nunca aparecem em número.
+WASD move, mouse mira, F/clique esquerdo liga a lanterna, clique direito dispara EMP, E segura para interagir, Espaço calibra o multímetro no skill check, Tab segura para Modo Foco (amplia o relógio), H/botão `[-]` minimiza o relógio, Q liga o modo econômico (com o Filtro Âmbar), 1/2 escolhem o upgrade no terminal. Esc pausa (configurações de volume, brilho e tela cheia) ou pula cutscenes (segurar 0,8 s). HUD diegético: relógio Chrono-Vigil sempre visível no canto inferior direito com ECG, bateria, gavetas de HD, seta direcional 4 vias + sinal RF para o HD e timers de buffs com alerta nos 3 s finais.
 
-Fluxo: Menu → Briefing → Jogo (Médica → Energia → Executiva → Eclusa) → Vitória (estatísticas) / Game Over (causa e reinício do checkpoint da ala).
+Fluxo: Menu → C0 Abertura → Fase 1 (Ala Médica) → I1 → Fase 2 (Ala de Energia) → I2 → Fase 3 (Ala Executiva) → C3 Revelação → Eclusa → C4 / C5 → Laudo (Rank S/A/B/C).
 
 ## 9. Narrativa
 
-Anos 90. Thomas Reis, auditor da Aethelgard Dynamics, vai ao Sub-Nível 4 do Complexo EREBUS. A base entra em confinamento; o Voluntário 07 do Projeto Hipnos (o Espécime Vazio) massacrou a equipe. Logs da Dra. Valerie Vance revelam o projeto, a falha de contenção e a conspiração (Thomas foi enviado de propósito). **Pendente:** definir a reviravolta exata do Ato 3.
+1994. Thomas Reis acredita ser auditor externo da Aethelgard Dynamics enviado ao Sub-Nível 4 do Complexo EREBUS para recuperar 3 HDs do Projeto Hipnos. Na verdade ele é o **Voluntário 08**, com a memória apagada pela Dra. Valerie Vance — que sobreviveu presa na sala de observação e o guia pelos logs (`VANCE-01` a `03`) enquanto a empresa mede quanto ele aguenta. O arco se desenrola por falas internas do Thomas (`InnerVoiceLine` em variantes Estável/Abalado), pistas em fósforo, objetos reativos (`SanitySpriteSwap`), 3 memórias em paleta verde de 4 cores (`M1`–`M3`) e a revelação em `C3`, culminando na escolha final na Eclusa (*Testemunha* em `C4` ou *Amostra entregue* em `C5`). Ver [narrativa/roteiro-rc.md](../narrativa/roteiro-rc.md).
 
 ## 10. Técnico
 
@@ -116,3 +118,4 @@ Marcos: Protótipo (semana 4), Vertical slice com Ala Médica (semana 8), Versã
 | 1.0.5 | 09/11/2026 | Ala Médica do vertical slice: 1 min sem monstro e primeiro encontro roteirizado (Proposta 4), checkpoint JSON com "Progresso salvo" ao concluir a ala (Proposta 2, #45) |
 | 1.0.6 | 09/11/2026 | Ala Executiva (#43): HD-03 com trava de senha, dígitos em pistas de fósforo (sanidade < 35) e Módulo Neural (-15 de sanidade, revela as pistas por 20 s); `DifficultyProfile` por ala com a tabela da Proposta 1 (#30) |
 | 1.0.7 | 09/11/2026 | Fuga da Eclusa: terminal recebe os 3 HDs, purga de 150 s comunicada por sirene e luz (sem número), monstro em fúria (4.6, Proposta 1), Game Over próprio da purga e cena `Wings/Eclusa` (#44). Ver [eclusa.md](../eclusa.md) |
+| 1.1.0 | 22/11/2026 | Release Candidate: encadeamento de 3 fases + Eclusa, Sonâmbulo, câmeras de segurança, sistema de áudio e trilha, HUD Chrono-Vigil fixo com Modo Foco (`Tab`), bússola 4 vias, monólogo do Thomas, objetos reativos à sanidade e 11 cutscenes/memórias do arco "Voluntário 08" (#88–#92, #99) |

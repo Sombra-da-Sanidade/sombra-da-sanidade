@@ -90,28 +90,44 @@ namespace SombraDaSanidade.Player
             return true;
         }
 
-        // Ícone e quantidade embaixo à direita, ao lado do relógio (HUD em pixel art). Some sem sinalizador, a não ser logo
-        // depois de tentar jogar sem nenhum.
+        // Ícone e quantidade embaixo à direita, integrado à borda esquerda do relógio do DemoHud (expande/recolhe junto).
         private void OnGUI()
         {
             if (Event.current.type != EventType.Repaint || icon == null) return;
             if (GameManager.Instance != null && !GameManager.Instance.IsPlaying) return;
+            if (UI.ModalScreen.IsOpen || UI.UpgradeTerminal.IsOpen) return;
             bool flash = Time.unscaledTime < flashUntil;
             if (count <= 0 && !flash) return;
             UI.PixelHud.Begin();
             int px = UI.PixelHud.Px;
-            // À esquerda do relógio de pulso do DemoHud (64 px + margem de 8 no canto de baixo à direita).
-            int x = UI.PixelHud.Width - 64 - 8 - 34, y = UI.PixelHud.Height - 20;
-            var tex = icon.texture;
-            var r = icon.textureRect;
-            var uv = new Rect(r.x / tex.width, r.y / tex.height, r.width / tex.width, r.height / tex.height);
-            var prev = GUI.color;
-            GUI.color = new Color(1f, 1f, 1f, count > 0 ? 1f : 0.45f);
-            GUI.DrawTextureWithTexCoords(new Rect(x * px, y * px, r.width * px, r.height * px), tex, uv);
-            GUI.color = prev;
-            var color = count > 0 ? (flash ? UI.PixelHud.Ambar2 : UI.PixelHud.Concreto7) : UI.PixelHud.Emergencia4;
-            UI.PixelHud.Text($"x{count}", x + 13, y + 3, color);
-            UI.PixelHud.Text("G", x + 1, y - 7, UI.PixelHud.Concreto5);
+
+            int rightAnchor = UI.DemoHud.HasWatchCluster ? UI.DemoHud.WatchClusterLeftPx - 4 : UI.PixelHud.Width - 8;
+            float scale = UI.DemoHud.HasWatchCluster ? UI.DemoHud.WatchClusterScale : 1f;
+            int x = rightAnchor - 28, y = UI.PixelHud.Height - 20;
+
+            Matrix4x4 prevMatrix = GUI.matrix;
+            if (scale > 1.001f)
+            {
+                Vector2 pivot = new Vector2(rightAnchor * px, (UI.PixelHud.Height - 6) * px);
+                GUIUtility.ScaleAroundPivot(new Vector2(scale, scale), pivot);
+            }
+            try
+            {
+                var tex = icon.texture;
+                var r = icon.textureRect;
+                var uv = new Rect(r.x / tex.width, r.y / tex.height, r.width / tex.width, r.height / tex.height);
+                var prev = GUI.color;
+                GUI.color = new Color(1f, 1f, 1f, count > 0 ? 1f : 0.45f);
+                GUI.DrawTextureWithTexCoords(new Rect(x * px, y * px, r.width * px, r.height * px), tex, uv);
+                GUI.color = prev;
+                var color = count > 0 ? (flash ? UI.PixelHud.Ambar2 : UI.PixelHud.Concreto7) : UI.PixelHud.Emergencia4;
+                UI.PixelHud.Text($"x{count}", x + 13, y + 3, color);
+                UI.PixelHud.Text("G", x + 1, y - 7, UI.PixelHud.Concreto5);
+            }
+            finally
+            {
+                GUI.matrix = prevMatrix;
+            }
         }
     }
 }

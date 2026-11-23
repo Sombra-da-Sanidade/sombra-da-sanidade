@@ -31,8 +31,10 @@ namespace SombraDaSanidade.UI
 
         public const float SkipHoldSeconds = 0.8f;
         private const float FadeSeconds = 0.45f;
+        private const float ExitFadeOutSeconds = 0.40f;
+        private const float ExitFadeInSeconds = 0.70f;
         private const float GlitchSeconds = 0.35f;
-        private const float CharsPerSecond = 40f;
+        private const float CharsPerSecond = 75f;
         private const float LetterboxSpeed = 3f;
 
         public Cutscene Current => current;
@@ -44,7 +46,7 @@ namespace SombraDaSanidade.UI
         private Cutscene current;
         private Action onDone;
         private int index;
-        private float shotTime, typed, skipHeld, letterbox, previousTimeScale = 1f, baseSize;
+        private float shotTime, typed, skipHeld, letterbox, exitFadeAlpha, previousTimeScale = 1f, baseSize;
         private bool froze;
         private Camera cam;
         private CameraFollow follow;
@@ -143,8 +145,12 @@ namespace SombraDaSanidade.UI
 
         private void Update()
         {
-            if (current == null) return;
             float dt = Time.unscaledDeltaTime;
+            if (current == null)
+            {
+                if (exitFadeAlpha > 0f) exitFadeAlpha = Mathf.MoveTowards(exitFadeAlpha, 0f, dt / ExitFadeInSeconds);
+                return;
+            }
             var shot = Shot;
 
             var kb = Keyboard.current;
@@ -228,6 +234,7 @@ namespace SombraDaSanidade.UI
             onDone = null;
             skipHeld = 0f;
             letterbox = 0f;
+            exitFadeAlpha = queue.Count == 0 ? 1f : 0f; // Fade suave ao voltar para a gameplay
             MemoryEffect.Active = false;
             PlayerController.InputLocked = false;
             ModalScreen.Pop();
@@ -248,9 +255,18 @@ namespace SombraDaSanidade.UI
 
         private void OnGUI()
         {
-            var shot = Shot;
-            if (current == null || shot == null) return;
             if (white == null) white = Texture2D.whiteTexture;
+            if (current == null)
+            {
+                if (exitFadeAlpha > 0f)
+                {
+                    GUI.depth = -50;
+                    Fill(new Rect(0, 0, Screen.width, Screen.height), Color.black, exitFadeAlpha);
+                }
+                return;
+            }
+            var shot = Shot;
+            if (shot == null) return;
             GUI.depth = -50;
             PixelHud.Begin();
             int W = Screen.width, H = Screen.height;
@@ -308,7 +324,7 @@ namespace SombraDaSanidade.UI
             int maxW = PixelHud.Width - 40;
             var lines = Wrap(string.IsNullOrEmpty(shot.speaker) ? text : shot.speaker + ": " + text, maxW);
             int lineH = 10;
-            int y = intertitle ? PixelHud.Height / 2 - lines.Count * lineH / 2 : PixelHud.Height - 16 - lines.Count * lineH;
+            int y = intertitle ? PixelHud.Height / 2 - lines.Count * lineH / 2 : PixelHud.Height - 18 - lines.Count * lineH;
 
             if (!PixelHud.HasArt)
             {
@@ -316,8 +332,8 @@ namespace SombraDaSanidade.UI
                 GUI.Label(new Rect(0, y * PixelHud.Px, Screen.width, lines.Count * lineH * PixelHud.Px), string.Join("\n", lines), style);
                 return;
             }
-            if (!intertitle && shot.kind == CutsceneShotKind.World)
-                PixelHud.Box(10, y - 4, PixelHud.Width - 20, lines.Count * lineH + 6, PixelHud.Vazio, 0.6f);
+            if (!intertitle)
+                PixelHud.Box(10, y - 4, PixelHud.Width - 20, lines.Count * lineH + 6, PixelHud.Vazio, 0.78f);
             for (int i = 0; i < lines.Count; i++)
             {
                 int x = (PixelHud.Width - PixelHud.TextWidth(lines[i])) / 2;
@@ -357,7 +373,13 @@ namespace SombraDaSanidade.UI
         {
             if (shot.transition == CutsceneTransition.Fade && shotTime < FadeSeconds)
                 Fill(new Rect(0, 0, Screen.width, Screen.height), Color.black, 1f - shotTime / FadeSeconds);
-            else if (shot.transition == CutsceneTransition.Glitch && shotTime < GlitchSeconds)
+            else if (current != null && index == current.shots.Length - 1)
+            {
+                float remaining = shot.duration - shotTime;
+                if (remaining < ExitFadeOutSeconds && shotTime > FadeSeconds)
+                    Fill(new Rect(0, 0, Screen.width, Screen.height), Color.black, Mathf.Clamp01(1f - remaining / ExitFadeOutSeconds));
+            }
+            if (shot.transition == CutsceneTransition.Glitch && shotTime < GlitchSeconds)
             {
                 // Faixas horizontais com ruído, no ritmo de quadros de fita.
                 var rng = new System.Random(Mathf.FloorToInt(Time.unscaledTime * 24f));

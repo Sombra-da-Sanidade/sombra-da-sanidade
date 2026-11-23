@@ -40,6 +40,28 @@ namespace SombraDaSanidade.Narrative
 
         public string TextFor(float sanity) => sanity < ShakenBelow && shaken.Length > 0 ? shaken : stable;
 
+        // Compatibilidade com as versões de asset antigas: o player legado usa os vetores estáveis/abalados.
+        [HideInInspector] [TextArea(1, 3)] public string[] stableLines = new string[0];
+        [HideInInspector] [TextArea(1, 3)] public string[] shakenLines = new string[0];
+
+        public string[] PickLines(bool shaken) =>
+            shaken && shakenLines != null && shakenLines.Length > 0 ? shakenLines
+            : stableLines != null && stableLines.Length > 0 ? stableLines
+            : new[] { TextFor(shaken ? 20f : 80f) };
+
+        public AudioLog ToRuntimeLog(bool shaken)
+        {
+            var log = CreateInstance<AudioLog>();
+            log.hideFlags = HideFlags.DontSave;
+            log.id = id;
+            log.speaker = "THOMAS";
+            log.babblePitch = ThomasPitch;
+            log.lines = PickLines(shaken);
+            log.isInternalThought = true;
+            log.tape = false;
+            return log;
+        }
+
         // Fita de uma linha para o AudioLogPlayer: sem clique nem chiado, fora da lista de logs ouvidos.
         public AudioLog ToLog(float sanity)
         {

@@ -118,9 +118,10 @@ namespace SombraDaSanidade.Narrative
             // Pela partida inteira: na Ala de Energia o primeiro HD da cena é o HD-02 (VANCE-02).
             int index = (GameManager.Instance != null ? GameManager.Instance.TotalDrives : count) - 1;
             if (index < 0 || index >= driveLogs.Length || driveLogs[index] == null) return;
+            // O log do HD tem prioridade sobre um terminal ou fala interna; dois HDs seguidos entram na fila.
             // O log do HD tem prioridade sobre um terminal e sobre uma fala do Thomas (#89); dois HDs seguidos
             // entram na fila.
-            if (IsPlaying && (Source != null || !Current.tape)) Stop();
+            if (IsPlaying && (Source != null || !Current.tape || Current.isInternalThought)) Stop();
             Play(driveLogs[index]);
         }
 
@@ -128,6 +129,7 @@ namespace SombraDaSanidade.Narrative
         public void Play(AudioLog log, Transform source = null, float radius = 0f)
         {
             if (log == null || log.lines == null || log.lines.Length == 0) return;
+            if (!log.isInternalThought && IsPlaying && Current.isInternalThought) Stop();
             if (IsPlaying)
             {
                 if (source == null) queue.Enqueue(log);
@@ -138,7 +140,7 @@ namespace SombraDaSanidade.Narrative
             Source = source;
             hearingRadius = radius;
             SetSignalLost(false);
-            if (log.tape)
+            if (log.tape && !log.isInternalThought)
             {
                 babble.PlayOneShot(clickClip);
                 hiss.volume = Config.tapeHissVolume;
@@ -172,6 +174,11 @@ namespace SombraDaSanidade.Narrative
                 queue.Clear();
                 return;
             }
+            if (UI.CutscenePlayer.IsPlaying)
+            {
+                if (Current.isInternalThought) Stop();
+                return;
+            }
 
             if (listener != null && Source != null
                 && Vector2.Distance(listener.transform.position, Source.position) > hearingRadius)
@@ -180,13 +187,16 @@ namespace SombraDaSanidade.Narrative
                 return;
             }
 
-            bool monsterNear = listener != null && listener.DistanceToMonster <= Config.interruptRadius;
-            if (monsterNear != SignalLost)
+            if (!Current.isInternalThought)
             {
-                SetSignalLost(monsterNear);
-                babble.PlayOneShot(monsterNear ? staticClip : clickClip);
+                bool monsterNear = listener != null && listener.DistanceToMonster <= Config.interruptRadius;
+                if (monsterNear != SignalLost)
+                {
+                    SetSignalLost(monsterNear);
+                    babble.PlayOneShot(monsterNear ? staticClip : clickClip);
+                }
+                if (SignalLost) return;
             }
-            if (SignalLost) return;
 
             LineTime += Time.deltaTime;
             if (inPause)
@@ -234,7 +244,7 @@ namespace SombraDaSanidade.Narrative
         {
             var log = Current;
             Stop();
-            if (log.tape) AudioLogArchive.Add(log);
+            if (log.tape && !log.isInternalThought) AudioLogArchive.Add(log);
             Completed?.Invoke(log);
             if (queue.Count > 0) Play(queue.Dequeue());
         }

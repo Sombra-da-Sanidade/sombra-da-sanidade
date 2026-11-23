@@ -117,7 +117,7 @@ namespace SombraDaSanidade.UI
             PixelHud.Sprite("screens", mind ? "stamp_dead_mind" : "stamp_dead_monster", cx - 24, y + 4, 1f, 3);
             PixelHud.TextCentered("FIM DA LINHA", cx, y + 64, mind ? PixelHud.Hipnos2 : PixelHud.Emergencia4, 1f, 2);
             string cause = mind ? "SUA MENTE COLAPSOU NO ESCURO."
-                : purge ? "A PURGA DA ECLUSA TE ALCANÇOU."
+                : purge ? "A AUTODESTRUIÇÃO TE ALCANÇOU."
                 : "O ESPÉCIME VAZIO TE ALCANÇOU.";
             PixelHud.TextCentered(cause, cx, y + 84, PixelHud.Concreto7);
             cachedFailures = -1;

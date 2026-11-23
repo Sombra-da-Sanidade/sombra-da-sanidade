@@ -13,11 +13,12 @@ namespace SombraDaSanidade.UI
         public const string MenuScene = "Menu";
 
         private static readonly string[] Items = { "CONTINUAR", "CONFIGURAÇÕES", "REINICIAR", "SAIR" };
-        private const int PanelW = 144, PanelH = 124, ButtonW = 112;
+        private const int PanelW = 144, PanelH = 126, ButtonW = 112;
 
         public bool IsOpen { get; private set; }
 
         private readonly SettingsPanel settings = new SettingsPanel();
+        private Sanity.SanityController cachedSanity;
         private bool inSettings;
         private int selected;
         private float previousTimeScale = 1f;
@@ -52,6 +53,7 @@ namespace SombraDaSanidade.UI
             IsOpen = true;
             inSettings = false;
             selected = 0;
+            cachedSanity = FindAnyObjectByType<Sanity.SanityController>();
             ModalScreen.Push();
             previousTimeScale = Time.timeScale > 0f ? Time.timeScale : 1f;
             Time.timeScale = 0f;
@@ -131,7 +133,7 @@ namespace SombraDaSanidade.UI
 
             int x = (PixelHud.Width - PanelW) / 2, y = (PixelHud.Height - PanelH) / 2;
             int bx = x + (PanelW - ButtonW) / 2;
-            int ButtonY(int i) => y + 36 + i * 18;
+            int ButtonY(int i) => y + 38 + i * 18;
             for (int i = 0; i < Items.Length; i++)
             {
                 if (!PixelHud.MouseOver(bx, ButtonY(i) + 2, ButtonW, 11)) continue;

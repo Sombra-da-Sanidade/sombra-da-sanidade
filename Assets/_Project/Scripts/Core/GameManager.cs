@@ -152,6 +152,7 @@ namespace SombraDaSanidade.Core
                 return;
             }
 
+            if (UI.CutscenePlayer.IsPlaying) return;
             var kb = Keyboard.current;
             if (kb == null) return;
             if (kb.rKey.wasPressedThisFrame) Restart();
@@ -236,7 +237,7 @@ namespace SombraDaSanidade.Core
 
         private void OnGUI()
         {
-            if (IsPlaying) return;
+            if (IsPlaying || UI.CutscenePlayer.IsPlaying) return;
             // No apagão do Game Over (#94) a tela de fim só aparece quando a linha abre.
             if (UI.CrtTransition.HidingEndScreen) return;
             // Tela com o kit CRT (UI.ResultScreen); sem a arte, a versão de texto abaixo.
@@ -263,7 +264,7 @@ namespace SombraDaSanidade.Core
                 body = LastDeathCause switch
                 {
                     DeathCause.Monster => "O Espécime Vazio te alcançou.",
-                    DeathCause.Purge => "A purga da eclusa te alcançou.",
+                    DeathCause.Purge => "A autodestruição da base te alcançou.",
                     _ => "Sua mente colapsou no escuro."
                 };
             }
