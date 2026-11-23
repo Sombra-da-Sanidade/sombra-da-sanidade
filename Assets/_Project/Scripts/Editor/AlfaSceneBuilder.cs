@@ -216,6 +216,9 @@ namespace SombraDaSanidade.EditorTools
             cso.FindProperty("nextWing").stringValue = "Eclusa";
             cso.ApplyModifiedPropertiesWithoutUndo();
 
+            // C3 (planejamento-rc 4): a revelação toca depois do HD-03.
+            go.AddComponent<SombraDaSanidade.Level.DriveCutscene>().Setup(FindCutscene("C3"));
+
             // Trava de senha: o teclado (X) libera o servidor da ala.
             var keypad = UnityEngine.Object.FindAnyObjectByType<KeypadLock>();
             var server = ctx.Objectives.GetComponentInChildren<DriveServer>();

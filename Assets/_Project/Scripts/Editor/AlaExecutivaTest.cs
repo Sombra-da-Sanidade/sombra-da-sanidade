@@ -79,6 +79,7 @@ namespace SombraDaSanidade.EditorTools
                     if (failed) { Finish(); return; }
                     CheckProfile(gm, monster, sanity);
                     CheckLayout(gm, keypad);
+                    CheckRc(monster, player);
                     Next();
                     break;
 
@@ -90,6 +91,7 @@ namespace SombraDaSanidade.EditorTools
                     Check("Cada pista mostra a posição do seu dígito (\"SENHA _ 7 _ _\")", clues.All(c => c.Text == Expected(keypad, c.Index)));
                     player.enabled = false;
                     monster.gameObject.SetActive(false);   // comportamento do monstro tem teste próprio; aqui ele atrapalharia
+                    foreach (var w in Object.FindObjectsByType<SleepwalkerController>()) w.gameObject.SetActive(false);
                     sanityBefore = sanity.Value;
                     var module = Object.FindObjectsByType<NeuralModule>().First();
                     module.CompleteInteract();
@@ -226,6 +228,20 @@ namespace SombraDaSanidade.EditorTools
         {
             step++;
             stepStart = Time.time;
+        }
+
+        // Beats da fase 3 (planejamento-rc 1): os dois monstros longe um do outro, 4 a 5 câmeras, M3 com sanidade
+        // baixa e C3 depois do HD-03.
+        private static void CheckRc(MonsterController monster, PlayerController player)
+        {
+            var walker = Object.FindAnyObjectByType<SleepwalkerController>();
+            float apart = walker == null ? 0f : Vector2.Distance(walker.transform.position, monster.transform.position);
+            Check($"Espécime e Sonâmbulo longe um do outro ({apart:0} m)", walker != null && apart >= 25f);
+            int cams = Object.FindObjectsByType<SecurityCamera>().Length;
+            Check($"4 a 5 câmeras (veio {cams})", cams >= 4 && cams <= 5);
+            var m3 = GameObject.Find("CutsceneTrigger_M3");
+            Check("Gatilho da M3 só com sanidade baixa", m3 != null);
+            Check("C3 montada para depois do HD-03", Object.FindAnyObjectByType<DriveCutscene>() != null);
         }
 
         private static void Check(string label, bool ok)
