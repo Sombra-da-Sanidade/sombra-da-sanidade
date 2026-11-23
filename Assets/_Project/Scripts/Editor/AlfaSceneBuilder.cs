@@ -121,6 +121,8 @@ namespace SombraDaSanidade.EditorTools
             iso.FindProperty("monster").objectReferenceValue = UnityEngine.Object.FindAnyObjectByType<MonsterController>();
             iso.FindProperty("neverWakes").boolValue = true;
             iso.ApplyModifiedPropertiesWithoutUndo();
+            go.AddComponent<SombraDaSanidade.Level.WingOpening>().Setup("I1");
+            AddSleepwalkerReveal();
             go.AddComponent<SombraDaSanidade.Level.WingBlackout>().Setup(
                 AssetDatabase.LoadAssetAtPath<SombraDaSanidade.Audio.SoundEvent>(Root + "/ScriptableObjects/Audio/Camera/camera_apagao.asset"));
 
@@ -218,6 +220,7 @@ namespace SombraDaSanidade.EditorTools
 
             // C3 (planejamento-rc 4): a revelação toca depois do HD-03.
             go.AddComponent<SombraDaSanidade.Level.DriveCutscene>().Setup(FindCutscene("C3"));
+            go.AddComponent<SombraDaSanidade.Level.WingOpening>().Setup("I2");
 
             // Trava de senha: o teclado (X) libera o servidor da ala.
             var keypad = UnityEngine.Object.FindAnyObjectByType<KeypadLock>();
@@ -276,6 +279,7 @@ namespace SombraDaSanidade.EditorTools
             WriteVariant(ctx.Map, variants.GetArrayElementAtIndex(0), "Enfermaria", "123", 'x');
             WriteVariant(ctx.Map, variants.GetArrayElementAtIndex(1), "Laboratorio", "456", 'y');
             so.FindProperty("wakeCutscene").objectReferenceValue = FindCutscene("C1");
+            go.AddComponent<SombraDaSanidade.Level.WingOpening>().Setup("C0");
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -342,6 +346,7 @@ namespace SombraDaSanidade.EditorTools
             PrototypeSceneBuilder.GetOrCreatePlaceholderSprite();
             DriveServerPrefabBuilder.GetOrBuild();
             PrototypeSceneBuilder.EnsurePropArt();
+            if (CutsceneAssetBuilder.Load("C0") == null) CutsceneAssetBuilder.Build();   // #91: gatilhos acham pelo id
             int wallLayer = PrototypeSceneBuilder.EnsureLayer(PrototypeSceneBuilder.WallLayerName);
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
