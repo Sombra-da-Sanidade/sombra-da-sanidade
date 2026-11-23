@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e28c8d2afcd444f86f5959064cbfbbd, type: 3}
+  m_Name: C1_Especime
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.UI.Cutscene
+  id: C1
+  music: {fileID: 0}
+  freezeWorld: 0
+  shots:
+  - kind: 1
+    image: {fileID: 0}
+    focus: especime
+    zoom: {x: 1, y: 0.85}
+    panFrom: {x: 0, y: 0}
+    panTo: {x: 0, y: 0}
+    duration: 2.2
+    speaker: 
+    caption: 
+    sound: {fileID: 0}
+    transition: 1
+    memory: 0
+    cue: 
+  - kind: 1
+    image: {fileID: 0}
+    focus: especime
+    zoom: {x: 0.85, y: 0.72}
+    panFrom: {x: 0, y: 0}
+    panTo: {x: 0, y: 0}
+    duration: 1.8
+    speaker: 
+    caption: 
+    sound: {fileID: 0}
+    transition: 0
+    memory: 0
+    cue: 
+  - kind: 1
+    image: {fileID: 0}
+    focus: especime
+    zoom: {x: 0.72, y: 0.62}
+    panFrom: {x: 0, y: 0}
+    panTo: {x: 0, y: 0}
+    duration: 2.4
+    speaker: THOMAS
+    caption: "Ele n\xE3o me viu."
+    sound: {fileID: 0}
+    transition: 0
+    memory: 0
+    cue: 

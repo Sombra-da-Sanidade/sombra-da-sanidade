@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e28c8d2afcd444f86f5959064cbfbbd, type: 3}
+  m_Name: M1_SalaBranca
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.UI.Cutscene
+  id: M1
+  music: {fileID: 8300000, guid: 20fe93ab6da409aa4e164ca9ddcc2ce4, type: 3}
+  freezeWorld: 1
+  shots:
+  - kind: 0
+    image: {fileID: 21300000, guid: d91fa079a54275042a38414e9288d6e2, type: 3}
+    focus: player
+    zoom: {x: 1, y: 1}
+    panFrom: {x: 0, y: 0}
+    panTo: {x: 0, y: 0}
+    duration: 2
+    speaker: 
+    caption: 
+    sound: {fileID: 0}
+    transition: 2
+    memory: 1
+    cue: 
+  - kind: 0
+    image: {fileID: 21300000, guid: 1097666a37bc56d4c9372b497f26ff28, type: 3}
+    focus: player
+    zoom: {x: 1, y: 1}
+    panFrom: {x: 0, y: 0}
+    panTo: {x: 0, y: 0}
+    duration: 3
+    speaker: VANCE
+    caption: "Vai doer menos se voc\xEA n\xE3o lutar."
+    sound: {fileID: 0}
+    transition: 0
+    memory: 1
+    cue: 
+  - kind: 0
+    image: {fileID: 21300000, guid: ac9b0302b91f7fb44a291bd2b78d553c, type: 3}
+    focus: player
+    zoom: {x: 1, y: 1}
+    panFrom: {x: 0, y: 0}
+    panTo: {x: 0, y: 0}
+    duration: 3.2
+    speaker: VANCE
+    caption: "Conte de 10 para tr\xE1s, Thomas."
+    sound: {fileID: 0}
+    transition: 0
+    memory: 1
+    cue: 
+  - kind: 0
+    image: {fileID: 21300000, guid: 63fe0234ce8b84c479d9fab8967f7e2c, type: 3}
+    focus: player
+    zoom: {x: 1, y: 1}
+    panFrom: {x: 0, y: 0}
+    panTo: {x: 0, y: 0}
+    duration: 2.8
+    speaker: THOMAS
+    caption: Dez. Nove. Oito.
+    sound: {fileID: 0}
+    transition: 2
+    memory: 1
+    cue: 

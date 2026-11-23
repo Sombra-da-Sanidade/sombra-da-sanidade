@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e28c8d2afcd444f86f5959064cbfbbd, type: 3}
+  m_Name: C2_Sonambulo
+  m_EditorClassIdentifier: Assembly-CSharp::SombraDaSanidade.UI.Cutscene
+  id: C2
+  music: {fileID: 0}
+  freezeWorld: 0
+  shots:
+  - kind: 1
+    image: {fileID: 0}
+    focus: sonambulo
+    zoom: {x: 1, y: 0.9}
+    panFrom: {x: 0, y: 0}
+    panTo: {x: 0, y: 0}
+    duration: 2
+    speaker: 
+    caption: 
+    sound: {fileID: 0}
+    transition: 1
+    memory: 0
+    cue: 
+  - kind: 1
+    image: {fileID: 0}
+    focus: sonambulo
+    zoom: {x: 0.9, y: 0.8}
+    panFrom: {x: 0, y: 0}
+    panTo: {x: 0, y: 0}
+    duration: 1.2
+    speaker: 
+    caption: 
+    sound: {fileID: 0}
+    transition: 0
+    memory: 0
+    cue: c2_lampada
+  - kind: 1
+    image: {fileID: 0}
+    focus: sonambulo
+    zoom: {x: 0.8, y: 0.65}
+    panFrom: {x: 0, y: 0}
+    panTo: {x: 0, y: 0}
+    duration: 2.8
+    speaker: THOMAS
+    caption: Ele se mexeu. Quando a luz apagou, ele se mexeu.
+    sound: {fileID: 0}
+    transition: 0
+    memory: 0
+    cue: 
