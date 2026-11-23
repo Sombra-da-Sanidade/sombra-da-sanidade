@@ -125,7 +125,6 @@ namespace SombraDaSanidade.Monster
         private readonly List<(Vector2 pos, float time)> noiseHistory = new List<(Vector2, float)>();
 
         private Vector2 lastKnownPlayerPos;
-        private bool pausedByCutscene, stoppedBeforeCutscene;
         private float lastSeenTime = float.NegativeInfinity;
 
         private Vector2 lastNoisePos;
@@ -237,20 +236,6 @@ namespace SombraDaSanidade.Monster
             {
                 agent.isStopped = true;
                 return;
-            }
-
-            // Parado durante cutscenes (o Thomas não pode se mexer): volta como estava quando ela acaba.
-            if (SombraDaSanidade.UI.CutscenePlayer.IsPlaying)
-            {
-                if (!pausedByCutscene) { pausedByCutscene = true; stoppedBeforeCutscene = agent.isStopped; }
-                agent.isStopped = true;
-                agent.velocity = Vector3.zero;
-                return;
-            }
-            if (pausedByCutscene)
-            {
-                pausedByCutscene = false;
-                agent.isStopped = stoppedBeforeCutscene;
             }
 
             if (State == MonsterState.Stunned)
@@ -714,8 +699,7 @@ namespace SombraDaSanidade.Monster
             if (patrolPoints != null && patrolPoints.Length > 0)
             {
                 int next = currentWaypoint;
-                if (TryLeashedPoint(out int leashed)) next = leashed;
-                else if (patrolPoints.Length > 1)
+                if (patrolPoints.Length > 1)
                     while (next == currentWaypoint) next = Random.Range(0, patrolPoints.Length);
                 else next = 0;
                 currentWaypoint = next;
@@ -727,29 +711,6 @@ namespace SombraDaSanidade.Monster
                 if (NavMesh.SamplePosition(target, out var hit, 3f, NavMesh.AllAreas)) target = hit.position;
             }
             MoveTo(target);
-        }
-
-        // Guia da ala (DifficultyProfile.monsterLeashDistance): a patrulha nunca se afasta muito do jogador, para ele
-        // ser encontrado. Sorteia entre os pontos a até essa distância do jogador; sem nenhum, vai ao mais perto dele.
-        private bool TryLeashedPoint(out int index)
-        {
-            index = -1;
-            var profile = DifficultyProfile.Active;
-            float leash = profile != null ? profile.monsterLeashDistance : 0f;
-            if (leash <= 0f || player == null || patrolPoints.Length < 2) return false;
-            Vector2 p = player.position;
-            var near = new List<int>();
-            int closest = -1;
-            float best = float.MaxValue;
-            for (int i = 0; i < patrolPoints.Length; i++)
-            {
-                if (patrolPoints[i] == null) continue;
-                float d = Vector2.Distance(patrolPoints[i].position, p);
-                if (d < best) { best = d; closest = i; }
-                if (d <= leash && i != currentWaypoint) near.Add(i);
-            }
-            index = near.Count > 0 ? near[Random.Range(0, near.Count)] : closest;
-            return index >= 0;
         }
 
         // Ponto de patrulha mais longe de `from`. Se já está nele, vai para o segundo mais longe,

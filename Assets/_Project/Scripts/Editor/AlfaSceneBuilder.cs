@@ -272,8 +272,6 @@ namespace SombraDaSanidade.EditorTools
 
         private static void AddWingFlow(BuildContext ctx)
         {
-            // Perfil da ala (#30): sem ele a Médica usava os valores padrão do MonsterConfig e da sanidade.
-            SetSceneProfile("Medica");
             var go = new GameObject("WingFlow");
             var checkpoint = go.AddComponent<SombraDaSanidade.Level.WingCheckpoint>();
             var cso = new SerializedObject(checkpoint);
