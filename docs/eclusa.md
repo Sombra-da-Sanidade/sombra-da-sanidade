@@ -36,6 +36,19 @@ A fúria fica no `MonsterConfig` (`furySpeed = 4.6`, `furyHearingRadius = 9`).
 - **Beta e Alfa**: o terminal fica no saguão (onde era a eclusa) e a porta externa vai para a sala mais longe (Beta: pelo menos 25 tiles do saguão; Alfa: Executiva).
 - Legenda nova nas plantas: `G` terminal da eclusa (`U` é a subestação da Energia) (na face da parede, como o `T`). `E` continua sendo a porta, agora a externa.
 
+## Dois caminhos da escolha (RC, #86)
+
+| Caminho | Rota | Tempo correndo (4,0 u/s) |
+|---|---|---|
+| Deixar a Vance | Terminal, Câmara central, corredor norte, Antecâmara | ~26 s |
+| Salvar a Vance | Terminal, corredor sul, sala sudeste (Sonâmbulo), corredor leste, cela na sala nordeste (6 s), atalho, Antecâmara | ~52 s |
+
+- Cela: `LevelMarker` `cela_eclusa_1` (`V`, 3x2 tiles). O sistema da cela (#82) encaixa nesse marcador.
+- Atalho: `Level/ShortcutGate` (`=`) fecha o corredor norte entre a cela e a saída. Sem ele, a volta da cela leva ~28 s em vez de ~19 s. A escolha (#95) abre com `ShortcutGate.OpenAll()`.
+- 4 câmeras (`C`) e o Sonâmbulo (`Z`) na sala sudeste, no caminho da cela. A fúria do Sonâmbulo vem da RC1.
+- Tempos medidos por BFS na planta. Os dois cabem nos 150 s da purga com folga para se esconder.
+- O NavMesh não conhece a grade: o Espécime pode tentar passar por ela e parar encostado. Em fúria ele persegue o Thomas, então isso só aparece se o Thomas estiver do outro lado da grade.
+
 ## Painel de teste (F1, Beta)
 
 Mostra se a purga está ativa e quanto falta (só no painel). Botões **+3 HDs**, **Iniciar purga** e **Purga em 10 s**; "Ir para" tem o terminal e a porta externa.

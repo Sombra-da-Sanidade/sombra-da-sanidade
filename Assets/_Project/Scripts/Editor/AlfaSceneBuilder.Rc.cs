@@ -15,6 +15,7 @@ namespace SombraDaSanidade.EditorTools
     //  ! ? & gatilhos de cutscene: a área que cobre todas as células do caractere. Qual cutscene cada um toca
     //        vem de uma diretiva na planta: "# @cutscene ? M1" ou "# @cutscene ? M3 35" (só com sanidade < 35).
     //  ~ som do Espécime atrás da parede (WallNoise; vai numa célula de parede)
+    //  = vira também a grade do atalho (ShortcutGate), fechada até a Vance abrir
     //  " fala do Thomas   % objeto que muda com a sanidade   V cela da Vance   = atalho da Eclusa
     //        (LevelMarker com id "<tipo>_<ala>_<n>"; o sistema de outra frente encaixa no marcador).
     // A cutscene é achada pelo campo id (C1, M1...) em qualquer pasta. Sem o asset, o gatilho fica vazio e não
@@ -162,6 +163,7 @@ namespace SombraDaSanidade.EditorTools
                     go.transform.position = (Vector2)rect.center;
                     go.AddComponent<LevelMarker>().Setup($"{prefix}_{wing}_{counters[wing]}", kind,
                         g.Count > 1 ? rect.size : Vector2.zero);
+                    if (kind == LevelMarker.Kind.Shortcut) AddShortcutGate(go, rect.size);
                 }
             }
         }
@@ -171,6 +173,19 @@ namespace SombraDaSanidade.EditorTools
             AssetDatabase.FindAssets("t:Cutscene")
                 .Select(g => AssetDatabase.LoadAssetAtPath<Cutscene>(AssetDatabase.GUIDToAssetPath(g)))
                 .FirstOrDefault(c => c != null && c.id == id);
+
+        // Grade fechada do atalho: bloqueia o corredor até a Vance abrir (ShortcutGate.Open).
+        private static void AddShortcutGate(GameObject go, Vector2 size)
+        {
+            var box = go.AddComponent<BoxCollider2D>();
+            box.size = size;
+            var art = new GameObject("Grade").AddComponent<SpriteRenderer>();
+            art.transform.SetParent(go.transform, false);
+            art.transform.localScale = new Vector3(size.x, size.y, 1f);
+            art.sprite = PrototypeSceneBuilder.GetOrCreatePlaceholderSprite();
+            art.sortingOrder = 5;
+            go.AddComponent<ShortcutGate>().Setup(art);
+        }
 
         private static Rect RectOf(List<Vector2Int> cells)
         {
